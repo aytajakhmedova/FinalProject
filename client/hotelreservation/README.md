@@ -1,16 +1,69 @@
-# React + Vite
+# Hotel Reservation Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Folder Struktur
 
-Currently, two official plugins are available:
+```
+src/
+├── assets/                # Şəkillər və media faylları
+│   ├── hero.png
+│   ├── react.svg
+│   └── vite.svg
+├── components/            # React komponentləri
+│   ├── Header/           # Navbar komponenti
+│   │   ├── Header.jsx
+│   │   └── Header.css
+│   ├── Hero/             # Hero section komponenti
+│   │   ├── Hero.jsx
+│   │   └── Hero.css
+│   └── SearchForm/       # Axtarış formu komponenti
+│       ├── SearchForm.jsx
+│       └── SearchForm.css
+├── App.jsx               # Əsas App komponenti
+├── App.css               # App stilləri
+├── main.jsx              # Entry point
+└── index.css             # Global stillər
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Public Folderdə Lazım Olan Fayllar
 
-## React Compiler
+Aşağıdakı faylları `public/` folderinə əlavə edin:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **logo.png** - Sizin göndərdiyiniz OtelBurada logosu
+2. **avatar.png** - İstifadəçi profil şəkli
+3. **hotel-room.jpg** - Əsas hero şəkli
+4. **hotel-1.jpg** - Floating şəkil 1
+5. **hotel-2.jpg** - Floating şəkil 2
 
-## Expanding the ESLint configuration
+## Proyekti İşə Salma
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+# React Icons paketini quraşdırın
+npm install react-icons
+
+# Proyekti işə salın
+npm install
+npm run dev
+```
+
+## Xüsusiyyətlər
+
+- ✅ Modern və responsive dizayn
+- ✅ Header navigation ilə
+- ✅ Hero section axtarış formu ilə
+- ✅ Animasiyalı floating şəkillər
+- ✅ 24/7 dəstək badge
+- ✅ Gradient background
+- ✅ Hover effektləri
+
+## Texnologiyalar
+
+- React 19.2.8
+- Vite 8.3.0
+- React Icons (professional ikonlar üçün)
+- CSS3 (Modern features)
+
+## Qeydlər
+
+⚠️ **LOGO**: Header-də sizin göndərdiyiniz OtelBurada logosu istifadə olunur. Logo faylını `public/logo.png` kimi qeyd edin.
+
+⚠️ **ŞƏKİLLƏR**: Hero section-da istifadə olunan şəkilləri `public/` folderinə əlavə edin.

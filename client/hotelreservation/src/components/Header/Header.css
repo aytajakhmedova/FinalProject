@@ -1,0 +1,178 @@
+.header {
+  background-color: #1a1a1a;
+  color: white;
+  padding: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  height: 60px;
+}
+
+.header-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem 0 0;
+  height: 100%;
+}
+
+.logo-image {
+  height: 120px;
+  width: auto;
+  max-width: 450px;
+  object-fit: contain;
+  margin-top: 5px;
+}
+
+.main-nav {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: color 0.3s;
+  position: relative;
+}
+
+.nav-item:hover {
+  color: #4a90e2;
+}
+
+.dropdown-arrow {
+  display: flex;
+  align-items: center;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.nav-item.more {
+  font-size: 1.5rem;
+  padding: 0 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.quick-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.quick-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: background 0.3s;
+  font-size: 0.9rem;
+}
+
+.quick-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.quick-nav-btn .icon {
+  font-size: 1.2rem;
+}
+
+.user-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.theme-toggle-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: rotate(20deg);
+}
+
+.notification-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background 0.3s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.user-profile {
+  cursor: pointer;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #4a90e2;
+  object-fit: cover;
+}
+
+@media (max-width: 1024px) {
+  .main-nav {
+    display: none;
+  }
+  
+  .quick-nav {
+    gap: 0.5rem;
+  }
+  
+  .quick-nav-btn .text {
+    display: none;
+  }
+}

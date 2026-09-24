@@ -1,0 +1,126 @@
+.search-form-container {
+  background: rgba(26, 26, 46, 0.8);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-header {
+  margin-bottom: 1.5rem;
+}
+
+.form-title {
+  color: white;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.field-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  color: #667eea;
+}
+
+.field-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.field-content label {
+  display: block;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.field-content input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  outline: none;
+  padding: 0;
+}
+
+.field-content input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.form-divider {
+  width: 1px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.search-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 12px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+
+.search-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.search-icon {
+  font-size: 1.2rem;
+  color: white;
+}
+
+@media (max-width: 968px) {
+  .search-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .form-divider {
+    width: 100%;
+    height: 1px;
+  }
+  
+  .search-button {
+    width: 100%;
+    height: 50px;
+  }
+}
+
+@media (max-width: 640px) {
+  .search-form-container {
+    padding: 1.5rem;
+  }
+  
+  .form-title {
+    font-size: 1.1rem;
+  }
+}
