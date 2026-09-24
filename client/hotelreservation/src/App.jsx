@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header/Header';
 import Hero from './components/Hero/Hero';
-import PromoSlider from './components/PromoSlider/PromoSlider';
-import Stats from './components/Stats/Stats';
 import HolidaySection from './components/HolidaySection/HolidaySection';
 import FeaturedHotels from './components/FeaturedHotels/FeaturedHotels';
-import Testimonials from './components/Testimonials/Testimonials';
+import ImageGallery from './components/ImageGallery/ImageGallery';
+import Footer from './components/Footer/Footer';
 import './App.css';
 
 function App() {
@@ -29,11 +28,10 @@ function App() {
     <div className={`App ${darkMode ? 'dark-mode' : 'light-mode'}`}>
       <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
       <Hero />
-      <PromoSlider />
-      <Stats />
       <HolidaySection />
       <FeaturedHotels />
-      <Testimonials />
+      <ImageGallery />
+      <Footer />
     </div>
   );
 }
