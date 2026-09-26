@@ -9,30 +9,30 @@ const PromoSlider = () => {
   const promos = [
     {
       id: 1,
-      title: 'Up to 60% OFF',
-      subtitle: 'On Hotel Bookings Online',
-      tag: 'BOOK NOW',
+      title: '60%-dək endirim',
+      subtitle: 'Onlayn otel bronlarında',
+      tag: 'İNDİ BRON ET',
       bgColor: 'linear-gradient(135deg, #a8d5ff 0%, #e3f2fd 100%)',
     },
     {
       id: 2,
-      title: 'Book & Enjoy',
-      subtitle: '20% Off on the best available room rate',
+      title: 'Bron et və yaşa',
+      subtitle: 'Ən yaxşı otaq tarifində 20% endirim',
       tag: '20% OFF',
       bgColor: 'linear-gradient(135deg, #b3e5fc 0%, #81d4fa 100%)',
     },
     {
       id: 3,
-      title: 'Hot Summer Nights',
-      subtitle: 'Up to 3 nights free',
-      tag: 'SUMMER BOOKING',
+      title: 'Yay gecələri',
+      subtitle: '3 gecəyə qədər hədiyyə',
+      tag: 'YAY KAMPANİYASI',
       bgColor: 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
     },
     {
       id: 4,
-      title: 'Daily 50 Lucky Winners get a Free Stay',
-      subtitle: 'Valid till 15 Nov',
-      tag: 'DAILY JACKPORT',
+      title: 'Hər gün 50 şanslı qonaq',
+      subtitle: 'Pulsuz gecələmə — 15 Noyabra qədər',
+      tag: 'GÜNLÜK ÇƏKİLİŞ',
       bgColor: 'linear-gradient(135deg, #e3f5ff 0%, #b3e5fc 100%)',
     }
   ];

@@ -26,8 +26,8 @@ const ImageGallery = () => {
   ];
 
   return (
-    <section className="image-gallery-section">
-      <h2 className="gallery-title">OtelBurada Hotel Theme</h2>
+    <section className="image-gallery-section" id="gallery">
+      <h2 className="gallery-title">OtelBurada dünyası</h2>
       <div className="gallery-slider">
         <div className="gallery-track">
           {/* 3 dəfə təkrarlayırıq ki, sonsuz smooth loop olsun */}

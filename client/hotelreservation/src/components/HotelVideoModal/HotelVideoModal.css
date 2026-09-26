@@ -1,0 +1,90 @@
+.video-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 10, 22, 0.82);
+  backdrop-filter: blur(8px);
+  z-index: 4000;
+  display: grid;
+  place-items: center;
+  padding: 1.2rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.video-modal {
+  width: min(920px, 100%);
+  background: #12152b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 1rem 1rem 1.1rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.video-modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.video-modal-head p {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #8ea2ff;
+}
+
+.video-modal-head h3 {
+  margin: 0.15rem 0 0;
+  color: #fff;
+  font-size: 1.15rem;
+}
+
+.video-close {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.video-frame {
+  position: relative;
+  padding-top: 56.25%;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #000;
+}
+
+.video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+
+.video-open-yt {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #c9d2ff;
+  font-size: 0.85rem;
+}

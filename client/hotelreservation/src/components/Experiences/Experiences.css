@@ -1,0 +1,130 @@
+.experiences-section {
+  padding: 4.5rem 0;
+}
+
+.experiences-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.experiences-intro {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.experiences-intro .eyebrow {
+  color: #8ea2ff;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.experiences-intro h2 {
+  color: #fff;
+  font-size: 2.3rem;
+  margin: 0.4rem 0 0.7rem;
+}
+
+.experiences-intro p {
+  color: rgba(255, 255, 255, 0.65);
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.experiences-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.3rem;
+}
+
+.xp-card {
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  animation: cardIn 0.6s ease both;
+  transition: transform 0.3s;
+}
+
+.xp-card:hover {
+  transform: translateY(-8px);
+}
+
+.xp-media {
+  position: relative;
+  height: 180px;
+}
+
+.xp-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.xp-card:hover img {
+  transform: scale(1.08);
+}
+
+.xp-media span {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+}
+
+.xp-body {
+  padding: 1rem 1.1rem 1.2rem;
+}
+
+.xp-body h3 {
+  color: #fff;
+  margin: 0 0 0.5rem;
+}
+
+.xp-body p {
+  display: flex;
+  gap: 0.9rem;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.85rem;
+  margin-bottom: 0.9rem;
+}
+
+.xp-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.xp-footer strong {
+  color: #fff;
+  font-size: 1.15rem;
+}
+
+.xp-footer button {
+  border: none;
+  background: #fff;
+  color: #1a1a2e;
+  font-weight: 700;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.xp-footer button:hover {
+  background: #667eea;
+  color: #fff;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}

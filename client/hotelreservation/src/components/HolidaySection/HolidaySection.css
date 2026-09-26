@@ -65,7 +65,8 @@
   align-items: center;
 }
 
-.rating-avatars img {
+.rating-avatars img,
+.avatar-chip {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -74,7 +75,17 @@
   object-fit: cover;
 }
 
-.rating-avatars img:first-child {
+.avatar-chip {
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  font-size: 0.85rem;
+}
+
+.rating-avatars img:first-child,
+.avatar-chip:first-child {
   margin-left: 0;
 }
 
@@ -129,6 +140,14 @@
   display: flex;
   gap: 1rem;
   align-items: flex-start;
+  padding: 0.8rem;
+  border-radius: 16px;
+  transition: transform 0.3s, background 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .feature-icon {

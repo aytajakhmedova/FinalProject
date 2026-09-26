@@ -7,10 +7,10 @@ const Stats = () => {
   const statsRef = useRef(null);
 
   const stats = [
-    { icon: <FaHotel />, value: 2500, suffix: '+', label: 'Luxury Hotels', color: '#667eea' },
-    { icon: <FaUsers />, value: 15000, suffix: '+', label: 'Happy Customers', color: '#f43f5e' },
-    { icon: <FaGlobeAmericas />, value: 180, suffix: '+', label: 'Countries', color: '#4ade80' },
-    { icon: <FaStar />, value: 98, suffix: '%', label: 'Satisfaction Rate', color: '#fbbf24' }
+    { icon: <FaHotel />, value: 2500, suffix: '+', label: 'Lüks otel', color: '#667eea' },
+    { icon: <FaUsers />, value: 15000, suffix: '+', label: 'Məmnun qonaq', color: '#f43f5e' },
+    { icon: <FaGlobeAmericas />, value: 180, suffix: '+', label: 'Ölkə', color: '#4ade80' },
+    { icon: <FaStar />, value: 98, suffix: '%', label: 'Məmnunluq', color: '#fbbf24' }
   ];
 
   useEffect(() => {

@@ -7,32 +7,32 @@ const HolidaySection = () => {
   const features = [
     {
       icon: <FaUtensils />,
-      title: 'Quality Food',
-      description: 'Departure defective arranging rapturous did. Conduct denied adding worthy little.',
+      title: 'Keyfiyyətli yemək',
+      description: 'Yerli və beynəlxalq mətbəx — chef menyusu və halal seçimlər.',
       color: '#4ade80'
     },
     {
       icon: <FaBolt />,
-      title: 'Quick Services',
-      description: 'Supposing so be resolving breakfast am or perfectly.',
+      title: 'Sürətli xidmət',
+      description: 'Dəqiqəlik check-in, ani təsdiq və 24 saat otaq xidməti.',
       color: '#f43f5e'
     },
     {
       icon: <FaShieldAlt />,
-      title: 'High Security',
-      description: 'Arranging rapturous did believe him all had supported.',
+      title: 'Təhlükəsiz ödəniş',
+      description: 'SSL bron, geri qaytarılan tariflər və sığorta paketləri.',
       color: '#fb923c'
     },
     {
       icon: <FaClock />,
-      title: '24 Hours Alert',
-      description: 'Rapturous did believe him all had supported.',
+      title: '7/24 dəstək',
+      description: 'Səyahət boyu Azərbaycan dilində canlı dəstək.',
       color: '#3b82f6'
     }
   ];
 
   return (
-    <section className="holiday-section">
+    <section className="holiday-section" id="about">
       <div className="holiday-container">
         <div className="holiday-left">
           <div className="holiday-image-wrapper">
@@ -44,25 +44,24 @@ const HolidaySection = () => {
             </div>
             <div className="rating-badge">
               <div className="rating-avatars">
-                <img src="/avatar1.jpg" alt="Client 1" />
-                <img src="/avatar2.jpg" alt="Client 2" />
-                <img src="/avatar3.jpg" alt="Client 3" />
-                <img src="/avatar4.jpg" alt="Client 4" />
+                {['A', 'L', 'N', 'S'].map((letter) => (
+                  <span key={letter} className="avatar-chip">{letter}</span>
+                ))}
               </div>
               <div className="rating-info">
-                <div className="rating-label">Client</div>
-                <div className="rating-text">Rating</div>
-                <div className="rating-stars">4.5 ⭐</div>
+                <div className="rating-label">Qonaqlar</div>
+                <div className="rating-text">Reytinq</div>
+                <div className="rating-stars">4.8 ⭐</div>
               </div>
             </div>
           </div>
         </div>
 
         <div className="holiday-right">
-          <h2 className="holiday-title">The Best Holidays Start Here!</h2>
+          <h2 className="holiday-title">Ən yaxşı tətil buradan başlayır</h2>
           <p className="holiday-description">
-            Book your hotel with us and don't forget to grab an awesome hotel deal to 
-            save massive on your stay.
+            Oteli bron edin, eyni anda uçuş, tur və transfer əlavə edin — kampaniya kodları ilə
+            qalmanızı daha sərfəli edin.
           </p>
 
           <div className="features-grid">

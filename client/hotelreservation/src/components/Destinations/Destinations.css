@@ -14,8 +14,17 @@
   font-weight: 700;
   color: white;
   text-align: center;
-  margin-bottom: 3rem;
+  margin-bottom: 2.2rem;
   line-height: 1.4;
+}
+
+.destinations-content {
+  animation: fadeSwap 0.4s ease;
+}
+
+@keyframes fadeSwap {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
 }
 
 .destinations-tabs {
@@ -95,6 +104,12 @@
   transition: all 0.3s;
   cursor: pointer;
   border-radius: 8px;
+  width: 100%;
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  text-align: left;
 }
 
 .price-row:hover {

@@ -1,65 +1,105 @@
-import React, { useState } from 'react';
-import { FaHotel, FaPlane, FaCar, FaTaxi } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import { FaHotel, FaPlane, FaCar, FaTaxi, FaBars, FaTimes } from 'react-icons/fa';
 import { IoNotifications } from 'react-icons/io5';
-import { MdKeyboardArrowDown, MdMoreHoriz, MdDarkMode, MdLightMode } from 'react-icons/md';
+import { MdKeyboardArrowDown, MdDarkMode, MdLightMode } from 'react-icons/md';
 import logo from '../../assets/images/logo.png';
 import './Header.css';
 
-const Header = ({ darkMode, toggleDarkMode }) => {
-  const [activeMenu, setActiveMenu] = useState(null);
+const Header = ({
+  darkMode,
+  toggleDarkMode,
+  currency,
+  onCurrencyChange,
+  onServiceChange,
+  favoriteCount,
+}) => {
+  const [scrolled, setScrolled] = useState(false);
+  const [openMenu, setOpenMenu] = useState(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
 
-  const menuItems = [
-    { name: 'İlanlar', hasDropdown: true },
-    { name: 'Sayfalar', hasDropdown: true },
-    { name: 'Hesaplar', hasDropdown: true },
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const menus = [
+    {
+      name: 'Kəşf et',
+      items: [
+        { label: 'Otellər', href: '#results' },
+        { label: 'Təyinatlar', href: '#destinations' },
+        { label: 'Turlar', href: '#tours' },
+      ],
+    },
+    {
+      name: 'Səhifələr',
+      items: [
+        { label: 'Haqqımızda', href: '#about' },
+        { label: 'Rəylər', href: '#reviews' },
+        { label: 'Qalereya', href: '#gallery' },
+      ],
+    },
   ];
 
   const navItems = [
-    { icon: <FaHotel />, text: 'Otel' },
-    { icon: <FaPlane />, text: 'Uçuş' },
-    { icon: <FaCar />, text: 'Tur' },
-    { icon: <FaTaxi />, text: 'Taksi' }
+    { icon: <FaHotel />, text: 'Otel', type: 'hotel' },
+    { icon: <FaPlane />, text: 'Uçuş', type: 'flight' },
+    { icon: <FaCar />, text: 'Tur', type: 'tour' },
+    { icon: <FaTaxi />, text: 'Taksi', type: 'taxi' },
   ];
 
+  const go = (href) => {
+    setMobileOpen(false);
+    setOpenMenu(null);
+    const el = document.querySelector(href);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
-    <header className="header">
+    <header className={`header ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
         <div className="header-left">
-          <div className="logo">
-            <img 
-              src={logo} 
-              alt="OtelBurada" 
-              className="logo-image"
-              onError={(e) => {
-                console.log('Logo yüklənmədi!');
-                e.target.style.border = '2px solid red';
-              }}
-              onLoad={() => console.log('Logo uğurla yükləndi!')}
-            />
-          </div>
-          
+          <a className="logo" href="#top" onClick={(e) => { e.preventDefault(); go('#top'); }}>
+            <img src={logo} alt="OtelBurada" className="logo-image" />
+          </a>
+
           <nav className="main-nav">
-            {menuItems.map((item, index) => (
-              <div 
-                key={index} 
+            {menus.map((item) => (
+              <div
+                key={item.name}
                 className="nav-item"
-                onMouseEnter={() => setActiveMenu(item.name)}
-                onMouseLeave={() => setActiveMenu(null)}
+                onMouseEnter={() => setOpenMenu(item.name)}
+                onMouseLeave={() => setOpenMenu(null)}
               >
                 <span>{item.name}</span>
-                {item.hasDropdown && <MdKeyboardArrowDown className="dropdown-arrow" />}
+                <MdKeyboardArrowDown className={`dropdown-arrow ${openMenu === item.name ? 'open' : ''}`} />
+                {openMenu === item.name && (
+                  <div className="dropdown-panel">
+                    {item.items.map((link) => (
+                      <button key={link.href} onClick={() => go(link.href)}>
+                        {link.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
-            <div className="nav-item more">
-              <MdMoreHoriz />
-            </div>
           </nav>
         </div>
 
         <div className="header-right">
           <div className="quick-nav">
-            {navItems.map((item, index) => (
-              <button key={index} className="quick-nav-btn">
+            {navItems.map((item) => (
+              <button
+                key={item.type}
+                className="quick-nav-btn"
+                onClick={() => {
+                  onServiceChange(item.type);
+                  go('#search');
+                }}
+              >
                 <span className="icon">{item.icon}</span>
                 <span className="text">{item.text}</span>
               </button>
@@ -67,18 +107,55 @@ const Header = ({ darkMode, toggleDarkMode }) => {
           </div>
 
           <div className="user-actions">
-            <button className="theme-toggle-btn" onClick={toggleDarkMode}>
+            <select
+              className="currency-select"
+              value={currency}
+              onChange={(e) => onCurrencyChange(e.target.value)}
+              aria-label="Valyuta"
+            >
+              <option value="AZN">₼ AZN</option>
+              <option value="USD">$ USD</option>
+              <option value="EUR">€ EUR</option>
+            </select>
+
+            <button className="theme-toggle-btn" onClick={toggleDarkMode} aria-label="Tema">
               {darkMode ? <MdLightMode /> : <MdDarkMode />}
             </button>
-            <button className="notification-btn">
-              <IoNotifications />
-            </button>
-            <div className="user-profile">
-              <img src="/avatar.png" alt="User" className="avatar" />
+
+            <div className="note-wrap">
+              <button className="notification-btn" onClick={() => setNotesOpen((v) => !v)}>
+                <IoNotifications />
+                {favoriteCount > 0 && <span className="badge">{favoriteCount}</span>}
+              </button>
+              {notesOpen && (
+                <div className="notes-panel">
+                  <p>Yay endirimi — otellərdə 20%-dək</p>
+                  <p>Seçilmiş otellər: {favoriteCount}</p>
+                  <p>7/24 dəstək aktivdir</p>
+                </div>
+              )}
             </div>
+
+            <div className="user-profile" title="Hesab">
+              <div className="avatar-fallback">A</div>
+            </div>
+
+            <button className="burger" onClick={() => setMobileOpen((v) => !v)}>
+              {mobileOpen ? <FaTimes /> : <FaBars />}
+            </button>
           </div>
         </div>
       </div>
+
+      {mobileOpen && (
+        <div className="mobile-drawer">
+          {menus.flatMap((m) => m.items).map((link) => (
+            <button key={link.href} onClick={() => go(link.href)}>
+              {link.label}
+            </button>
+          ))}
+        </div>
+      )}
     </header>
   );
 };

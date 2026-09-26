@@ -22,9 +22,9 @@ const Newsletter = () => {
       <div className="newsletter-container">
         <div className="newsletter-content">
           <div className="newsletter-text">
-            <h2 className="newsletter-title">Subscribe to Our Newsletter</h2>
+            <h2 className="newsletter-title">Kampaniyalardan xəbərdar olun</h2>
             <p className="newsletter-description">
-              Get exclusive deals, special offers, and insider tips delivered straight to your inbox.
+              Eksklüziv otel endirimləri, last-minute turlar və səyahət tövsiyələri e-poçtunuza gəlsin.
             </p>
           </div>
 
@@ -32,7 +32,7 @@ const Newsletter = () => {
             <div className="form-wrapper">
               <input
                 type="email"
-                placeholder="Enter your email address"
+                placeholder="E-poçt ünvanınız"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="newsletter-input"
@@ -42,12 +42,12 @@ const Newsletter = () => {
                 {submitted ? (
                   <>
                     <FaCheckCircle />
-                    <span>Subscribed!</span>
+                    <span>Abunə oldunuz!</span>
                   </>
                 ) : (
                   <>
                     <FaPaperPlane />
-                    <span>Subscribe</span>
+                    <span>Abunə ol</span>
                   </>
                 )}
               </button>
@@ -55,7 +55,7 @@ const Newsletter = () => {
             
             {submitted && (
               <p className="success-message">
-                Thank you for subscribing! Check your email for confirmation.
+                Təşəkkürlər! Təsdiq üçün e-poçtunuzu yoxlayın.
               </p>
             )}
           </form>

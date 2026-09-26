@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FaQuoteLeft, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import './Testimonials.css';
 
@@ -8,53 +8,45 @@ const Testimonials = () => {
   const testimonials = [
     {
       id: 1,
-      name: 'Sarah Johnson',
-      role: 'Travel Blogger',
-      image: '/avatar1.jpg',
+      name: 'Leyla Məmmədova',
+      role: 'Səyahət blogeri',
+      letter: 'L',
       rating: 5,
-      text: 'Incredible experience! The hotel was luxurious, the staff was amazing, and the location was perfect. I will definitely be booking again!'
+      text: 'Qəbələ dağ oteli və spa paketi gözləntilərimi aşdı. Bron prosesi 2 dəqiqə çəkdi.',
     },
     {
       id: 2,
-      name: 'Michael Chen',
-      role: 'Business Executive',
-      image: '/avatar2.jpg',
+      name: 'Rəşad Əliyev',
+      role: 'Biznes səyahətçisi',
+      letter: 'R',
       rating: 5,
-      text: 'Professional service and top-notch amenities. The booking process was seamless, and the hotel exceeded all my expectations.'
+      text: 'Bakı mərkəzindəki suit, gecə uçuşu və taksi hamısı bir rezervasiyada. Peşəkar xidmət.',
     },
     {
       id: 3,
-      name: 'Emma Williams',
-      role: 'Vacation Enthusiast',
-      image: '/avatar3.jpg',
+      name: 'Nigar Həsənova',
+      role: 'Ailəvi tətil',
+      letter: 'N',
       rating: 4,
-      text: 'Beautiful properties and excellent customer service. Made our family vacation truly memorable. Highly recommend!'
-    }
+      text: 'Antalya all-inclusive və uşaq klubu sayəsində ailə tətilimiz problemsiz keçdi.',
+    },
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % testimonials.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, [testimonials.length]);
 
-  const handlePrev = () => {
-    setActiveIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
-  };
-
-  const handleNext = () => {
-    setActiveIndex((prev) => (prev + 1) % testimonials.length);
-  };
-
   return (
-    <section className="testimonials-section">
+    <section className="testimonials-section" id="reviews">
       <div className="testimonials-container">
-        <h2 className="testimonials-title">What Our Guests Say</h2>
-        
+        <p className="eyebrow center">Rəylər</p>
+        <h2 className="testimonials-title">Qonaqlarımız nə deyir</h2>
+
         <div className="testimonials-slider">
-          <button className="testimonial-nav nav-left" onClick={handlePrev}>
+          <button className="testimonial-nav nav-left" onClick={() => setActiveIndex((p) => (p === 0 ? testimonials.length - 1 : p - 1))}>
             <FaChevronLeft />
           </button>
 
@@ -65,17 +57,14 @@ const Testimonials = () => {
                 className={`testimonial-card ${index === activeIndex ? 'active' : ''}`}
               >
                 <FaQuoteLeft className="quote-icon" />
-                
                 <div className="testimonial-rating">
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <FaStar key={i} className="star" />
                   ))}
                 </div>
-
                 <p className="testimonial-text">{testimonial.text}</p>
-
                 <div className="testimonial-author">
-                  <img src={testimonial.image} alt={testimonial.name} className="author-image" />
+                  <div className="author-image letter">{testimonial.letter}</div>
                   <div className="author-info">
                     <h4 className="author-name">{testimonial.name}</h4>
                     <p className="author-role">{testimonial.role}</p>
@@ -85,7 +74,7 @@ const Testimonials = () => {
             ))}
           </div>
 
-          <button className="testimonial-nav nav-right" onClick={handleNext}>
+          <button className="testimonial-nav nav-right" onClick={() => setActiveIndex((p) => (p + 1) % testimonials.length)}>
             <FaChevronRight />
           </button>
         </div>
