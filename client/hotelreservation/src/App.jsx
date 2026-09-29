@@ -10,6 +10,13 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Profile from './pages/Profile/Profile';
+import AdminLayout from './layouts/AdminLayout/AdminLayout';
+import AdminDashboard from './pages/Admin/Dashboard/AdminDashboard';
+import AdminHotels from './pages/Admin/Hotels/AdminHotels';
+import AdminBookings from './pages/Admin/Bookings/AdminBookings';
+import AdminUsers from './pages/Admin/Users/AdminUsers';
+import AdminAnalytics from './pages/Admin/Analytics/AdminAnalytics';
+import AdminSettings from './pages/Admin/Settings/AdminSettings';
 import './App.css';
 
 function App() {
@@ -56,38 +63,81 @@ function App() {
   return (
     <BrowserRouter>
       <div className={`App ${darkMode ? 'dark-mode' : 'light-mode'}`}>
-        <Header
-          darkMode={darkMode}
-          toggleDarkMode={toggleDarkMode}
-          currency={currency}
-          onCurrencyChange={changeCurrency}
-          onServiceChange={(type) => {
-            setServiceType(type);
-          }}
-          favoriteCount={favorites.length}
-        />
-        
         <Routes>
-          <Route 
-            path="/" 
-            element={
+          {/* Public Routes with Header & Footer */}
+          <Route path="/" element={
+            <>
+              <Header
+                darkMode={darkMode}
+                toggleDarkMode={toggleDarkMode}
+                currency={currency}
+                onCurrencyChange={changeCurrency}
+                onServiceChange={(type) => setServiceType(type)}
+                favoriteCount={favorites.length}
+              />
               <Home 
                 currency={currency}
                 favorites={favorites}
                 onToggleFavorite={toggleFavorite}
               />
-            } 
-          />
-          <Route path="/hotels" element={<Hotels />} />
-          <Route path="/hotels/:id" element={<HotelDetail />} />
-          <Route path="/rooms/:id" element={<RoomDetail />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/hotels" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Hotels />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/hotels/:id" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <HotelDetail />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/rooms/:id" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <RoomDetail />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/dashboard" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Dashboard />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/profile" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Profile />
+              <Footer />
+            </>
+          } />
+          
+          {/* Auth Routes without Header & Footer */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="hotels" element={<AdminHotels />} />
+            <Route path="bookings" element={<AdminBookings />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
         </Routes>
-
-        <Footer />
 
         {toast && <div className="app-toast">{toast}</div>}
       </div>
