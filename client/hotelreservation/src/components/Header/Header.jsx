@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaHotel, FaPlane, FaCar, FaTaxi, FaBars, FaTimes } from 'react-icons/fa';
 import { IoNotifications } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdDarkMode, MdLightMode } from 'react-icons/md';
@@ -13,6 +14,7 @@ const Header = ({
   onServiceChange,
   favoriteCount,
 }) => {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -28,7 +30,7 @@ const Header = ({
     {
       name: 'Kəşf et',
       items: [
-        { label: 'Otellər', href: '#results' },
+        { label: 'Otellər', href: '/hotels', isRoute: true },
         { label: 'Təyinatlar', href: '#destinations' },
         { label: 'Turlar', href: '#tours' },
       ],
@@ -50,20 +52,24 @@ const Header = ({
     { icon: <FaTaxi />, text: 'Taksi', type: 'taxi' },
   ];
 
-  const go = (href) => {
+  const go = (href, isRoute = false) => {
     setMobileOpen(false);
     setOpenMenu(null);
-    const el = document.querySelector(href);
-    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (isRoute) {
+      navigate(href);
+    } else {
+      const el = document.querySelector(href);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   return (
     <header className={`header ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
         <div className="header-left">
-          <a className="logo" href="#top" onClick={(e) => { e.preventDefault(); go('#top'); }}>
+          <Link className="logo" to="/">
             <img src={logo} alt="OtelBurada" className="logo-image" />
-          </a>
+          </Link>
 
           <nav className="main-nav">
             {menus.map((item) => (
@@ -78,7 +84,7 @@ const Header = ({
                 {openMenu === item.name && (
                   <div className="dropdown-panel">
                     {item.items.map((link) => (
-                      <button key={link.href} onClick={() => go(link.href)}>
+                      <button key={link.href} onClick={() => go(link.href, link.isRoute)}>
                         {link.label}
                       </button>
                     ))}
@@ -150,7 +156,7 @@ const Header = ({
       {mobileOpen && (
         <div className="mobile-drawer">
           {menus.flatMap((m) => m.items).map((link) => (
-            <button key={link.href} onClick={() => go(link.href)}>
+            <button key={link.href} onClick={() => go(link.href, link.isRoute)}>
               {link.label}
             </button>
           ))}

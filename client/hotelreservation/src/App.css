@@ -1,211 +1,124 @@
 .App {
   min-height: 100vh;
-  transition: background 0.4s ease, color 0.4s ease;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.App.dark-mode {
-  background:
-    radial-gradient(900px 400px at 90% 10%, rgba(118, 75, 162, 0.18), transparent 50%),
-    linear-gradient(180deg, #101226 0%, #12152b 40%, #0f1224 100%);
-  color: #fff;
+.light-mode {
+  background: #ffffff;
+  color: #2c3e50;
 }
 
-.App.light-mode {
-  background: linear-gradient(180deg, #f4f6fb 0%, #e8edf7 100%);
+.dark-mode {
+  background: #0f1419;
+  color: #e4e6eb;
+}
+
+/* Hero Section */
+.dark-mode .hero-section {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(102, 126, 234, 0.22), transparent 50%),
+    linear-gradient(160deg, #101226 0%, #16213e 55%, #1a1030 100%);
+}
+
+.light-mode .hero-section {
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(102, 126, 234, 0.15), transparent 50%),
+    linear-gradient(160deg, #f8f9fa 0%, #e9ecef 55%, #dee2e6 100%);
+}
+
+.light-mode .hero-text {
+  color: #2c3e50;
+}
+
+.light-mode .hero-title {
   color: #1a1a2e;
+}
+
+.light-mode .hero-description {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.light-mode .hero-kicker {
+  color: #667eea;
+}
+
+/* Holiday Section */
+.light-mode .holiday-section {
+  background: #ffffff;
+  color: #2c3e50;
+}
+
+.dark-mode .holiday-section {
+  background: #0f1419;
+  color: #e4e6eb;
+}
+
+/* Destinations */
+.light-mode .destinations-section {
+  background: #f8f9fa;
+}
+
+.dark-mode .destinations-section {
+  background: #1a1f2e;
+}
+
+/* Featured Hotels */
+.light-mode .featured-section {
+  background: #ffffff;
+}
+
+.dark-mode .featured-section {
+  background: #0f1419;
+}
+
+.light-mode .hotel-card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  color: #2c3e50;
+}
+
+.dark-mode .hotel-card {
+  background: #1a1f2e;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #e4e6eb;
+}
+
+/* Image Gallery */
+.light-mode .image-gallery-section {
+  background: #f8f9fa;
+}
+
+.dark-mode .image-gallery-section {
+  background: #0f1419;
+}
+
+.light-mode .gallery-title {
+  color: #1a1a2e;
+}
+
+.dark-mode .gallery-title {
+  color: #ffffff;
 }
 
 .app-toast {
   position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #111827;
-  color: #fff;
-  padding: 0.85rem 1.3rem;
-  border-radius: 999px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
-  z-index: 3000;
-  animation: toastIn 0.3s ease;
-  font-size: 0.9rem;
+  bottom: 30px;
+  right: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  z-index: 9999;
+  animation: slideIn 0.3s ease;
+  font-weight: 500;
 }
 
-@keyframes toastIn {
-  from { opacity: 0; transform: translate(-50%, 12px); }
-  to { opacity: 1; transform: translate(-50%, 0); }
-}
-
-.App.light-mode .header {
-  background: rgba(255, 255, 255, 0.82);
-  color: #1a1a2e;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
-}
-
-.App.light-mode .header.scrolled {
-  background: rgba(255, 255, 255, 0.95);
-}
-
-.App.light-mode .header .nav-item,
-.App.light-mode .header .quick-nav-btn,
-.App.light-mode .header .theme-toggle-btn,
-.App.light-mode .header .notification-btn,
-.App.light-mode .header .burger {
-  color: #1a1a2e;
-}
-
-.App.light-mode .dropdown-panel,
-.App.light-mode .notes-panel,
-.App.light-mode .mobile-drawer {
-  background: #fff;
-  color: #1a1a2e;
-}
-
-.App.light-mode .dropdown-panel button,
-.App.light-mode .mobile-drawer button,
-.App.light-mode .notes-panel p {
-  color: #1a1a2e;
-}
-
-.App.light-mode .currency-select {
-  color: #1a1a2e;
-  background: #f3f4f6;
-}
-
-.App.light-mode .hero-section {
-  background: linear-gradient(160deg, #eef2ff 0%, #f8fafc 55%, #ede9fe 100%);
-}
-
-.App.light-mode .hero-title,
-.App.light-mode .hero-description,
-.App.light-mode .holiday-title,
-.App.light-mode .holiday-description,
-.App.light-mode .feature-title,
-.App.light-mode .feature-description,
-.App.light-mode .section-title,
-.App.light-mode .destinations-title,
-.App.light-mode .gallery-title,
-.App.light-mode .testimonials-title,
-.App.light-mode .stat-value,
-.App.light-mode .stat-label,
-.App.light-mode .results-head h2,
-.App.light-mode .result-top h3,
-.App.light-mode .experiences-intro h2,
-.App.light-mode .xp-body h3 {
-  color: #1a1a2e;
-}
-
-.App.light-mode .hero-description,
-.App.light-mode .holiday-description,
-.App.light-mode .feature-description,
-.App.light-mode .experiences-intro p,
-.App.light-mode .result-desc,
-.App.light-mode .result-loc {
-  color: rgba(26, 26, 46, 0.7);
-}
-
-.App.light-mode .search-form-container {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.App.light-mode .form-title,
-.App.light-mode .field-content input,
-.App.light-mode .guest-trigger {
-  color: #1a1a2e;
-}
-
-.App.light-mode .field-content label {
-  color: rgba(0, 0, 0, 0.5);
-}
-
-.App.light-mode .search-form {
-  background: rgba(0, 0, 0, 0.03);
-}
-
-.App.light-mode .form-divider {
-  background: rgba(0, 0, 0, 0.08);
-}
-
-.App.light-mode .search-tab {
-  color: #334155;
-  background: #eef2ff;
-}
-
-.App.light-mode .search-tab.active {
-  color: #fff;
-}
-
-.App.light-mode .suggest-list,
-.App.light-mode .guest-popover {
-  background: #fff;
-  color: #1a1a2e;
-}
-
-.App.light-mode .suggest-list li,
-.App.light-mode .guest-row {
-  color: #1a1a2e;
-}
-
-.App.light-mode .guest-controls button {
-  color: #1a1a2e;
-  border-color: #d1d5db;
-}
-
-.App.light-mode .support-badge {
-  background: white;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.App.light-mode .result-card,
-.App.light-mode .xp-card,
-.App.light-mode .stat-card,
-.App.light-mode .destinations-content,
-.App.light-mode .testimonial-card {
-  background: #fff;
-  border-color: rgba(0, 0, 0, 0.06);
-}
-
-.App.light-mode .ghost-btn {
-  color: #1a1a2e !important;
-  border-color: rgba(26, 26, 46, 0.18) !important;
-}
-
-.App.light-mode .video-modal {
-  background: #fff;
-}
-
-.App.light-mode .video-modal-head h3,
-.App.light-mode .video-close {
-  color: #1a1a2e;
-}
-
-.App.light-mode .video-close {
-  background: #eef2ff;
-}
-
-.App.light-mode .video-open-yt {
-  color: #4f46e5;
-}
-
-.App.light-mode .result-footer strong,
-.App.light-mode .xp-footer strong,
-.App.light-mode .month-name,
-.App.light-mode .price-range,
-.App.light-mode .author-name,
-.App.light-mode .testimonial-text {
-  color: #1a1a2e;
-}
-
-.App.light-mode .chip,
-.App.light-mode .results-tools select {
-  color: #1a1a2e;
-  background: #fff;
-}
-
-.App.light-mode .tab-btn {
-  color: #475569;
-}
-
-.App.light-mode .feature-card:hover {
-  transform: translateY(-4px);
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }

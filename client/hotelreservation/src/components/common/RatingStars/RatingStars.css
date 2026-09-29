@@ -1,0 +1,20 @@
+.rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.star-filled {
+  color: #fbbf24;
+}
+
+.star-empty {
+  color: var(--border-color);
+}
+
+.rating-number {
+  margin-left: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95em;
+}
