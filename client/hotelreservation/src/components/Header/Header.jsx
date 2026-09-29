@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHotel, FaPlane, FaCar, FaTaxi, FaBars, FaTimes } from 'react-icons/fa';
+import { FaHotel, FaPlane, FaCar, FaTaxi, FaBars, FaTimes, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { IoNotifications } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdDarkMode, MdLightMode } from 'react-icons/md';
 import logo from '../../assets/images/logo.png';
@@ -19,6 +19,20 @@ const Header = ({
   const [openMenu, setOpenMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  // Check if user is authenticated
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const authStatus = localStorage.getItem('isAuthenticated');
+    const userData = localStorage.getItem('user');
+    if (authStatus === 'true' && userData) {
+      setIsAuthenticated(true);
+      setUser(JSON.parse(userData));
+    }
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -55,12 +69,33 @@ const Header = ({
   const go = (href, isRoute = false) => {
     setMobileOpen(false);
     setOpenMenu(null);
+    setUserMenuOpen(false);
     if (isRoute) {
       navigate(href);
     } else {
       const el = document.querySelector(href);
       el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('user');
+    localStorage.removeItem('rememberMe');
+    setIsAuthenticated(false);
+    setUser(null);
+    setUserMenuOpen(false);
+    navigate('/');
+  };
+
+  const getUserInitials = () => {
+    if (!user || !user.name) return 'A';
+    return user.name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
@@ -142,9 +177,40 @@ const Header = ({
               )}
             </div>
 
-            <div className="user-profile" title="Hesab">
-              <div className="avatar-fallback">A</div>
-            </div>
+            {isAuthenticated ? (
+              <div 
+                className="user-profile" 
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                title={user?.name || 'Hesab'}
+              >
+                <div className="avatar-fallback">{getUserInitials()}</div>
+                {userMenuOpen && (
+                  <div className="user-menu-dropdown">
+                    <div className="user-menu-header">
+                      <div className="user-menu-avatar">{getUserInitials()}</div>
+                      <div className="user-menu-info">
+                        <span className="user-menu-name">{user?.name}</span>
+                        <span className="user-menu-email">{user?.email}</span>
+                      </div>
+                    </div>
+                    <div className="user-menu-divider"></div>
+                    <Link to="/profile" className="user-menu-item" onClick={() => setUserMenuOpen(false)}>
+                      <FaUser />
+                      <span>Profil</span>
+                    </Link>
+                    <div className="user-menu-divider"></div>
+                    <button className="user-menu-item logout" onClick={handleLogout}>
+                      <FaSignOutAlt />
+                      <span>Çıxış</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/login" className="login-btn">
+                Daxil ol
+              </Link>
+            )}
 
             <button className="burger" onClick={() => setMobileOpen((v) => !v)}>
               {mobileOpen ? <FaTimes /> : <FaBars />}

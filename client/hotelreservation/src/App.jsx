@@ -7,6 +7,9 @@ import Hotels from './pages/Hotels/Hotels';
 import HotelDetail from './pages/HotelDetail/HotelDetail';
 import RoomDetail from './pages/RoomDetail/RoomDetail';
 import Dashboard from './pages/Dashboard/Dashboard';
+import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
+import Profile from './pages/Profile/Profile';
 import './App.css';
 
 function App() {
@@ -79,6 +82,9 @@ function App() {
           <Route path="/hotels/:id" element={<HotelDetail />} />
           <Route path="/rooms/:id" element={<RoomDetail />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
 
         <Footer />

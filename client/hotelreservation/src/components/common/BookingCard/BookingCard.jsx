@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { FaCalendarAlt, FaUsers } from 'react-icons/fa';
 import './BookingCard.css';
 
-const BookingCard = ({ hotel }) => {
+const BookingCard = ({ hotel, room }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(2);
@@ -16,23 +19,47 @@ const BookingCard = ({ hotel }) => {
   };
 
   const nights = calculateNights();
-  const total = nights * hotel.pricePerNight;
+  const pricePerNight = room?.pricePerNight || hotel?.pricePerNight || 0;
+  const total = nights * pricePerNight;
 
   const handleBooking = (e) => {
     e.preventDefault();
-    alert('Rezervasiya funksiyası gələcəkdə əlavə ediləcək');
+    
+    // Check authentication
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    
+    if (!isAuthenticated) {
+      // Save booking data to localStorage for after login
+      const bookingData = {
+        hotelId: hotel?.id,
+        roomId: room?.id,
+        checkIn,
+        checkOut,
+        guests,
+        nights,
+        total,
+      };
+      localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
+      
+      // Redirect to login with return path
+      navigate('/login', { state: { from: location.pathname } });
+    } else {
+      // User is authenticated, proceed to booking
+      // TODO: Navigate to booking page or show booking modal
+      alert('Rezervasiya funksiyası gələcəkdə əlavə ediləcək');
+    }
   };
 
   return (
     <div className="booking-card">
       <div className="booking-card-header">
         <div className="booking-price">
-          <span className="booking-price-amount">₼{hotel.pricePerNight}</span>
+          <span className="booking-price-amount">₼{pricePerNight}</span>
           <span className="booking-price-unit">/ gecə</span>
         </div>
         <div className="booking-rating-small">
-          <span className="rating-badge">★ {hotel.rating}</span>
-          <span className="review-count-small">({hotel.reviews})</span>
+          <span className="rating-badge">★ {hotel?.rating || room?.rating || 0}</span>
+          <span className="review-count-small">({hotel?.reviews || 0})</span>
         </div>
       </div>
 
@@ -85,7 +112,7 @@ const BookingCard = ({ hotel }) => {
         {nights > 0 && (
           <div className="booking-summary">
             <div className="summary-row">
-              <span>₼{hotel.pricePerNight} × {nights} gecə</span>
+              <span>₼{pricePerNight} × {nights} gecə</span>
               <span>₼{total}</span>
             </div>
             <div className="summary-row summary-total">

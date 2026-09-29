@@ -5,8 +5,9 @@ import RatingStars from '../../components/common/RatingStars/RatingStars';
 import RoomCard from '../../components/common/RoomCard/RoomCard';
 import BookingCard from '../../components/common/BookingCard/BookingCard';
 import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
-import Reviews from '../../components/common/Reviews/Reviews';
+import ReviewsSection from '../../components/common/ReviewsSection/ReviewsSection';
 import { getHotelById } from '../../data/hotelsData';
+import { getHotelReviews, getAverageRating, getTotalReviews } from '../../data/reviewsData';
 import './HotelDetail.css';
 
 const HotelDetail = () => {
@@ -14,6 +15,11 @@ const HotelDetail = () => {
   const navigate = useNavigate();
   const hotel = getHotelById(id);
   const [selectedImage, setSelectedImage] = useState(0);
+
+  // Get reviews data
+  const reviews = getHotelReviews(id);
+  const averageRating = getAverageRating(id);
+  const totalReviews = getTotalReviews(id);
 
   if (!hotel) {
     return (
@@ -141,7 +147,11 @@ const HotelDetail = () => {
 
             {/* Reviews */}
             <section className="hotel-section">
-              <Reviews hotelId={hotel.id} rating={hotel.rating} reviewCount={hotel.reviews} />
+              <ReviewsSection 
+                reviews={reviews}
+                averageRating={averageRating || hotel.rating}
+                totalReviews={totalReviews || hotel.reviews}
+              />
             </section>
           </div>
 
