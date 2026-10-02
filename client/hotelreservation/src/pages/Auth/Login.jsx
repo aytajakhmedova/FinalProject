@@ -55,10 +55,10 @@ const Login = () => {
 
     // Mock authentication
     setTimeout(() => {
-      // Mock successful login
+      // Mock successful login - use actual entered email
       const mockUser = {
-        id: 1,
-        name: 'Aynur Məmmədova',
+        id: Date.now(), // unique ID
+        name: formData.email.split('@')[0], // use email username as name temporarily
         email: formData.email,
         phone: '+994 50 123 45 67',
       };

@@ -181,6 +181,7 @@
 .bookings-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .bookings-table thead {
@@ -197,6 +198,12 @@
   letter-spacing: 0.5px;
 }
 
+.bookings-table th:nth-child(1) { width: 60px; }
+.bookings-table th:nth-child(2) { width: auto; }
+.bookings-table th:nth-child(3) { width: auto; }
+.bookings-table th:nth-child(4) { width: 140px; }
+.bookings-table th:nth-child(5) { width: 130px; }
+
 .bookings-table tbody tr {
   border-top: 1px solid var(--border-color);
   transition: background 0.2s ease;
@@ -209,12 +216,19 @@
 .bookings-table td {
   padding: 1rem 1.5rem;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
 }
 
 .guest-cell {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  white-space: nowrap;
+  overflow: visible;
+  max-width: 250px;
 }
 
 .guest-avatar {

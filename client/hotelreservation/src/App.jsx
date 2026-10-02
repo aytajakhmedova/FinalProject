@@ -13,6 +13,9 @@ import Register from './pages/Auth/Register';
 import Profile from './pages/Profile/Profile';
 import Tours from './pages/Tours/Tours';
 import TourDetail from './pages/TourDetail/TourDetail';
+import Flights from './pages/Flights/Flights';
+import FlightResults from './pages/FlightResults/FlightResults';
+import FlightBooking from './pages/FlightBooking/FlightBooking';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import AdminDashboard from './pages/Admin/Dashboard/AdminDashboard';
 import AdminHotels from './pages/Admin/Hotels/AdminHotels';
@@ -107,6 +110,30 @@ function App() {
             <>
               <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <TourDetail />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/flights" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Flights />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/flight-results" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <FlightResults />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/flight-booking" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <FlightBooking />
               <Footer />
             </>
           } />

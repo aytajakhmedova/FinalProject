@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaCheckCircle, FaHourglass, FaTimesCircle, FaClipboardList } from 'react-icons/fa';
 import { MOCK_RESERVATIONS, getDashboardStats } from '../../data/reservationsData';
@@ -6,7 +6,26 @@ import './Dashboard.css';
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('all');
+  const [user, setUser] = useState(null);
   const stats = getDashboardStats();
+
+  useEffect(() => {
+    // Get user data from localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, []);
+
+  const getUserInitials = () => {
+    if (!user || !user.name) return 'A';
+    return user.name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   const getStatusBadge = (status) => {
     const badges = {
@@ -34,16 +53,18 @@ const Dashboard = () => {
         {/* Welcome Section */}
         <div className="dashboard-header">
           <div className="welcome-section">
-            <h1 className="dashboard-title">Xoş gəlmisiniz!</h1>
+            <h1 className="dashboard-title">
+              Xoş gəlmisiniz{user?.name ? `, ${user.name}` : ''}!
+            </h1>
             <p className="dashboard-subtitle">Rezervasiyalarınızı idarə edin və səyahətlərinizi izləyin</p>
           </div>
           <div className="user-profile-summary">
             <div className="user-avatar">
-              <span>A</span>
+              <span>{getUserInitials()}</span>
             </div>
             <div className="user-info">
-              <h3>Aynur Məmmədova</h3>
-              <p>aynur@example.com</p>
+              <h3>{user?.name || 'İstifadəçi'}</h3>
+              <p>{user?.email || 'email@example.com'}</p>
             </div>
           </div>
         </div>

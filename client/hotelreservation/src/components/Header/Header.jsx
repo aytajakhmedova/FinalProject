@@ -34,6 +34,21 @@ const Header = ({
     }
   }, []);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuOpen && !event.target.closest('.user-profile')) {
+        setUserMenuOpen(false);
+      }
+      if (notesOpen && !event.target.closest('.note-wrap')) {
+        setNotesOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [userMenuOpen, notesOpen]);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
     window.addEventListener('scroll', onScroll);
@@ -60,10 +75,10 @@ const Header = ({
   ];
 
   const navItems = [
-    { icon: <FaHotel />, text: 'Otel', type: 'hotel' },
-    { icon: <FaPlane />, text: 'Uçuş', type: 'flight' },
-    { icon: <FaCar />, text: 'Tur', type: 'tour' },
-    { icon: <FaTaxi />, text: 'Taksi', type: 'taxi' },
+    { icon: <FaHotel />, text: 'Otel', type: 'hotel', route: '/hotels' },
+    { icon: <FaPlane />, text: 'Uçuş', type: 'flight', route: '/flights' },
+    { icon: <FaCar />, text: 'Tur', type: 'tour', route: '/tours' },
+    { icon: <FaTaxi />, text: 'Taksi', type: 'taxi', route: '#' },
   ];
 
   const go = (href, isRoute = false) => {
@@ -137,8 +152,12 @@ const Header = ({
                 key={item.type}
                 className="quick-nav-btn"
                 onClick={() => {
-                  onServiceChange(item.type);
-                  go('#search');
+                  if (item.route && item.route !== '#') {
+                    navigate(item.route);
+                  } else {
+                    onServiceChange(item.type);
+                    go('#search');
+                  }
                 }}
               >
                 <span className="icon">{item.icon}</span>

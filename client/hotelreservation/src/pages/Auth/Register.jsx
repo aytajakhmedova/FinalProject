@@ -80,14 +80,22 @@ const Register = () => {
 
     // Mock registration
     setTimeout(() => {
-      // Simulate successful registration
+      // Create user object with registration data
+      const newUser = {
+        id: Date.now(),
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+      };
+
+      // Save to localStorage and authenticate immediately
+      localStorage.setItem('user', JSON.stringify(newUser));
+      localStorage.setItem('isAuthenticated', 'true');
+      
       setIsLoading(false);
       
-      // Show success message (you can add toast here)
-      alert('Qeydiyyat uğurla tamamlandı! İndi daxil ola bilərsiniz.');
-      
-      // Redirect to login
-      navigate('/login');
+      // Redirect to dashboard
+      navigate('/dashboard', { replace: true });
     }, 1500);
   };
 
