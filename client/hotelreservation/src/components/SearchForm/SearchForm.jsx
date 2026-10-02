@@ -23,8 +23,8 @@ const plusDaysISO = (days) => {
 
 const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
   const [location, setLocation] = useState('');
-  const [checkIn, setCheckIn] = useState(todayISO());
-  const [checkOut, setCheckOut] = useState(plusDaysISO(4));
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState({ adults: 2, children: 0, rooms: 1 });
   const [showGuests, setShowGuests] = useState(false);
   const [showCities, setShowCities] = useState(false);
@@ -59,6 +59,16 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
       const next = Math.max(min, prev[key] + delta);
       return { ...prev, [key]: next };
     });
+  };
+
+  const handleCheckInChange = (e) => {
+    const newCheckIn = e.target.value;
+    setCheckIn(newCheckIn);
+    
+    // If checkout exists and is before or equal to new checkin, reset it
+    if (checkOut && checkOut <= newCheckIn) {
+      setCheckOut('');
+    }
   };
 
   const handleSubmit = (e) => {
@@ -152,7 +162,9 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
               type="date"
               value={checkIn}
               min={todayISO()}
-              onChange={(e) => setCheckIn(e.target.value)}
+              onChange={handleCheckInChange}
+              placeholder="Giriş tarixi seçin"
+              required
             />
           </div>
         </div>
@@ -167,8 +179,11 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
                 <input
                   type="date"
                   value={checkOut}
-                  min={checkIn}
+                  min={checkIn ? new Date(new Date(checkIn).getTime() + 86400000).toISOString().split('T')[0] : new Date(Date.now() + 86400000).toISOString().split('T')[0]}
                   onChange={(e) => setCheckOut(e.target.value)}
+                  placeholder="Çıxış tarixi seçin"
+                  disabled={!checkIn}
+                  required
                 />
               </div>
             </div>

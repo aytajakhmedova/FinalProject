@@ -3,7 +3,7 @@
   min-height: calc(100vh - 72px);
   padding: 3.5rem 2rem 2.5rem;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .hero-orbs {
@@ -45,6 +45,7 @@
   margin: 0 auto;
   position: relative;
   z-index: 1;
+  overflow: visible;
 }
 
 .hero-content {

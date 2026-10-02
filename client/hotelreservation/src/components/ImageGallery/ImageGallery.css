@@ -1,17 +1,17 @@
 .image-gallery-section {
-  padding: 3rem 0;
+  padding: 2.5rem 0;
   background: transparent;
   overflow: hidden;
 }
 
 .gallery-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: white;
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   font-family: 'Georgia', serif;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 .gallery-slider {
@@ -36,7 +36,7 @@
 
 .gallery-track {
   display: flex;
-  gap: 1.5rem;
+  gap: 1.25rem;
   animation: scroll 60s linear infinite;
   width: max-content;
 }
@@ -56,17 +56,17 @@
 
 .gallery-item {
   flex-shrink: 0;
-  width: 300px;
-  height: 200px;
-  border-radius: 15px;
+  width: 260px;
+  height: 180px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .gallery-item:hover {
-  transform: scale(1.05) translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  transform: scale(1.04) translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
   z-index: 10;
 }
 
@@ -82,13 +82,22 @@
 }
 
 @media (max-width: 768px) {
+  .image-gallery-section {
+    padding: 2rem 0;
+  }
+
   .gallery-title {
-    font-size: 2rem;
+    font-size: 1.6rem;
+    margin-bottom: 1.25rem;
   }
 
   .gallery-item {
-    width: 250px;
-    height: 170px;
+    width: 220px;
+    height: 150px;
+  }
+
+  .gallery-track {
+    gap: 1rem;
   }
 
   @keyframes scroll {

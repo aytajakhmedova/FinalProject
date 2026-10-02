@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { FaMapMarkerAlt, FaStar, FaWifi, FaParking, FaSwimmingPool, FaDumbbell, FaUtensils, FaCocktail, FaCheck, FaArrowLeft } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaStar, FaWifi, FaParking, FaSwimmingPool, FaDumbbell, FaUtensils, FaCocktail, FaCheck, FaArrowLeft, FaBed } from 'react-icons/fa';
 import RatingStars from '../../components/common/RatingStars/RatingStars';
 import RoomCard from '../../components/common/RoomCard/RoomCard';
-import BookingCard from '../../components/common/BookingCard/BookingCard';
 import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
 import ReviewsSection from '../../components/common/ReviewsSection/ReviewsSection';
 import { getHotelById } from '../../data/hotelsData';
@@ -20,6 +19,13 @@ const HotelDetail = () => {
   const reviews = getHotelReviews(id);
   const averageRating = getAverageRating(id);
   const totalReviews = getTotalReviews(id);
+
+  const handleScrollToRooms = () => {
+    const roomsSection = document.getElementById('rooms');
+    if (roomsSection) {
+      roomsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   if (!hotel) {
     return (
@@ -136,8 +142,9 @@ const HotelDetail = () => {
             </section>
 
             {/* Available Rooms */}
-            <section className="hotel-section" id="rezervasiya">
+            <section className="hotel-section" id="rooms">
               <h2 className="section-title">Mövcud Otaqlar</h2>
+              <p className="section-subtitle">Rezervasiya etmək üçün otaq seçin</p>
               <div className="rooms-grid">
                 {hotel.rooms.map(room => (
                   <RoomCard key={room.id} room={room} hotelId={hotel.id} />
@@ -155,9 +162,48 @@ const HotelDetail = () => {
             </section>
           </div>
 
-          {/* Sticky Booking Card */}
+          {/* Sticky Info Card - NOT Booking */}
           <aside className="hotel-sidebar">
-            <BookingCard hotel={hotel} />
+            <div className="hotel-info-sidebar-card">
+              <div className="sidebar-price-section">
+                <span className="sidebar-price-label">Otaq qiymətləri başlanğıc</span>
+                <div className="sidebar-price-amount">₼{hotel.pricePerNight}</div>
+                <span className="sidebar-price-unit">gecəlik</span>
+              </div>
+
+              <div className="sidebar-rating-box">
+                <div className="sidebar-rating-score">
+                  <FaStar className="star-icon" />
+                  <span>{hotel.rating}</span>
+                </div>
+                <span className="sidebar-rating-text">{hotel.reviews} rəy</span>
+              </div>
+
+              <div className="sidebar-divider"></div>
+
+              <div className="sidebar-action-section">
+                <p className="sidebar-info-text">
+                  Rezervasiya etmək üçün otaq seçin
+                </p>
+                <button onClick={handleScrollToRooms} className="btn-select-room">
+                  <FaBed /> Otaq Seç
+                </button>
+              </div>
+
+              <div className="sidebar-amenities-preview">
+                <h4>Əsas imkanlar</h4>
+                <ul>
+                  {hotel.amenities.slice(0, 5).map((amenity, idx) => (
+                    <li key={idx}>
+                      <FaCheck /> {amenity}
+                    </li>
+                  ))}
+                  {hotel.amenities.length > 5 && (
+                    <li className="more-amenities">+{hotel.amenities.length - 5} daha çox</li>
+                  )}
+                </ul>
+              </div>
+            </div>
           </aside>
         </div>
       </div>

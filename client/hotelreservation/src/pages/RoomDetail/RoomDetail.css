@@ -155,6 +155,199 @@
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.room-section-title svg {
+  color: #667eea;
+}
+
+/* Availability Search */
+.availability-search-box {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.search-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.search-input-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.date-input,
+.guests-select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.875rem 1rem;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: all 0.3s;
+  box-sizing: border-box;
+}
+
+.date-input:focus,
+.guests-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.date-input:disabled,
+.guests-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.guests-select {
+  cursor: pointer;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 2px;
+  margin-left: 4px;
+}
+
+.date-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Availability Result */
+.availability-result {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.availability-result.available {
+  background: rgba(76, 175, 80, 0.1);
+  border: 2px solid rgba(76, 175, 80, 0.3);
+}
+
+.availability-result.unavailable {
+  background: rgba(231, 76, 60, 0.1);
+  border: 2px solid rgba(231, 76, 60, 0.3);
+}
+
+.availability-icon {
+  font-size: 2rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.availability-result.available .availability-icon {
+  color: #4caf50;
+}
+
+.availability-result.unavailable .availability-icon {
+  color: #e74c3c;
+}
+
+.availability-text {
+  flex: 1;
+}
+
+.availability-text strong {
+  display: block;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.availability-text p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* Price Breakdown */
+.price-breakdown-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2rem;
+}
+
+.breakdown-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+}
+
+.breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.breakdown-row span:last-child {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.breakdown-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 1rem 0;
+}
+
+.breakdown-total {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding-top: 1rem;
+}
+
+.breakdown-total span {
+  color: #667eea;
+}
+
+.breakdown-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: rgba(102, 126, 234, 0.05);
+  border-radius: 10px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.breakdown-info svg {
+  color: #667eea;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
 }
 
 .room-description-text {
@@ -271,6 +464,12 @@
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: 1fr;
   }
+
+  .availability-search-box {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
 }
 
 @media (max-width: 768px) {
@@ -289,4 +488,125 @@
   .room-amenities-grid {
     grid-template-columns: 1fr;
   }
+
+  .availability-search-box {
+    padding: 1.5rem;
+  }
+
+  .price-breakdown-card {
+    padding: 1.5rem;
+  }
+
+  .breakdown-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+/* Room Booking Card */
+.room-booking-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.booking-summary-box {
+  margin: 1.5rem 0;
+}
+
+.booking-summary-box h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem 0;
+}
+
+.booking-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.875rem 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.booking-detail-row strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.booking-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 1rem 0;
+}
+
+.booking-price-row {
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding-top: 1rem;
+}
+
+.booking-total-price {
+  font-size: 1.5rem;
+  color: #667eea !important;
+}
+
+.btn-reserve-now {
+  width: 100%;
+  padding: 1.125rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1.5rem 0 1rem 0;
+}
+
+.btn-reserve-now:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+}
+
+.btn-reserve-now:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.booking-guarantee-text {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.booking-instruction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.instruction-icon {
+  font-size: 2.5rem;
+  color: rgba(102, 126, 234, 0.3);
+  margin-bottom: 1rem;
+}
+
+.booking-instruction p {
+  margin: 0;
+  line-height: 1.6;
 }

@@ -10,6 +10,20 @@ const BookingCard = ({ hotel, room }) => {
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(2);
 
+  const getTodayISO = () => {
+    return new Date().toISOString().split('T')[0];
+  };
+
+  const handleCheckInChange = (e) => {
+    const newCheckIn = e.target.value;
+    setCheckIn(newCheckIn);
+    
+    // If checkout exists and is before or equal to new checkin, reset it
+    if (checkOut && checkOut <= newCheckIn) {
+      setCheckOut('');
+    }
+  };
+
   const calculateNights = () => {
     if (!checkIn || !checkOut) return 0;
     const start = new Date(checkIn);
@@ -72,8 +86,10 @@ const BookingCard = ({ hotel, room }) => {
           <input
             type="date"
             value={checkIn}
-            onChange={(e) => setCheckIn(e.target.value)}
+            onChange={handleCheckInChange}
             className="booking-input"
+            min={getTodayISO()}
+            placeholder="Giriş tarixi seçin"
             required
           />
         </div>
@@ -88,7 +104,9 @@ const BookingCard = ({ hotel, room }) => {
             value={checkOut}
             onChange={(e) => setCheckOut(e.target.value)}
             className="booking-input"
-            min={checkIn}
+            min={checkIn ? new Date(new Date(checkIn).getTime() + 86400000).toISOString().split('T')[0] : new Date(Date.now() + 86400000).toISOString().split('T')[0]}
+            placeholder="Çıxış tarixi seçin"
+            disabled={!checkIn}
             required
           />
         </div>

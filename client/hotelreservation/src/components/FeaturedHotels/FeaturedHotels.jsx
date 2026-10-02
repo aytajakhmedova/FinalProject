@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaHeart, FaPlay, FaRegHeart, FaStar } from 'react-icons/fa';
 import { HOTELS, formatPrice } from '../../data/travelData';
 import './FeaturedHotels.css';
 
 const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onPlayVideo }) => {
+  const navigate = useNavigate();
   const [activeIndex, setActiveIndex] = useState(0);
   const featured = HOTELS.slice(0, 5);
   const hotel = featured[activeIndex];
@@ -24,6 +26,20 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
   };
 
   const mid = Math.floor(featured.length / 2);
+
+  const handleHotelClick = (hotelId) => {
+    // Navigate to hotel detail page
+    navigate(`/hotels/${hotelId}`);
+  };
+
+  const handleDiscoverClick = (e) => {
+    e.stopPropagation(); // Prevent card click
+    if (onDiscover) {
+      onDiscover(hotel);
+    } else {
+      handleHotelClick(hotel.id);
+    }
+  };
 
   return (
     <section className="featured-hotels-section" id="featured">
@@ -50,12 +66,19 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
           </div>
 
           <div className="main-display">
-            <div className="main-image">
+            <div 
+              className="main-image" 
+              onClick={() => handleHotelClick(hotel.id)}
+              style={{ cursor: 'pointer' }}
+            >
               <img key={hotel.id} src={hotel.image} alt={hotel.title} />
               {hotel.video && (
                 <button
                   className="featured-play"
-                  onClick={() => onPlayVideo(hotel)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card click
+                    onPlayVideo(hotel);
+                  }}
                   aria-label="Video turu izlə"
                 >
                   <FaPlay />
@@ -67,7 +90,10 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
                   <span className="year-badge">{hotel.year}</span>
                   <button
                     className={`inline-fav ${favorites.includes(hotel.id) ? 'on' : ''}`}
-                    onClick={() => onToggleFavorite(hotel.id)}
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent card click
+                      onToggleFavorite(hotel.id);
+                    }}
                   >
                     {favorites.includes(hotel.id) ? <FaHeart /> : <FaRegHeart />}
                   </button>
@@ -78,7 +104,10 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
                   <span><FaStar /> {hotel.rating}</span>
                   <strong>{formatPrice(hotel.price, currency)} / gecə</strong>
                 </div>
-                <button className="discover-btn" onClick={() => onDiscover(hotel)}>
+                <button 
+                  className="discover-btn" 
+                  onClick={handleDiscoverClick}
+                >
                   KƏŞF EDİN
                 </button>
               </div>

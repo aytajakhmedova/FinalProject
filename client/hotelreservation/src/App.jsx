@@ -7,9 +7,12 @@ import Hotels from './pages/Hotels/Hotels';
 import HotelDetail from './pages/HotelDetail/HotelDetail';
 import RoomDetail from './pages/RoomDetail/RoomDetail';
 import Dashboard from './pages/Dashboard/Dashboard';
+import ReservationDetail from './pages/ReservationDetail/ReservationDetail';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Profile from './pages/Profile/Profile';
+import Tours from './pages/Tours/Tours';
+import TourDetail from './pages/TourDetail/TourDetail';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import AdminDashboard from './pages/Admin/Dashboard/AdminDashboard';
 import AdminHotels from './pages/Admin/Hotels/AdminHotels';
@@ -92,6 +95,22 @@ function App() {
             </>
           } />
           
+          <Route path="/tours" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Tours />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/tours/:id" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <TourDetail />
+              <Footer />
+            </>
+          } />
+          
           <Route path="/hotels/:id" element={
             <>
               <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
@@ -112,6 +131,14 @@ function App() {
             <>
               <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <Dashboard />
+              <Footer />
+            </>
+          } />
+          
+          <Route path="/reservations/:id" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <ReservationDetail />
               <Footer />
             </>
           } />

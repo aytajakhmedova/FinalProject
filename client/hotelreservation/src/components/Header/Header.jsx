@@ -46,7 +46,7 @@ const Header = ({
       items: [
         { label: 'Otellər', href: '/hotels', isRoute: true },
         { label: 'Təyinatlar', href: '#destinations' },
-        { label: 'Turlar', href: '#tours' },
+        { label: 'Turlar', href: '/tours', isRoute: true },
       ],
     },
     {

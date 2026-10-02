@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { FaUsers, FaBed, FaExpand, FaCheck, FaArrowLeft } from 'react-icons/fa';
-import BookingCard from '../../components/common/BookingCard/BookingCard';
+import { FaUsers, FaBed, FaExpand, FaCheck, FaArrowLeft, FaCalendarAlt, FaInfoCircle } from 'react-icons/fa';
 import { getHotelById, getRoomById } from '../../data/hotelsData';
+import { checkRoomAvailability, calculateRoomPrice, calculateNights, formatDate, getMinCheckInDate, getMinCheckOutDate } from '../../data/roomsData';
 import './RoomDetail.css';
 
 const RoomDetail = () => {
@@ -12,9 +12,38 @@ const RoomDetail = () => {
   const hotelId = searchParams.get('hotel');
   
   const [selectedImage, setSelectedImage] = useState(0);
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [guests, setGuests] = useState(2);
+  const [isAvailable, setIsAvailable] = useState(true);
+  const [priceBreakdown, setPriceBreakdown] = useState(null);
 
   const hotel = getHotelById(hotelId);
   const room = hotel?.rooms.find(r => r.id === parseInt(id));
+
+  const handleCheckInChange = (e) => {
+    const newCheckIn = e.target.value;
+    setCheckIn(newCheckIn);
+    
+    // If checkout exists and is before or equal to new checkin, reset it
+    if (checkOut && checkOut <= newCheckIn) {
+      setCheckOut('');
+    }
+  };
+
+  useEffect(() => {
+    if (checkIn && checkOut && room) {
+      const available = checkRoomAvailability(room.id, checkIn, checkOut);
+      setIsAvailable(available);
+      
+      if (available) {
+        const breakdown = calculateRoomPrice(room.pricePerNight, checkIn, checkOut, guests);
+        setPriceBreakdown(breakdown);
+      } else {
+        setPriceBreakdown(null);
+      }
+    }
+  }, [checkIn, checkOut, guests, room]);
 
   if (!hotel || !room) {
     return (
@@ -24,6 +53,39 @@ const RoomDetail = () => {
       </div>
     );
   }
+
+  const nights = calculateNights(checkIn, checkOut);
+
+  const handleReserveNow = () => {
+    // Check authentication
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    
+    if (!isAuthenticated) {
+      // Save booking data for after login
+      const bookingData = {
+        hotelId: hotel.id,
+        roomId: room.id,
+        checkIn,
+        checkOut,
+        guests,
+        priceBreakdown
+      };
+      localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
+      navigate('/login', { state: { from: `/rooms/${room.id}?hotel=${hotel.id}` } });
+    } else {
+      // Navigate to booking page with data
+      navigate('/booking', {
+        state: {
+          hotel,
+          room,
+          checkIn,
+          checkOut,
+          guests,
+          priceBreakdown
+        }
+      });
+    }
+  };
 
   return (
     <div className="room-detail-page">
@@ -94,6 +156,115 @@ const RoomDetail = () => {
               </div>
             </div>
 
+            {/* Availability Search */}
+            <section className="room-section">
+              <h2 className="room-section-title">
+                <FaCalendarAlt /> Mövcudluq Yoxla
+              </h2>
+              
+              <div className="availability-search-box">
+                <div className="search-input-group">
+                  <label>Giriş tarixi</label>
+                  <input 
+                    type="date" 
+                    value={checkIn}
+                    min={getMinCheckInDate()}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    className="date-input"
+                  />
+                </div>
+
+                <div className="search-input-group">
+                  <label>Çıxış tarixi</label>
+                  <input 
+                    type="date" 
+                    value={checkOut}
+                    min={getMinCheckOutDate(checkIn)}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    className="date-input"
+                    disabled={!checkIn}
+                  />
+                </div>
+
+                <div className="search-input-group">
+                  <label>Qonaq sayı</label>
+                  <select 
+                    value={guests}
+                    onChange={(e) => setGuests(parseInt(e.target.value))}
+                    className="guests-select"
+                  >
+                    {[...Array(room.capacity)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1} nəfər
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {checkIn && checkOut && (
+                <div className={`availability-result ${isAvailable ? 'available' : 'unavailable'}`}>
+                  {isAvailable ? (
+                    <>
+                      <div className="availability-icon">✓</div>
+                      <div className="availability-text">
+                        <strong>Mövcuddur!</strong>
+                        <p>{formatDate(checkIn)} - {formatDate(checkOut)} ({nights} gecə)</p>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="availability-icon">✕</div>
+                      <div className="availability-text">
+                        <strong>Mövcud deyil</strong>
+                        <p>Bu tarixlər üçün otaq rezerv olunub. Zəhmət olmasa başqa tarix seçin.</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {priceBreakdown && priceBreakdown.nights > 0 && (
+                <div className="price-breakdown-card">
+                  <h3 className="breakdown-title">Qiymət Hesablanması</h3>
+                  
+                  <div className="breakdown-row">
+                    <span>₼{room.pricePerNight} × {priceBreakdown.nights} gecə</span>
+                    <span>₼{priceBreakdown.basePrice}</span>
+                  </div>
+
+                  {priceBreakdown.extraGuestFee > 0 && (
+                    <div className="breakdown-row">
+                      <span>Əlavə qonaq haqqı</span>
+                      <span>₼{priceBreakdown.extraGuestFee}</span>
+                    </div>
+                  )}
+
+                  <div className="breakdown-row">
+                    <span>Ara cəm</span>
+                    <span>₼{priceBreakdown.subtotal}</span>
+                  </div>
+
+                  <div className="breakdown-row">
+                    <span>Vergi (18%)</span>
+                    <span>₼{priceBreakdown.tax}</span>
+                  </div>
+
+                  <div className="breakdown-divider"></div>
+
+                  <div className="breakdown-row breakdown-total">
+                    <span>Yekun məbləğ</span>
+                    <span>₼{priceBreakdown.total}</span>
+                  </div>
+
+                  <div className="breakdown-info">
+                    <FaInfoCircle />
+                    <span>2 nəfərdən çox qonaq üçün hər nəfər üçün gecəlik ₼50 əlavə ödəniş tətbiq olunur.</span>
+                  </div>
+                </div>
+              )}
+            </section>
+
             {/* Description */}
             <section className="room-section">
               <h2 className="room-section-title">Otaq Haqqında</h2>
@@ -116,17 +287,69 @@ const RoomDetail = () => {
 
           {/* Booking Sidebar */}
           <aside className="room-booking-sidebar" id="book">
-            {room.available ? (
-              <div className="availability-notice">
-                ✓ Mövcuddur
-              </div>
-            ) : (
-              <div className="availability-notice unavailable-notice">
-                ✕ Mövcud deyil
-              </div>
-            )}
-            
-            <BookingCard hotel={{...hotel, pricePerNight: room.pricePerNight}} />
+            <div className="room-booking-card">
+              {room.available ? (
+                <div className="availability-notice">
+                  ✓ Mövcuddur
+                </div>
+              ) : (
+                <div className="availability-notice unavailable-notice">
+                  ✕ Mövcud deyil
+                </div>
+              )}
+
+              {priceBreakdown && priceBreakdown.nights > 0 ? (
+                <>
+                  <div className="booking-summary-box">
+                    <h3>Rezervasiya Xülasəsi</h3>
+                    
+                    <div className="booking-detail-row">
+                      <span>Giriş</span>
+                      <strong>{formatDate(checkIn)}</strong>
+                    </div>
+
+                    <div className="booking-detail-row">
+                      <span>Çıxış</span>
+                      <strong>{formatDate(checkOut)}</strong>
+                    </div>
+
+                    <div className="booking-detail-row">
+                      <span>Qonaqlar</span>
+                      <strong>{guests} nəfər</strong>
+                    </div>
+
+                    <div className="booking-detail-row">
+                      <span>Gecələr</span>
+                      <strong>{priceBreakdown.nights} gecə</strong>
+                    </div>
+
+                    <div className="booking-divider"></div>
+
+                    <div className="booking-detail-row booking-price-row">
+                      <span>Yekun məbləğ</span>
+                      <strong className="booking-total-price">₼{priceBreakdown.total}</strong>
+                    </div>
+                  </div>
+
+                  <button 
+                    onClick={handleReserveNow}
+                    disabled={!isAvailable || !checkIn || !checkOut}
+                    className="btn-reserve-now"
+                  >
+                    <FaCheck /> Rezervasiya et
+                  </button>
+
+                  <p className="booking-guarantee-text">
+                    ✓ Pulsuz ləğvetmə • ✓ Ani təsdiq
+                  </p>
+                </>
+              ) : (
+                <div className="booking-instruction">
+                  <FaCalendarAlt className="instruction-icon" />
+                  <p>Rezervasiya etmək üçün yuxarıdan tarix və qonaq sayı seçin</p>
+                </div>
+              )}
+            </div>
 
             {/* Link to Hotel */}
             <div className="hotel-link-card">
