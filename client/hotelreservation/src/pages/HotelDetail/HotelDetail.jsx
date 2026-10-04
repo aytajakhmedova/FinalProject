@@ -13,7 +13,6 @@ const HotelDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const hotel = getHotelById(id);
-  const [selectedImage, setSelectedImage] = useState(0);
 
   // Get reviews data
   const reviews = getHotelReviews(id);
@@ -58,22 +57,7 @@ const HotelDetail = () => {
       {/* Image Gallery */}
       <section className="hotel-gallery-section">
         <div className="hotel-detail-container">
-          <div className="gallery-grid">
-            <div className="main-gallery-image">
-              <img src={hotel.images[selectedImage]} alt={hotel.title} />
-            </div>
-            <div className="gallery-thumbnails">
-              {hotel.images.slice(0, 4).map((img, idx) => (
-                <div 
-                  key={idx} 
-                  className={`thumbnail ${selectedImage === idx ? 'active' : ''}`}
-                  onClick={() => setSelectedImage(idx)}
-                >
-                  <img src={img} alt={`${hotel.title} ${idx + 1}`} />
-                </div>
-              ))}
-            </div>
-          </div>
+          <ImageGallery images={hotel.images} title={hotel.title} />
         </div>
       </section>
 

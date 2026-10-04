@@ -3,6 +3,7 @@ import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { FaUsers, FaBed, FaExpand, FaCheck, FaArrowLeft, FaCalendarAlt, FaInfoCircle } from 'react-icons/fa';
 import { getHotelById, getRoomById } from '../../data/hotelsData';
 import { checkRoomAvailability, calculateRoomPrice, calculateNights, formatDate, getMinCheckInDate, getMinCheckOutDate } from '../../data/roomsData';
+import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
 import './RoomDetail.css';
 
 const RoomDetail = () => {
@@ -11,7 +12,6 @@ const RoomDetail = () => {
   const navigate = useNavigate();
   const hotelId = searchParams.get('hotel');
   
-  const [selectedImage, setSelectedImage] = useState(0);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(2);
@@ -96,21 +96,8 @@ const RoomDetail = () => {
         </button>
 
         {/* Room Gallery */}
-        <div className="room-gallery">
-          <div className="room-main-image">
-            <img src={room.images[selectedImage]} alt={room.name} />
-          </div>
-          <div className="room-thumbnails">
-            {room.images.map((img, idx) => (
-              <div 
-                key={idx}
-                className={`room-thumbnail ${selectedImage === idx ? 'active' : ''}`}
-                onClick={() => setSelectedImage(idx)}
-              >
-                <img src={img} alt={`${room.name} ${idx + 1}`} />
-              </div>
-            ))}
-          </div>
+        <div className="room-gallery-section">
+          <ImageGallery images={room.images} title={room.name} />
         </div>
 
         {/* Room Content */}

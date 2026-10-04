@@ -58,56 +58,78 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem;
+  padding: 3rem 2rem;
 }
 
 .gallery-modal-content {
   position: relative;
-  max-width: 1200px;
-  max-height: 90vh;
+  max-width: 800px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .gallery-modal-content img {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 60vh;
+  width: auto;
+  height: auto;
   object-fit: contain;
   border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .gallery-close {
   position: absolute;
-  top: -50px;
+  top: -60px;
   right: 0;
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
   border: none;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   font-size: 1.5rem;
   cursor: pointer;
   color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.gallery-close:hover {
+  background: white;
+  transform: scale(1.1);
 }
 
 .gallery-nav {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
+  padding: 0.5rem;
 }
 
 .gallery-nav button {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   border: none;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.4);
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
+}
+
+.gallery-nav button:hover {
+  background: rgba(255, 255, 255, 0.7);
+  transform: scale(1.1);
 }
 
 .gallery-nav button.active {
   background: white;
-  width: 30px;
+  width: 28px;
   border-radius: 6px;
 }
 
@@ -119,5 +141,41 @@
   .gallery-thumbnails-grid {
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: 1fr;
+  }
+
+  .gallery-modal {
+    padding: 1.5rem 1rem;
+  }
+
+  .gallery-modal-content {
+    max-width: 95%;
+    width: 95%;
+  }
+
+  .gallery-modal-content img {
+    max-height: 55vh;
+  }
+
+  .gallery-close {
+    top: -50px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .gallery-nav {
+    margin-top: 1.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .gallery-modal-content img {
+    max-height: 50vh;
+  }
+  
+  .gallery-close {
+    top: -45px;
+    width: 36px;
+    height: 36px;
   }
 }
