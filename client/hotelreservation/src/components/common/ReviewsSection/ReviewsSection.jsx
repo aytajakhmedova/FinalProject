@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaStar, FaEdit } from 'react-icons/fa';
 import RatingStars from '../RatingStars/RatingStars';
 import ReviewCard from '../ReviewCard/ReviewCard';
@@ -6,8 +7,18 @@ import ReviewForm from '../ReviewForm/ReviewForm';
 import './ReviewsSection.css';
 
 const ReviewsSection = ({ reviews = [], averageRating = 0, totalReviews = 0 }) => {
+  const navigate = useNavigate();
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [reviewsList, setReviewsList] = useState(reviews);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check authentication status
+    const authStatus = localStorage.getItem('isAuthenticated');
+    if (authStatus === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
 
   // Calculate rating breakdown
   const getRatingBreakdown = () => {
@@ -27,10 +38,30 @@ const ReviewsSection = ({ reviews = [], averageRating = 0, totalReviews = 0 }) =
   };
 
   const handleSubmitReview = (newReview) => {
+    // Double-check authentication before processing
+    const authStatus = localStorage.getItem('isAuthenticated');
+    if (authStatus !== 'true') {
+      alert('Rəy yazmaq üçün daxil olmalısınız');
+      navigate('/login', { state: { from: window.location.pathname } });
+      return;
+    }
+    
     setReviewsList(prev => [newReview, ...prev]);
     setShowReviewForm(false);
     // Show success message (you can add toast notification here)
     alert('Rəyiniz uğurla əlavə edildi! Təşəkkür edirik.');
+  };
+
+  const handleWriteReviewClick = () => {
+    // Always check authentication from localStorage directly
+    const authStatus = localStorage.getItem('isAuthenticated');
+    if (authStatus !== 'true') {
+      if (window.confirm('Rəy yazmaq üçün daxil olmalısınız. Login səhifəsinə keçmək istəyirsiniz?')) {
+        navigate('/login', { state: { from: window.location.pathname } });
+      }
+      return;
+    }
+    setShowReviewForm(!showReviewForm);
   };
 
   return (
@@ -69,15 +100,18 @@ const ReviewsSection = ({ reviews = [], averageRating = 0, totalReviews = 0 }) =
 
         <button 
           className="btn-write-review"
-          onClick={() => setShowReviewForm(!showReviewForm)}
+          onClick={handleWriteReviewClick}
         >
           <FaEdit />
-          {showReviewForm ? 'Rəyi bağla' : 'Rəy yaz'}
+          {isAuthenticated 
+            ? (showReviewForm ? 'Rəyi bağla' : 'Rəy yaz')
+            : '🔒 Rəy yaz (Giriş tələb olunur)'
+          }
         </button>
       </div>
 
-      {/* Review Form */}
-      {showReviewForm && (
+      {/* Review Form - Only show if authenticated */}
+      {showReviewForm && isAuthenticated && (
         <ReviewForm 
           onSubmit={handleSubmitReview}
           onCancel={() => setShowReviewForm(false)}
@@ -97,7 +131,7 @@ const ReviewsSection = ({ reviews = [], averageRating = 0, totalReviews = 0 }) =
             <p>İlk rəyi siz yazın!</p>
             <button 
               className="btn-first-review"
-              onClick={() => setShowReviewForm(true)}
+              onClick={handleWriteReviewClick}
             >
               İlk rəyi yaz
             </button>

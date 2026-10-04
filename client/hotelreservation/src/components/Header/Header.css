@@ -5,16 +5,18 @@
   top: 0;
   z-index: 1000;
   height: 68px;
-  background: rgba(14, 16, 32, 0.55);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  transition: background 0.3s, box-shadow 0.3s, height 0.3s;
+  background: rgba(14, 16, 32, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
 }
 
 .header.scrolled {
-  background: rgba(12, 14, 28, 0.92);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  background: rgba(12, 14, 28, 0.95);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.05);
   height: 64px;
+  backdrop-filter: blur(24px) saturate(200%);
 }
 
 .header-container {
@@ -67,10 +69,13 @@
   position: relative;
   padding: 0.55rem 0.85rem;
   border-radius: 10px;
+  transition: all 0.25s ease;
 }
 
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
+  color: #8ea2ff;
+  transform: translateY(-1px);
 }
 
 .dropdown-arrow {
@@ -139,7 +144,7 @@
   cursor: pointer;
   padding: 0.45rem 0.8rem;
   border-radius: 10px;
-  transition: background 0.3s, transform 0.2s;
+  transition: all 0.25s ease;
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -147,6 +152,7 @@
 .quick-nav-btn:hover {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
 }
 
 .user-actions {
@@ -189,7 +195,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
   width: 36px;
   height: 36px;
 }
@@ -197,7 +203,8 @@
 .theme-toggle-btn:hover,
 .notification-btn:hover,
 .burger:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
+  transform: scale(1.05);
 }
 
 .theme-toggle-btn:hover {
@@ -395,11 +402,12 @@
   transition: all 0.3s ease;
   border: none;
   white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
 }
 
 .login-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
 }
 
 @media (max-width: 1100px) {

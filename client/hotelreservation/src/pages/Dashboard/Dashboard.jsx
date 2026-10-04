@@ -7,6 +7,9 @@ import './Dashboard.css';
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [user, setUser] = useState(null);
+  const [reservations, setReservations] = useState(MOCK_RESERVATIONS);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState(null);
   const stats = getDashboardStats();
 
   useEffect(() => {
@@ -39,13 +42,37 @@ const Dashboard = () => {
   };
 
   const filteredReservations = activeTab === 'all' 
-    ? MOCK_RESERVATIONS 
-    : MOCK_RESERVATIONS.filter(res => {
+    ? reservations 
+    : reservations.filter(res => {
         if (activeTab === 'upcoming') return res.status === 'confirmed' || res.status === 'upcoming';
         if (activeTab === 'completed') return res.status === 'completed' || res.status === 'checked-in';
         if (activeTab === 'cancelled') return res.status === 'cancelled';
         return true;
       });
+
+  const handleCancelReservation = (reservation) => {
+    setSelectedReservation(reservation);
+    setShowCancelModal(true);
+  };
+
+  const confirmCancelReservation = () => {
+    if (selectedReservation) {
+      setReservations(reservations.map(r => 
+        r.id === selectedReservation.id ? { ...r, status: 'cancelled' } : r
+      ));
+      setShowCancelModal(false);
+      setSelectedReservation(null);
+      alert('Rezervasiya uğurla ləğv edildi');
+    }
+  };
+
+  const canModifyReservation = (status) => {
+    return status === 'confirmed' || status === 'upcoming';
+  };
+
+  const canCancelReservation = (status) => {
+    return status === 'confirmed' || status === 'upcoming';
+  };
 
   return (
     <div className="dashboard-page">
@@ -199,12 +226,30 @@ const Dashboard = () => {
                           <span className="price-label">{reservation.nights} gecə</span>
                           <span className="price-amount">₼{reservation.totalPrice}</span>
                         </div>
-                        <Link 
-                          to={`/reservations/${reservation.id}`} 
-                          className="btn-view-reservation"
-                        >
-                          Ətraflı bax
-                        </Link>
+                        <div className="reservation-actions">
+                          <Link 
+                            to={`/reservations/${reservation.id}`} 
+                            className="btn-view-reservation"
+                          >
+                            Ətraflı bax
+                          </Link>
+                          {canModifyReservation(reservation.status) && (
+                            <button 
+                              className="btn-modify-reservation"
+                              onClick={() => alert('Dəyişdirmə funksiyası tezliklə əlavə olunacaq')}
+                            >
+                              Dəyişdir
+                            </button>
+                          )}
+                          {canCancelReservation(reservation.status) && (
+                            <button 
+                              className="btn-cancel-reservation"
+                              onClick={() => handleCancelReservation(reservation)}
+                            >
+                              Ləğv et
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -223,6 +268,39 @@ const Dashboard = () => {
           )}
         </div>
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelModal && (
+        <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Rezervasiyanı Ləğv Et</h3>
+            <p>Bu rezervasiyanı ləğv etmək istədiyinizə əminsiniz?</p>
+            {selectedReservation && (
+              <div className="modal-reservation-info">
+                <p><strong>{selectedReservation.hotelName}</strong></p>
+                <p>{selectedReservation.checkIn} - {selectedReservation.checkOut}</p>
+                <p className="modal-warning">
+                  ⚠️ Ləğv etdikdən sonra bu əməliyyatı geri qaytara bilməzsiniz
+                </p>
+              </div>
+            )}
+            <div className="modal-actions">
+              <button 
+                className="btn-modal-cancel"
+                onClick={() => setShowCancelModal(false)}
+              >
+                Xeyr, saxla
+              </button>
+              <button 
+                className="btn-modal-confirm"
+                onClick={confirmCancelReservation}
+              >
+                Bəli, ləğv et
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

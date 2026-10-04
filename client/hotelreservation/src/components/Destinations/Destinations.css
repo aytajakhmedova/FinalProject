@@ -115,8 +115,8 @@
 .price-row:hover {
   background: rgba(74, 222, 128, 0.15);
   border-color: #4ade80;
-  transform: translateX(4px);
-  box-shadow: -3px 0 0 #4ade80;
+  transform: translateX(6px);
+  box-shadow: -4px 0 0 #4ade80, 0 4px 12px rgba(74, 222, 128, 0.2);
 }
 
 .month-name {

@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import RatingStars from '../RatingStars/RatingStars';
 import './ReviewForm.css';
 
 const ReviewForm = ({ onSubmit, onCancel }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     rating: 0,
     title: '',
@@ -11,6 +13,15 @@ const ReviewForm = ({ onSubmit, onCancel }) => {
     cons: '',
   });
   const [errors, setErrors] = useState({});
+
+  // Check authentication on mount
+  useEffect(() => {
+    const authStatus = localStorage.getItem('isAuthenticated');
+    if (authStatus !== 'true') {
+      alert('Rəy yazmaq üçün daxil olmalısınız');
+      navigate('/login', { state: { from: window.location.pathname } });
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,13 +61,26 @@ const ReviewForm = ({ onSubmit, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    e.stopPropagation();
+
+    // Critical authentication check - must be first
+    const authStatus = localStorage.getItem('isAuthenticated');
+    if (authStatus !== 'true') {
+      alert('Rəy yazmaq üçün daxil olmalısınız');
+      navigate('/login', { state: { from: window.location.pathname } });
+      return;
+    }
 
     if (!validate()) return;
+
+    // Get user data
+    const userData = localStorage.getItem('user');
+    const user = userData ? JSON.parse(userData) : null;
 
     // Mock submit
     const newReview = {
       id: Date.now(),
-      userName: 'Siz',
+      userName: user?.name || 'İstifadəçi',
       rating: formData.rating,
       title: formData.title,
       comment: formData.comment,

@@ -30,10 +30,10 @@
   max-width: 600px;
   margin: 4rem auto;
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 3.5rem 2rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 20px;
+  border-radius: 18px;
 }
 
 .no-data-icon {
@@ -92,8 +92,8 @@
 .booking-form-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 2rem;
+  border-radius: 14px;
+  padding: 1.75rem;
 }
 
 .form-section-title {
@@ -125,13 +125,13 @@
 .form-input,
 .form-textarea {
   width: 100%;
-  padding: 1rem;
+  padding: 0.875rem;
   background: var(--bg-primary);
   border: 2px solid var(--border-color);
   border-radius: 10px;
   color: var(--text-primary);
   font-size: 1rem;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   font-family: inherit;
 }
 
@@ -203,15 +203,15 @@
 /* Submit Button */
 .btn-submit-booking {
   width: 100%;
-  padding: 1.25rem;
+  padding: 1.125rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1.2rem;
+  border-radius: 10px;
+  font-size: 1.125rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -236,8 +236,8 @@
 .summary-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
-  padding: 2rem;
+  border-radius: 14px;
+  padding: 1.75rem;
 }
 
 .summary-card-title {
@@ -249,10 +249,10 @@
 
 .summary-room-image {
   width: 100%;
-  height: 180px;
+  height: 160px;
   object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
 }
 
 .summary-hotel-details {

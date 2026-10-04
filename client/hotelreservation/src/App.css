@@ -1,6 +1,8 @@
 .App {
   min-height: 100vh;
   transition: background-color 0.3s ease, color 0.3s ease;
+  position: relative;
+  overflow-x: hidden;
 }
 
 .light-mode {
@@ -8,9 +10,33 @@
   color: #2c3e50;
 }
 
+/* Dark Mode - Modern və diqqət çəkici */
 .dark-mode {
   background: #0f1419;
   color: #e4e6eb;
+}
+
+.dark-mode::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  animation: float-orb 20s ease-in-out infinite;
+}
+
+@keyframes float-orb {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-100px, -80px) scale(1.1);
+  }
 }
 
 /* Hero Section */
@@ -106,10 +132,20 @@
   color: white;
   padding: 1rem 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
   z-index: 9999;
-  animation: slideIn 0.3s ease;
+  animation: slideIn 0.3s ease, pulse 2s ease infinite;
   font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15);
+  }
 }
 
 @keyframes slideIn {

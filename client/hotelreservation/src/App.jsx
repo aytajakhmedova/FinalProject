@@ -16,6 +16,7 @@ import TourDetail from './pages/TourDetail/TourDetail';
 import Flights from './pages/Flights/Flights';
 import FlightResults from './pages/FlightResults/FlightResults';
 import FlightBooking from './pages/FlightBooking/FlightBooking';
+import OccupancyCalendar from './pages/Admin/OccupancyCalendar/OccupancyCalendar';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import AdminDashboard from './pages/Admin/Dashboard/AdminDashboard';
 import AdminHotels from './pages/Admin/Hotels/AdminHotels';
@@ -189,6 +190,7 @@ function App() {
             <Route path="bookings" element={<AdminBookings />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="analytics" element={<AdminAnalytics />} />
+            <Route path="occupancy" element={<OccupancyCalendar />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>
