@@ -45,7 +45,7 @@
   width: 52px;
   height: 52px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -86,8 +86,8 @@
 
 .stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.18);
-  border-color: rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 24px rgba(139, 90, 60, 0.18);
+  border-color: rgba(139, 90, 60, 0.3);
 }
 
 .stat-icon {
@@ -102,7 +102,7 @@
 }
 
 .stat-upcoming .stat-icon {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
 }
 
 .stat-completed .stat-icon {
@@ -110,7 +110,7 @@
 }
 
 .stat-total .stat-icon {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #D2691E 0%, #f5576c 100%);
 }
 
 .stat-content {
@@ -157,7 +157,7 @@
 }
 
 .tab-btn.active {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .tab-btn.active::after {
@@ -167,7 +167,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #8B5A3C 0%, #A0522D 100%);
 }
 
 /* Reservations Section */
@@ -200,7 +200,7 @@
 .reservation-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
-  border-color: rgba(102, 126, 234, 0.3);
+  border-color: rgba(139, 90, 60, 0.3);
 }
 
 .reservation-image {
@@ -241,7 +241,7 @@
 }
 
 .badge-upcoming {
-  background: rgba(59, 130, 246, 0.9);
+  background: rgba(139, 90, 60, 0.9);
 }
 
 .badge-checked-in {
@@ -294,7 +294,7 @@
 }
 
 .reservation-location svg {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .reservation-room-type {
@@ -324,7 +324,7 @@
 }
 
 .detail-icon {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 1.1rem;
 }
 
@@ -371,12 +371,12 @@
 .price-amount {
   font-size: 1.35rem;
   font-weight: 700;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .btn-view-reservation {
   padding: 0.6rem 1.15rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -390,7 +390,7 @@
 
 .btn-view-reservation:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.35);
+  box-shadow: 0 8px 16px rgba(139, 90, 60, 0.35);
 }
 
 /* No Reservations */
@@ -424,7 +424,7 @@
 .btn-browse-hotels {
   display: inline-block;
   padding: 0.875rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border-radius: 12px;
   font-weight: 600;
@@ -434,7 +434,7 @@
 
 .btn-browse-hotels:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 16px rgba(139, 90, 60, 0.3);
 }
 
 /* Responsive */
@@ -537,12 +537,12 @@
 }
 
 .btn-modify-reservation {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+  background: rgba(139, 90, 60, 0.1);
+  color: #8B5A3C;
 }
 
 .btn-modify-reservation:hover {
-  background: rgba(59, 130, 246, 0.2);
+  background: rgba(139, 90, 60, 0.2);
 }
 
 .btn-cancel-reservation {

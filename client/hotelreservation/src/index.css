@@ -7,33 +7,33 @@
 }
 
 :root {
-  --primary: #667eea;
-  --primary-dark: #5568d3;
-  --secondary: #764ba2;
-  --accent: #f093fb;
+  --primary: #8B5A3C;
+  --primary-dark: #6B4423;
+  --secondary: #A0522D;
+  --accent: #D2691E;
   --success: #10b981;
   --warning: #f59e0b;
   --error: #ef4444;
-  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --gradient-primary: linear-gradient(135deg, #3A2118 0%, #8B5E3C 100%);
+  --gradient-secondary: linear-gradient(135deg, #8B5A3C 0%, #D2691E 100%);
   --gradient-success: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.16);
-  --shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 2px 8px rgba(58, 33, 24, 0.12);
+  --shadow-md: 0 4px 16px rgba(58, 33, 24, 0.16);
+  --shadow-lg: 0 8px 24px rgba(58, 33, 24, 0.2);
+  --shadow-xl: 0 12px 32px rgba(58, 33, 24, 0.25);
 }
 
-/* Dark Mode (Default) */
+/* Dark Mode (Default) - Şokolad Tonu */
 body {
-  --bg-primary: #0f1419;
-  --bg-secondary: #1a1f2e;
-  --bg-card: #1a1f2e;
-  --text-primary: #e4e6eb;
-  --text-secondary: rgba(255, 255, 255, 0.8);
-  --text-muted: rgba(255, 255, 255, 0.6);
-  --border-color: rgba(255, 255, 255, 0.1);
-  --hero-bg: radial-gradient(1200px 600px at 10% -10%, rgba(102, 126, 234, 0.22), transparent 50%),
-    linear-gradient(160deg, #101226 0%, #16213e 55%, #1a1030 100%);
+  --bg-primary: #1a1410;
+  --bg-secondary: #2a1f1a;
+  --bg-card: #2a1f1a;
+  --text-primary: #f5e6d3;
+  --text-secondary: rgba(245, 230, 211, 0.85);
+  --text-muted: rgba(245, 230, 211, 0.6);
+  --border-color: rgba(139, 90, 60, 0.2);
+  --hero-bg: radial-gradient(1200px 600px at 10% -10%, rgba(139, 90, 60, 0.25), transparent 50%),
+    linear-gradient(160deg, #1a1410 0%, #2a1f1a 55%, #1a0f0a 100%);
   
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -44,17 +44,17 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Light Mode - Modern və seliqəli */
+/* Light Mode - İsti Şokolad Tonları */
 .light-mode {
   --bg-primary: #ffffff;
-  --bg-secondary: #f8f9fa;
+  --bg-secondary: #f5ebe0;
   --bg-card: #ffffff;
-  --text-primary: #1a202c;
-  --text-secondary: #4a5568;
-  --text-muted: #718096;
-  --border-color: rgba(0, 0, 0, 0.08);
-  --hero-bg: radial-gradient(1200px 600px at 10% -10%, rgba(102, 126, 234, 0.12), transparent 50%),
-    linear-gradient(160deg, #f8f9fa 0%, #e9ecef 55%, #dee2e6 100%);
+  --text-primary: #1a1410;
+  --text-secondary: #3a2118;
+  --text-muted: #5a4a3f;
+  --border-color: rgba(139, 90, 60, 0.15);
+  --hero-bg: radial-gradient(1200px 600px at 10% -10%, rgba(139, 90, 60, 0.06), transparent 50%),
+    linear-gradient(160deg, #ffffff 0%, #faf7f4 55%, #f5ebe0 100%);
 }
 
 code {
@@ -73,19 +73,19 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #3A2118 0%, #8B5E3C 100%);
   border-radius: 10px;
   transition: background 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #764ba2 0%, #f093fb 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #D2691E 100%);
 }
 
 ::selection {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #3A2118 0%, #8B5E3C 100%);
+  color: #f5e6d3;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* Date Input Styling - Compact and Consistent */
@@ -96,12 +96,12 @@ input[type="date"] {
 
 input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
-  filter: invert(0.6);
+  filter: brightness(1.2) sepia(0.3) hue-rotate(-10deg);
   font-size: 1rem;
 }
 
 .light-mode input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(0.4);
+  filter: brightness(0.7) sepia(0.5) hue-rotate(-10deg);
 }
 
 input[type="date"]::-webkit-datetime-edit {

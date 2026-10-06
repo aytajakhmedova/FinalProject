@@ -17,7 +17,7 @@
 
 .header-title svg {
   font-size: 2rem;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .header-title h1 {
@@ -68,11 +68,11 @@
 }
 
 .stat-icon.rooms {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
 }
 
 .stat-icon.occupancy {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #D2691E 0%, #f5576c 100%);
 }
 
 .stat-icon.available {
@@ -115,9 +115,9 @@
 }
 
 .btn-month-nav:hover {
-  background: #667eea;
+  background: #8B5A3C;
   color: white;
-  border-color: #667eea;
+  border-color: #8B5A3C;
 }
 
 .current-month {
@@ -301,7 +301,7 @@
 
 .bar-fill {
   width: 100%;
-  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(180deg, #8B5A3C 0%, #A0522D 100%);
   border-radius: 4px 4px 0 0;
   transition: all 0.3s ease;
   cursor: pointer;

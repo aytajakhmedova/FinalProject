@@ -113,7 +113,7 @@
 }
 
 .slider-btn:hover:not(:disabled) {
-  background: #667eea;
+  background: #8B5A3C;
   color: white;
   transform: scale(1.1);
 }

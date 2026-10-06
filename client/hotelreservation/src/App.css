@@ -10,9 +10,9 @@
   color: #2c3e50;
 }
 
-/* Dark Mode - Modern və diqqət çəkici */
+/* Dark Mode - Şokolad Ton */
 .dark-mode {
-  background: #0f1419;
+  background: #1a1410;
   color: #e4e6eb;
 }
 
@@ -23,7 +23,7 @@
   right: -10%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(102, 126, 234, 0.08) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(139, 90, 60, 0.08) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
@@ -41,12 +41,12 @@
 
 /* Hero Section */
 .dark-mode .hero-section {
-  background: radial-gradient(1200px 600px at 10% -10%, rgba(102, 126, 234, 0.22), transparent 50%),
-    linear-gradient(160deg, #101226 0%, #16213e 55%, #1a1030 100%);
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(139, 90, 60, 0.22), transparent 50%),
+    linear-gradient(160deg, #1a1410 0%, #2a1f1a 55%, #1a0f0a 100%);
 }
 
 .light-mode .hero-section {
-  background: radial-gradient(1200px 600px at 10% -10%, rgba(102, 126, 234, 0.15), transparent 50%),
+  background: radial-gradient(1200px 600px at 10% -10%, rgba(139, 90, 60, 0.15), transparent 50%),
     linear-gradient(160deg, #f8f9fa 0%, #e9ecef 55%, #dee2e6 100%);
 }
 
@@ -63,7 +63,7 @@
 }
 
 .light-mode .hero-kicker {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 /* Holiday Section */
@@ -73,7 +73,7 @@
 }
 
 .dark-mode .holiday-section {
-  background: #0f1419;
+  background: #1a1410;
   color: #e4e6eb;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .dark-mode .destinations-section {
-  background: #1a1f2e;
+  background: #1a1410;
 }
 
 /* Featured Hotels */
@@ -92,7 +92,7 @@
 }
 
 .dark-mode .featured-section {
-  background: #0f1419;
+  background: #1a1410;
 }
 
 .light-mode .hotel-card {
@@ -102,7 +102,7 @@
 }
 
 .dark-mode .hotel-card {
-  background: #1a1f2e;
+  background: #1a1410;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #e4e6eb;
 }
@@ -113,7 +113,7 @@
 }
 
 .dark-mode .image-gallery-section {
-  background: #0f1419;
+  background: #1a1410;
 }
 
 .light-mode .gallery-title {
@@ -128,11 +128,11 @@
   position: fixed;
   bottom: 30px;
   right: 30px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   padding: 1rem 1.5rem;
   border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(139, 90, 60, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
   z-index: 9999;
   animation: slideIn 0.3s ease, pulse 2s ease infinite;
   font-weight: 500;
@@ -141,10 +141,10 @@
 
 @keyframes pulse {
   0%, 100% {
-    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 24px rgba(139, 90, 60, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.1);
   }
   50% {
-    box-shadow: 0 12px 32px rgba(102, 126, 234, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15);
+    box-shadow: 0 12px 32px rgba(139, 90, 60, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.15);
   }
 }
 

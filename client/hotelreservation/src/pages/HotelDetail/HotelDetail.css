@@ -26,13 +26,14 @@
 }
 
 .back-button:hover {
-  background: rgba(102, 126, 234, 0.1);
-  border-color: #667eea;
-  color: #667eea;
+  background: rgba(139, 90, 60, 0.1);
+  border-color: #8B5A3C;
+  color: #8B5A3C;
 }
 
 .hotel-gallery-section {
-  padding: 1.5rem 0;
+  padding: 1.5rem 0 2rem 0;
+  margin-bottom: 1rem;
 }
 
 .hotel-detail-content {
@@ -83,7 +84,7 @@
 }
 
 .hotel-location svg {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .hotel-rating-box {
@@ -136,16 +137,16 @@
 }
 
 .amenity-item:hover {
-  background: rgba(102, 126, 234, 0.08);
-  border-color: rgba(102, 126, 234, 0.35);
+  background: rgba(139, 90, 60, 0.08);
+  border-color: rgba(139, 90, 60, 0.35);
   transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  box-shadow: 0 4px 12px rgba(139, 90, 60, 0.15);
 }
 
 .amenity-icon {
   width: 42px;
   height: 42px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -209,17 +210,17 @@
 }
 
 .back-link {
-  color: #667eea;
+  color: #8B5A3C;
   text-decoration: none;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
-  border: 2px solid #667eea;
+  border: 2px solid #8B5A3C;
   border-radius: 12px;
   transition: all 0.3s;
 }
 
 .back-link:hover {
-  background: #667eea;
+  background: #8B5A3C;
   color: white;
 }
 
@@ -287,7 +288,7 @@
 .sidebar-price-amount {
   font-size: 2.25rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -354,7 +355,7 @@
   gap: 0.65rem;
   width: 100%;
   padding: 0.95rem 1.25rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border: none;
   border-radius: 11px;
@@ -367,7 +368,7 @@
 
 .btn-select-room:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.35);
+  box-shadow: 0 6px 16px rgba(139, 90, 60, 0.35);
 }
 
 .sidebar-amenities-preview {
@@ -401,7 +402,7 @@
 }
 
 .sidebar-amenities-preview li svg {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 0.85rem;
   flex-shrink: 0;
 }

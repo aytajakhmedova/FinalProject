@@ -5,10 +5,15 @@
 
 /* Hero Section */
 .tours-hero {
-  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+  background: linear-gradient(135deg, #1a1410 0%, #3a2118 100%);
   padding: 6rem 2rem 4rem;
   text-align: center;
   border-bottom: 1px solid var(--border-color);
+}
+
+/* Light Mode - Ağ arxa plan */
+.light-mode .tours-hero {
+  background: linear-gradient(135deg, #f5ebe0 0%, #ffffff 100%);
 }
 
 .tours-hero-content {
@@ -21,7 +26,18 @@
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Light Mode - Görünən yazı */
+.light-mode .tours-hero-title {
+  color: #1a1410;
+  background: none;
+  -webkit-text-fill-color: unset;
+}
+
+/* Dark Mode - Gradient yazı */
+.dark-mode .tours-hero-title {
+  background: linear-gradient(135deg, #D2691E 0%, #CD853F 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -83,8 +99,8 @@
 
 .search-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  border-color: #8B5A3C;
+  box-shadow: 0 0 0 4px rgba(139, 90, 60, 0.1);
 }
 
 .filter-group {
@@ -151,7 +167,7 @@
 .tour-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
-  border-color: rgba(102, 126, 234, 0.25);
+  border-color: rgba(139, 90, 60, 0.25);
 }
 
 .tour-card-link {
@@ -186,7 +202,7 @@
   top: 1rem;
   left: 1rem;
   padding: 0.5rem 1rem;
-  background: rgba(102, 126, 234, 0.9);
+  background: rgba(139, 90, 60, 0.9);
   color: white;
   font-size: 0.85rem;
   font-weight: 600;
@@ -252,7 +268,7 @@
 }
 
 .tour-location svg {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .tour-rating svg {
@@ -283,7 +299,7 @@
 
 .tour-duration svg,
 .tour-guests svg {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .tour-card-footer {
@@ -310,12 +326,12 @@
 .price-amount {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .btn-tour-view {
   padding: 0.65rem 1.35rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -328,7 +344,7 @@
 
 .btn-tour-view:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.35);
+  box-shadow: 0 8px 16px rgba(139, 90, 60, 0.35);
 }
 
 /* No Results */

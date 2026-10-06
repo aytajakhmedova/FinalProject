@@ -65,8 +65,8 @@
 
 .search-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #8B5A3C;
+  box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.1);
 }
 
 .filter-toggle-btn {
@@ -84,8 +84,8 @@
 }
 
 .filter-toggle-btn:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #8B5A3C;
+  color: #8B5A3C;
 }
 
 .hotels-content {
@@ -183,7 +183,7 @@
 }
 
 .checkbox-label:hover {
-  background: rgba(102, 126, 234, 0.05);
+  background: rgba(139, 90, 60, 0.05);
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -200,18 +200,18 @@
 .reset-filters-btn {
   width: 100%;
   padding: 0.875rem;
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  background: rgba(139, 90, 60, 0.1);
+  border: 1px solid rgba(139, 90, 60, 0.3);
   border-radius: 10px;
-  color: #667eea;
+  color: #8B5A3C;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
 }
 
 .reset-filters-btn:hover {
-  background: rgba(102, 126, 234, 0.2);
-  border-color: #667eea;
+  background: rgba(139, 90, 60, 0.2);
+  border-color: #8B5A3C;
 }
 
 .hotels-main {

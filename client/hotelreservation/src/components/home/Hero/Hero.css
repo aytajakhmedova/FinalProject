@@ -31,8 +31,8 @@
   height: 100%;
   background: linear-gradient(
     to bottom,
-    rgba(0, 0, 0, 0.4) 0%,
-    rgba(0, 0, 0, 0.6) 100%
+    rgba(26, 15, 10, 0.7) 0%,
+    rgba(58, 33, 24, 0.8) 100%
   );
   z-index: 2;
 }
@@ -61,11 +61,12 @@
 }
 
 .hero-highlight {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #D2691E 0%, #CD853F 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.5));
+  filter: drop-shadow(0 2px 8px rgba(210, 105, 30, 0.6));
+  font-weight: 800;
 }
 
 .hero-subtitle {
@@ -77,13 +78,14 @@
 }
 
 .hero-booking-form {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(250, 247, 244, 0.97);
   backdrop-filter: blur(12px);
   padding: 2rem;
   border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(58, 33, 24, 0.4);
   max-width: 1200px;
   margin: 0 auto;
+  border: 1px solid rgba(139, 90, 60, 0.2);
 }
 
 .form-row {
@@ -117,11 +119,11 @@
   gap: 0.5rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #333;
+  color: #2a1f1a;
 }
 
 .form-group label svg {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 1rem;
 }
 
@@ -130,31 +132,32 @@
   width: 100%;
   min-width: 0;
   padding: 0.875rem 1rem;
-  border: 2px solid rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(139, 90, 60, 0.2);
   border-radius: 10px;
   font-size: 0.95rem;
   background: white;
-  color: #333;
+  color: #1a1410;
   transition: all 0.3s;
   font-family: inherit;
   box-sizing: border-box;
+  font-weight: 500;
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #8B5A3C;
+  box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.15);
 }
 
 .form-group input:disabled {
-  background: rgba(0, 0, 0, 0.05);
+  background: rgba(139, 90, 60, 0.05);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
 .form-group input::placeholder {
-  color: #999;
+  color: #8a7a6f;
   font-size: 0.9rem;
 }
 
@@ -178,9 +181,9 @@
   right: 0;
   margin-top: 0.5rem;
   background: white;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(139, 90, 60, 0.2);
   border-radius: 12px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 32px rgba(58, 33, 24, 0.2);
   max-height: 300px;
   overflow-y: auto;
   z-index: 1000;
@@ -209,7 +212,7 @@
   text-align: left;
   cursor: pointer;
   transition: all 0.2s;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid rgba(139, 90, 60, 0.1);
 }
 
 .location-item:last-child {
@@ -217,24 +220,24 @@
 }
 
 .location-item:hover {
-  background: rgba(102, 126, 234, 0.08);
+  background: rgba(139, 90, 60, 0.08);
 }
 
 .location-item svg {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 1.1rem;
   flex-shrink: 0;
 }
 
 .location-name {
   font-weight: 600;
-  color: #333;
+  color: #1a1410;
   font-size: 0.95rem;
 }
 
 .location-country {
   font-size: 0.8rem;
-  color: #666;
+  color: #5a4a3f;
   margin-top: 0.125rem;
 }
 
@@ -251,7 +254,7 @@
 
 .btn-search {
   padding: 0.875rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -268,7 +271,7 @@
 
 .btn-search:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 20px rgba(139, 90, 60, 0.4);
 }
 
 .btn-search svg {

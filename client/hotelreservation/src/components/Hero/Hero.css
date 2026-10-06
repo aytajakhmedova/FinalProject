@@ -21,9 +21,9 @@
   animation: drift 12s ease-in-out infinite;
 }
 
-.orb-1 { width: 280px; height: 280px; background: #667eea; top: 8%; right: 12%; }
-.orb-2 { width: 180px; height: 180px; background: #764ba2; bottom: 18%; left: 8%; animation-delay: -4s; }
-.orb-3 { width: 140px; height: 140px; background: #22d3ee; top: 40%; left: 40%; animation-delay: -7s; opacity: 0.2; }
+.orb-1 { width: 280px; height: 280px; background: #8B5A3C; top: 8%; right: 12%; }
+.orb-2 { width: 180px; height: 180px; background: #A0522D; bottom: 18%; left: 8%; animation-delay: -4s; }
+.orb-3 { width: 140px; height: 140px; background: #D2691E; top: 40%; left: 40%; animation-delay: -7s; opacity: 0.25; }
 
 @keyframes drift {
   0%, 100% { transform: translate(0, 0) scale(1); }
@@ -37,7 +37,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 20% 50%, rgba(74, 144, 226, 0.1) 0%, transparent 50%);
+  background: radial-gradient(circle at 20% 50%, rgba(139, 90, 60, 0.08) 0%, transparent 50%);
   pointer-events: none;
 }
 
@@ -68,7 +68,7 @@
 }
 
 .hero-kicker {
-  color: #9bb0ff;
+  color: #D2691E;
   letter-spacing: 2.5px;
   text-transform: uppercase;
   font-size: 0.78rem;
@@ -85,7 +85,7 @@
 }
 
 .hero-title .underline {
-  background: linear-gradient(90deg, #8ea2ff, #c4b5fd);
+  background: linear-gradient(90deg, #D2691E, #CD853F);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -99,8 +99,11 @@
   bottom: 2px;
   width: 100%;
   height: 4px;
+  background: linear-gradient(90deg, #D2691E, #CD853F);
+  border-radius: 2px;
+}
   border-radius: 4px;
-  background: linear-gradient(90deg, #667eea, transparent);
+  background: linear-gradient(90deg, #8B5A3C, transparent);
 }
 
 .hero-description {
@@ -131,7 +134,7 @@
 }
 
 .discover-btn:first-child {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
 }
 
@@ -173,7 +176,7 @@
 
 .badge-icon {
   font-size: 2rem;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .badge-time {
@@ -193,7 +196,7 @@
   overflow: visible;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
   aspect-ratio: 5/3;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   max-height: 400px;
 }
 

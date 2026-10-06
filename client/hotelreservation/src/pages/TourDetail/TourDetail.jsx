@@ -11,13 +11,13 @@ import {
   FaCalendarAlt
 } from 'react-icons/fa';
 import { getTourById } from '../../data/toursData';
+import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
 import './TourDetail.css';
 
 const TourDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const tour = getTourById(id);
-  const [selectedImage, setSelectedImage] = useState(0);
   const [selectedDate, setSelectedDate] = useState('');
   const [guestCount, setGuestCount] = useState(2);
 
@@ -57,22 +57,7 @@ const TourDetail = () => {
       {/* Gallery */}
       <section className="tour-gallery-section">
         <div className="tour-detail-container">
-          <div className="tour-gallery">
-            <div className="main-tour-image">
-              <img src={tour.images[selectedImage]} alt={tour.name} />
-            </div>
-            <div className="tour-thumbnails">
-              {tour.images.map((img, idx) => (
-                <div
-                  key={idx}
-                  className={`tour-thumbnail ${selectedImage === idx ? 'active' : ''}`}
-                  onClick={() => setSelectedImage(idx)}
-                >
-                  <img src={img} alt={`${tour.name} ${idx + 1}`} />
-                </div>
-              ))}
-            </div>
-          </div>
+          <ImageGallery images={tour.images} title={tour.name} />
         </div>
       </section>
 

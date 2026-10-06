@@ -10,65 +10,21 @@
   padding: 0 2rem;
 }
 
-.room-gallery {
-  padding: 2rem 0;
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1rem;
+.room-gallery-section {
+  padding: 1.5rem 0 2rem 0;
+  margin-bottom: 1rem;
 }
 
 .room-main-image {
-  height: 500px;
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.room-main-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  display: none;
 }
 
 .room-thumbnails {
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  gap: 1rem;
+  display: none;
 }
 
 .room-thumbnail {
-  height: 100%;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  border: 3px solid transparent;
-  transition: all 0.3s;
-  position: relative;
-}
-
-.room-thumbnail::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.2);
-  transition: all 0.3s;
-}
-
-.room-thumbnail:hover::after {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.room-thumbnail.active {
-  border-color: #667eea;
-}
-
-.room-thumbnail.active::after {
-  background: transparent;
-}
-
-.room-thumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  display: none;
 }
 
 .room-detail-content {
@@ -120,7 +76,7 @@
 .room-info-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -161,7 +117,7 @@
 }
 
 .room-section-title svg {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 /* Availability Search */
@@ -208,8 +164,8 @@
 .date-input:focus,
 .guests-select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #8B5A3C;
+  box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.1);
 }
 
 .date-input:disabled,
@@ -328,7 +284,7 @@
 }
 
 .breakdown-total span {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .breakdown-info {
@@ -337,7 +293,7 @@
   gap: 0.75rem;
   margin-top: 1.5rem;
   padding: 1rem;
-  background: rgba(102, 126, 234, 0.05);
+  background: rgba(139, 90, 60, 0.05);
   border-radius: 10px;
   font-size: 0.9rem;
   color: var(--text-secondary);
@@ -345,7 +301,7 @@
 }
 
 .breakdown-info svg {
-  color: #667eea;
+  color: #8B5A3C;
   margin-top: 0.1rem;
   flex-shrink: 0;
 }
@@ -375,12 +331,12 @@
 }
 
 .room-amenity-item:hover {
-  background: rgba(102, 126, 234, 0.05);
-  border-color: rgba(102, 126, 234, 0.3);
+  background: rgba(139, 90, 60, 0.05);
+  border-color: rgba(139, 90, 60, 0.3);
 }
 
 .room-amenity-icon {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 1.1rem;
 }
 
@@ -431,10 +387,10 @@
 .btn-view-hotel {
   width: 100%;
   padding: 0.875rem;
-  background: rgba(102, 126, 234, 0.1);
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  background: rgba(139, 90, 60, 0.1);
+  border: 1px solid rgba(139, 90, 60, 0.3);
   border-radius: 10px;
-  color: #667eea;
+  color: #8B5A3C;
   font-weight: 600;
   text-decoration: none;
   text-align: center;
@@ -443,8 +399,8 @@
 }
 
 .btn-view-hotel:hover {
-  background: rgba(102, 126, 234, 0.2);
-  border-color: #667eea;
+  background: rgba(139, 90, 60, 0.2);
+  border-color: #8B5A3C;
 }
 
 @media (max-width: 1024px) {
@@ -454,15 +410,6 @@
 
   .room-booking-sidebar {
     position: static;
-  }
-
-  .room-gallery {
-    grid-template-columns: 1fr;
-  }
-
-  .room-thumbnails {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: 1fr;
   }
 
   .availability-search-box {
@@ -475,10 +422,6 @@
 @media (max-width: 768px) {
   .room-title {
     font-size: 2rem;
-  }
-
-  .room-main-image {
-    height: 300px;
   }
 
   .room-info-cards {
@@ -552,13 +495,13 @@
 
 .booking-total-price {
   font-size: 1.5rem;
-  color: #667eea !important;
+  color: #8B5A3C !important;
 }
 
 .btn-reserve-now {
   width: 100%;
   padding: 1.125rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -575,7 +518,7 @@
 
 .btn-reserve-now:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 24px rgba(139, 90, 60, 0.4);
 }
 
 .btn-reserve-now:disabled {
@@ -602,7 +545,7 @@
 
 .instruction-icon {
   font-size: 2.5rem;
-  color: rgba(102, 126, 234, 0.3);
+  color: rgba(139, 90, 60, 0.3);
   margin-bottom: 1rem;
 }
 

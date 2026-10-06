@@ -14,7 +14,7 @@
 }
 
 .eyebrow {
-  color: #8ea2ff;
+  color: #D2691E;
   text-transform: uppercase;
   letter-spacing: 2px;
   font-size: 0.75rem;
@@ -62,8 +62,8 @@
 }
 
 .chip.on {
-  background: #667eea;
-  border-color: #667eea;
+  background: #8B5A3C;
+  border-color: #8B5A3C;
 }
 
 .results-tools select option {
@@ -96,7 +96,7 @@
 .result-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 22px 40px rgba(0, 0, 0, 0.32);
-  border-color: rgba(102, 126, 234, 0.25);
+  border-color: rgba(139, 90, 60, 0.25);
 }
 
 @keyframes cardIn {
@@ -142,7 +142,7 @@
 
 .video-play-btn:hover {
   transform: translate(-50%, -50%) scale(1.08);
-  background: #667eea;
+  background: #8B5A3C;
 }
 
 .result-actions {
@@ -253,7 +253,7 @@
 .amenity-row span {
   font-size: 0.72rem;
   color: #c9d2ff;
-  background: rgba(102, 126, 234, 0.15);
+  background: rgba(139, 90, 60, 0.15);
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
   display: inline-flex;
@@ -278,7 +278,7 @@
 
 .result-footer button {
   border: none;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #8B5A3C, #A0522D);
   color: #fff;
   padding: 0.65rem 1.1rem;
   border-radius: 10px;

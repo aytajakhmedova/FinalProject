@@ -7,7 +7,7 @@ const Stats = () => {
   const statsRef = useRef(null);
 
   const stats = [
-    { icon: <FaHotel />, value: 2500, suffix: '+', label: 'Lüks otel', color: '#667eea' },
+    { icon: <FaHotel />, value: 2500, suffix: '+', label: 'Lüks otel', color: '#8B5A3C' },
     { icon: <FaUsers />, value: 15000, suffix: '+', label: 'Məmnun qonaq', color: '#f43f5e' },
     { icon: <FaGlobeAmericas />, value: 180, suffix: '+', label: 'Ölkə', color: '#4ade80' },
     { icon: <FaStar />, value: 98, suffix: '%', label: 'Məmnunluq', color: '#fbbf24' }

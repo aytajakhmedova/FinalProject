@@ -24,7 +24,7 @@
 .booking-price-amount {
   font-size: 2rem;
   font-weight: 800;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .booking-price-unit {
@@ -39,7 +39,7 @@
 }
 
 .rating-badge {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   padding: 0.4rem 0.8rem;
   border-radius: 8px;
@@ -76,7 +76,7 @@
 }
 
 .booking-label svg {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .booking-input {
@@ -95,8 +95,8 @@
 
 .booking-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #8B5A3C;
+  box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.1);
 }
 
 .booking-input:disabled {
@@ -117,7 +117,7 @@
 }
 
 .booking-summary {
-  background: rgba(102, 126, 234, 0.05);
+  background: rgba(139, 90, 60, 0.05);
   border-radius: 12px;
   padding: 1.25rem;
   display: flex;
@@ -143,7 +143,7 @@
 .booking-submit-btn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -156,7 +156,7 @@
 
 .booking-submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 10px 25px rgba(139, 90, 60, 0.4);
 }
 
 .booking-note {

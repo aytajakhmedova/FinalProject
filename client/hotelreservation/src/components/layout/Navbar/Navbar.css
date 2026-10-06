@@ -58,7 +58,7 @@
   left: 0;
   width: 0;
   height: 2px;
-  background: #667eea;
+  background: #8B5A3C;
   transition: width 0.3s;
 }
 
@@ -90,7 +90,7 @@
 }
 
 .btn-reserve {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   padding: 0.75rem 1.75rem;
   border-radius: 50px;
@@ -103,7 +103,7 @@
 
 .btn-reserve:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 10px 25px rgba(139, 90, 60, 0.4);
 }
 
 .user-icon {
@@ -114,7 +114,7 @@
 }
 
 .user-icon:hover {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .menu-toggle {
@@ -192,7 +192,7 @@
   .mobile-menu a:hover,
   .mobile-menu a.active {
     background: var(--bg-secondary);
-    color: #667eea;
+    color: #8B5A3C;
     padding-left: 2.5rem;
   }
 }

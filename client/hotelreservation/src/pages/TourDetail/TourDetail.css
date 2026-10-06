@@ -27,56 +27,21 @@
 }
 
 .back-button:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #8B5A3C;
+  color: #8B5A3C;
 }
 
-/* Gallery - Hotels.css kimi */
+/* Gallery - Artıq lazım deyil, ImageGallery komponentini istifadə edirik */
 .tour-gallery-section {
-  margin-bottom: 2rem;
+  padding: 1.5rem 0 2rem 0;
+  margin-bottom: 1rem;
 }
 
-.tour-gallery {
-  display: grid;
-  gap: 1rem;
-}
-
-.main-tour-image {
-  width: 100%;
-  height: 500px;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-.main-tour-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.tour-thumbnails {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1rem;
-}
-
+.tour-gallery,
+.main-tour-image,
+.tour-thumbnails,
 .tour-thumbnail {
-  height: 100px;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
-}
-
-.tour-thumbnail.active {
-  border-color: #667eea;
-}
-
-.tour-thumbnail img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  display: none;
 }
 
 /* Content Layout */
@@ -110,9 +75,9 @@
 }
 
 .category-badge {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
-  color: #667eea;
-  border: 1px solid rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, rgba(139, 90, 60, 0.15), rgba(118, 75, 162, 0.15));
+  color: #8B5A3C;
+  border: 1px solid rgba(139, 90, 60, 0.3);
 }
 
 .difficulty-asan { background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); }
@@ -141,7 +106,7 @@
   color: var(--text-secondary);
 }
 
-.tour-location svg { color: #667eea; }
+.tour-location svg { color: #8B5A3C; }
 .tour-rating svg { color: #fbbf24; }
 .reviews-text { color: var(--text-muted); }
 
@@ -165,7 +130,7 @@
 
 .info-icon {
   font-size: 1.5rem;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .info-label {
@@ -244,7 +209,7 @@
   justify-content: center;
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #8B5A3C, #A0522D);
   color: white;
   font-weight: 700;
   font-size: 0.9rem;
@@ -278,7 +243,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 /* Included/Excluded */
@@ -359,7 +324,7 @@
 .price-amount {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .price-unit {
@@ -391,7 +356,7 @@
 }
 
 .form-label svg {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .form-select {
@@ -407,7 +372,7 @@
 
 .form-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #8B5A3C;
 }
 
 .price-summary {
@@ -437,7 +402,7 @@
 .btn-book-tour {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #8B5A3C, #A0522D);
   color: white;
   border: none;
   border-radius: 12px;
@@ -450,7 +415,7 @@
 
 .btn-book-tour:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 12px 24px rgba(139, 90, 60, 0.3);
 }
 
 .booking-note {
@@ -488,10 +453,6 @@
 @media (max-width: 768px) {
   .tour-detail-container {
     padding: 0 1.5rem;
-  }
-  
-  .main-tour-image {
-    height: 300px;
   }
   
   .tour-title {

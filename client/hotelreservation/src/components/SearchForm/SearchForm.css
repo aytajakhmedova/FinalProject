@@ -1,10 +1,10 @@
 .search-form-container {
-  background: rgba(18, 20, 38, 0.72);
+  background: rgba(42, 31, 26, 0.85);
   backdrop-filter: blur(22px);
   border-radius: 28px;
   padding: 1.4rem 1.6rem 1.6rem;
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 70px rgba(58, 33, 24, 0.45);
+  border: 1px solid rgba(139, 90, 60, 0.25);
   animation: searchIn 0.7s ease both;
   position: relative;
   overflow: visible;
@@ -27,8 +27,8 @@
   align-items: center;
   gap: 0.45rem;
   border: 1px solid transparent;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.75);
+  background: rgba(139, 90, 60, 0.15);
+  color: rgba(245, 230, 211, 0.85);
   padding: 0.55rem 1rem;
   border-radius: 999px;
   cursor: pointer;
@@ -38,14 +38,14 @@
 }
 
 .search-tab:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background: rgba(139, 90, 60, 0.25);
+  color: #f5e6d3;
 }
 
 .search-tab.active {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #8B5A3C, #A0522D);
   color: #fff;
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.35);
+  box-shadow: 0 8px 20px rgba(139, 90, 60, 0.35);
 }
 
 .form-header {
@@ -54,9 +54,10 @@
 
 .form-title {
   color: white;
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
   margin: 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .search-form {
@@ -101,7 +102,7 @@
 .field-icon {
   font-size: 1.15rem;
   flex-shrink: 0;
-  color: #8ea2ff;
+  color: #D2691E;
 }
 
 .field-content {
@@ -111,10 +112,11 @@
 
 .field-content label {
   display: block;
-  color: rgba(255, 255, 255, 0.55);
-  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8rem;
   margin-bottom: 0.15rem;
   letter-spacing: 0.3px;
+  font-weight: 600;
 }
 
 .field-content input,
@@ -123,11 +125,12 @@
   background: transparent;
   border: none;
   color: white;
-  font-size: 0.95rem;
+  font-size: 1rem;
   outline: none;
   padding: 0;
   text-align: left;
   cursor: pointer;
+  font-weight: 500;
 }
 
 .field-content input[type='date']::-webkit-calendar-picker-indicator {
@@ -137,7 +140,8 @@
 }
 
 .field-content input::placeholder {
-  color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
 }
 
 .form-divider {
@@ -148,7 +152,7 @@
 }
 
 .search-button {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   border: none;
   border-radius: 14px;
   min-width: 112px;
@@ -166,7 +170,7 @@
 
 .search-button:hover {
   transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 10px 28px rgba(102, 126, 234, 0.45);
+  box-shadow: 0 10px 28px rgba(139, 90, 60, 0.45);
 }
 
 .search-icon {
@@ -223,7 +227,7 @@
 }
 
 .suggest-list li:hover {
-  background: rgba(102, 126, 234, 0.2);
+  background: rgba(139, 90, 60, 0.2);
 }
 
 .suggest-list small {
@@ -265,8 +269,8 @@
 }
 
 .guest-controls button:hover {
-  background: #667eea;
-  border-color: #667eea;
+  background: #8B5A3C;
+  border-color: #8B5A3C;
 }
 
 .search-error {

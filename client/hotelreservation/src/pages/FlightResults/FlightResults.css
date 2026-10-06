@@ -33,7 +33,7 @@
 }
 
 .summary-icon {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 1.2rem;
 }
 
@@ -75,7 +75,7 @@
 
 .btn-modify-search {
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   border: none;
   border-radius: 10px;
   color: white;
@@ -87,7 +87,7 @@
 
 .btn-modify-search:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 6px 20px rgba(139, 90, 60, 0.3);
 }
 
 /* Main Layout */
@@ -132,7 +132,7 @@
 .btn-clear-filters {
   background: none;
   border: none;
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -140,7 +140,7 @@
 }
 
 .btn-clear-filters:hover {
-  color: #764ba2;
+  color: #A0522D;
 }
 
 .filter-section {
@@ -165,7 +165,7 @@
 .price-range-display {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #667eea;
+  color: #8B5A3C;
   margin-bottom: 0.75rem;
 }
 
@@ -173,7 +173,7 @@
   width: 100%;
   height: 6px;
   border-radius: 5px;
-  background: rgba(102, 126, 234, 0.2);
+  background: rgba(139, 90, 60, 0.2);
   outline: none;
   -webkit-appearance: none;
 }
@@ -184,7 +184,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   cursor: pointer;
 }
 
@@ -192,7 +192,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   cursor: pointer;
   border: none;
 }
@@ -207,7 +207,7 @@
 }
 
 .filter-checkbox:hover {
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .filter-checkbox input[type="checkbox"] {
@@ -216,7 +216,7 @@
   border: 2px solid var(--border-color);
   border-radius: 4px;
   cursor: pointer;
-  accent-color: #667eea;
+  accent-color: #8B5A3C;
 }
 
 .filter-checkbox span {
@@ -250,8 +250,8 @@
 
 /* Guidelines Banner */
 .guidelines-banner {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: linear-gradient(135deg, rgba(139, 90, 60, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border: 1px solid rgba(139, 90, 60, 0.2);
   border-radius: 16px;
   padding: 1.5rem;
 }
@@ -284,7 +284,7 @@
 
 .btn-view-guidelines {
   padding: 0.75rem 1.5rem;
-  background: #667eea;
+  background: #8B5A3C;
   border: none;
   border-radius: 10px;
   color: white;
@@ -295,7 +295,7 @@
 }
 
 .btn-view-guidelines:hover {
-  background: #764ba2;
+  background: #A0522D;
   transform: translateY(-2px);
 }
 
@@ -317,7 +317,7 @@
 .flight-card:hover {
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
   transform: translateY(-2px);
-  border-color: rgba(102, 126, 234, 0.2);
+  border-color: rgba(139, 90, 60, 0.2);
 }
 
 .flight-card-header {
@@ -353,11 +353,11 @@
 
 .travel-class {
   padding: 0.5rem 1rem;
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(139, 90, 60, 0.1);
   border-radius: 8px;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .flight-card-body {
@@ -411,13 +411,13 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #667eea;
+  background: #8B5A3C;
 }
 
 .duration-path {
   flex: 1;
   height: 2px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #8B5A3C 0%, #A0522D 100%);
 }
 
 .duration-text {
@@ -478,12 +478,12 @@
 .price-amount {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .btn-book-flight {
   padding: 0.875rem 1.75rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   border: none;
   border-radius: 10px;
   color: white;
@@ -495,15 +495,15 @@
 
 .btn-book-flight:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 20px rgba(139, 90, 60, 0.4);
 }
 
 .btn-flight-details {
   padding: 0.875rem 1.25rem;
   background: transparent;
-  border: 2px solid #667eea;
+  border: 2px solid #8B5A3C;
   border-radius: 10px;
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
@@ -511,7 +511,7 @@
 }
 
 .btn-flight-details:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(139, 90, 60, 0.1);
 }
 
 /* No Flights */
@@ -543,7 +543,7 @@
 
 .btn-clear-filters-large {
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   border: none;
   border-radius: 10px;
   color: white;
@@ -554,7 +554,7 @@
 
 .btn-clear-filters-large:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 20px rgba(139, 90, 60, 0.4);
 }
 
 /* Responsive */

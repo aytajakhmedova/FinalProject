@@ -41,7 +41,7 @@
 
 .route-icon {
   font-size: 2rem;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .route-title {
@@ -62,9 +62,9 @@
 .flight-class-badge {
   display: inline-block;
   padding: 0.5rem 1rem;
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(139, 90, 60, 0.1);
   border-radius: 8px;
-  color: #667eea;
+  color: #8B5A3C;
   font-weight: 600;
   font-size: 0.9rem;
   margin-bottom: 2rem;
@@ -92,7 +92,7 @@
 .airline-badge {
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -157,7 +157,7 @@
 .connector-line {
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(90deg, #8B5A3C 0%, #A0522D 100%);
   position: relative;
 }
 
@@ -168,7 +168,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #667eea;
+  background: #8B5A3C;
   top: 50%;
   transform: translateY(-50%);
 }
@@ -209,8 +209,8 @@
   display: flex;
   gap: 1rem;
   padding: 1.5rem;
-  background: rgba(102, 126, 234, 0.05);
-  border-left: 3px solid #667eea;
+  background: rgba(139, 90, 60, 0.05);
+  border-left: 3px solid #8B5A3C;
   border-radius: 8px;
   margin-bottom: 1rem;
 }
@@ -221,7 +221,7 @@
 
 .alert-icon {
   font-size: 1.5rem;
-  color: #667eea;
+  color: #8B5A3C;
   flex-shrink: 0;
 }
 
@@ -269,16 +269,16 @@
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
   background: transparent;
-  border: 2px solid #667eea;
+  border: 2px solid #8B5A3C;
   border-radius: 10px;
-  color: #667eea;
+  color: #8B5A3C;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .btn-add-passenger:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(139, 90, 60, 0.1);
 }
 
 .info-notice {
@@ -385,7 +385,7 @@
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #8B5A3C;
   background: var(--bg-card);
 }
 
@@ -420,7 +420,7 @@
 .btn-proceed-payment {
   width: 100%;
   padding: 1.25rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   border: none;
   border-radius: 12px;
   color: white;
@@ -433,7 +433,7 @@
 
 .btn-proceed-payment:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 12px 32px rgba(139, 90, 60, 0.4);
 }
 
 /* Fare Sidebar */
@@ -510,7 +510,7 @@
 .total-value {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 /* Coupon Section */
@@ -544,12 +544,12 @@
 
 .coupon-input-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #8B5A3C;
 }
 
 .btn-apply-coupon {
   padding: 0.75rem 1.25rem;
-  background: #667eea;
+  background: #8B5A3C;
   border: none;
   border-radius: 8px;
   color: white;
@@ -560,7 +560,7 @@
 }
 
 .btn-apply-coupon:hover {
-  background: #764ba2;
+  background: #A0522D;
 }
 
 /* Cancellation Info */
@@ -601,9 +601,9 @@
 .btn-view-rules {
   padding: 0.625rem 1rem;
   background: transparent;
-  border: 1px solid #667eea;
+  border: 1px solid #8B5A3C;
   border-radius: 8px;
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -611,7 +611,7 @@
 }
 
 .btn-view-rules:hover {
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(139, 90, 60, 0.1);
 }
 
 /* Responsive */

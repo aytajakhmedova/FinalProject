@@ -65,7 +65,7 @@
   height: 120px;
   border-radius: 50%;
   overflow: hidden;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -92,7 +92,7 @@
   right: 0;
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -105,7 +105,7 @@
 
 .avatar-upload-btn:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(139, 90, 60, 0.4);
 }
 
 .profile-info {
@@ -199,7 +199,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -210,7 +210,7 @@
 
 .btn-edit:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 16px rgba(139, 90, 60, 0.3);
 }
 
 /* Info Grid */
@@ -233,7 +233,7 @@
 .info-icon {
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -314,8 +314,8 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  border-color: #8B5A3C;
+  box-shadow: 0 0 0 4px rgba(139, 90, 60, 0.1);
 }
 
 .input-wrapper.error .form-input {
@@ -346,14 +346,14 @@
 }
 
 .btn-save {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   flex: 1;
 }
 
 .btn-save:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 16px rgba(139, 90, 60, 0.3);
 }
 
 .btn-cancel {

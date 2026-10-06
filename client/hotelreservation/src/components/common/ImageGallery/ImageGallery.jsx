@@ -7,18 +7,21 @@ const ImageGallery = ({ images, title }) => {
 
   if (!images || images.length === 0) return null;
 
+  // Yalnız ilk 3 şəkili göstər
+  const displayImages = images.slice(0, 3);
+
   return (
     <>
       <div className="image-gallery-component">
-        <div className="gallery-main-image" onClick={() => setShowModal(true)}>
-          <img src={images[selectedImage]} alt={title} />
-        </div>
         <div className="gallery-thumbnails-grid">
-          {images.map((img, idx) => (
+          {displayImages.map((img, idx) => (
             <div
               key={idx}
               className={`gallery-thumbnail ${selectedImage === idx ? 'active' : ''}`}
-              onClick={() => setSelectedImage(idx)}
+              onClick={() => {
+                setSelectedImage(idx);
+                setShowModal(true);
+              }}
             >
               <img src={img} alt={`${title} ${idx + 1}`} />
             </div>
@@ -32,9 +35,9 @@ const ImageGallery = ({ images, title }) => {
             <button className="gallery-close" onClick={() => setShowModal(false)}>
               ✕
             </button>
-            <img src={images[selectedImage]} alt={title} />
+            <img src={displayImages[selectedImage]} alt={title} />
             <div className="gallery-nav">
-              {images.map((_, idx) => (
+              {displayImages.map((_, idx) => (
                 <button
                   key={idx}
                   className={selectedImage === idx ? 'active' : ''}

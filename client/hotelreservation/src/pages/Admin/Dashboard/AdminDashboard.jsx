@@ -11,7 +11,7 @@ const AdminDashboard = () => {
       value: '24',
       change: '+3',
       changeType: 'positive',
-      color: '#667eea',
+      color: '#8B5A3C',
     },
     {
       icon: <FaCalendarCheck />,

@@ -38,7 +38,7 @@
 
 .no-reservation svg {
   font-size: 4rem;
-  color: rgba(102, 126, 234, 0.3);
+  color: rgba(139, 90, 60, 0.3);
   margin-bottom: 1.5rem;
 }
 
@@ -51,7 +51,7 @@
 .btn-back-dashboard {
   display: inline-block;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   text-decoration: none;
   border-radius: 12px;
@@ -62,7 +62,7 @@
 
 .btn-back-dashboard:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 20px rgba(139, 90, 60, 0.4);
 }
 
 /* Status Banner */
@@ -162,7 +162,7 @@
 }
 
 .info-icon {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 1.3rem;
   margin-top: 0.3rem;
   flex-shrink: 0;
@@ -199,7 +199,7 @@
 }
 
 .date-item svg {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 1.2rem;
   margin-top: 0.3rem;
 }
@@ -277,8 +277,8 @@
 .edit-input:focus,
 .edit-select:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #8B5A3C;
+  box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.1);
 }
 
 .edit-actions {
@@ -289,7 +289,7 @@
 .btn-save {
   flex: 1;
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -305,7 +305,7 @@
 
 .btn-save:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 20px rgba(139, 90, 60, 0.4);
 }
 
 .btn-cancel-edit {
@@ -320,8 +320,8 @@
 }
 
 .btn-cancel-edit:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #8B5A3C;
+  color: #8B5A3C;
 }
 
 /* Guest Info */
@@ -381,7 +381,7 @@
 .btn-edit {
   flex: 1;
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border: none;
   border-radius: 12px;
@@ -397,7 +397,7 @@
 
 .btn-edit:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 20px rgba(139, 90, 60, 0.4);
 }
 
 .btn-cancel-booking {
@@ -480,7 +480,7 @@
 
 .summary-total strong {
   font-size: 1.75rem;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 .booking-info-card {
@@ -599,8 +599,8 @@
 }
 
 .btn-keep:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: #8B5A3C;
+  color: #8B5A3C;
 }
 
 /* Responsive */

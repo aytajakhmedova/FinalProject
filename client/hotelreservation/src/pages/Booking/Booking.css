@@ -38,7 +38,7 @@
 
 .no-data-icon {
   font-size: 4rem;
-  color: rgba(102, 126, 234, 0.3);
+  color: rgba(139, 90, 60, 0.3);
   margin-bottom: 1.5rem;
 }
 
@@ -58,7 +58,7 @@
 .btn-back-hotels {
   display: inline-block;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   text-decoration: none;
   border-radius: 12px;
@@ -68,7 +68,7 @@
 
 .btn-back-hotels:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 20px rgba(139, 90, 60, 0.4);
 }
 
 /* Booking Content */
@@ -138,8 +138,8 @@
 .form-input:focus,
 .form-textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #8B5A3C;
+  box-shadow: 0 0 0 3px rgba(139, 90, 60, 0.1);
 }
 
 .form-textarea {
@@ -153,14 +153,14 @@
   align-items: flex-start;
   gap: 1rem;
   padding: 1.25rem;
-  background: rgba(102, 126, 234, 0.05);
-  border: 1px solid rgba(102, 126, 234, 0.2);
+  background: rgba(139, 90, 60, 0.05);
+  border: 1px solid rgba(139, 90, 60, 0.2);
   border-radius: 12px;
   color: var(--text-secondary);
 }
 
 .payment-info-notice svg {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 1.5rem;
   margin-top: 0.1rem;
   flex-shrink: 0;
@@ -204,7 +204,7 @@
 .btn-submit-booking {
   width: 100%;
   padding: 1.125rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
   border: none;
   border-radius: 10px;
@@ -220,7 +220,7 @@
 
 .btn-submit-booking:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 12px 24px rgba(139, 90, 60, 0.4);
 }
 
 /* Booking Summary Sidebar */
@@ -268,7 +268,7 @@
 }
 
 .summary-icon {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 1.2rem;
   margin-top: 0.3rem;
   flex-shrink: 0;
@@ -319,7 +319,7 @@
 }
 
 .summary-row-label svg {
-  color: #667eea;
+  color: #8B5A3C;
   font-size: 0.9rem;
 }
 
@@ -357,7 +357,7 @@
 
 .summary-total-row strong {
   font-size: 1.75rem;
-  color: #667eea;
+  color: #8B5A3C;
 }
 
 /* Policy Card */
