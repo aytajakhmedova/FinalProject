@@ -88,17 +88,19 @@
 }
 
 .input-icon {
-  position: absolute;
-  left: 1rem;
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-  pointer-events: none;
-  z-index: 1;
+  position: absolute !important;
+  left: 1rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: var(--text-secondary) !important;
+  font-size: 1.1rem !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
 }
 
 .form-input {
   width: 100%;
-  padding: 0.875rem 1rem 0.875rem 3rem;
+  padding: 0.875rem 1rem 0.875rem 2.75rem !important;
   background: var(--bg-primary);
   border: 2px solid var(--border-color);
   border-radius: 12px;
