@@ -1,0 +1,196 @@
+.fill-wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0.5rem 1.5rem 3.5rem;
+}
+
+.fill-kicker {
+  margin: 0;
+  color: #8B5A3C;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.fill-title {
+  margin: 0.4rem 0 0.55rem;
+  font-size: 1.75rem;
+  line-height: 1.25;
+  color: var(--text-primary, #1a1410);
+}
+
+.fill-lead {
+  margin: 0 0 1.4rem;
+  max-width: 680px;
+  color: #5c534c;
+  line-height: 1.65;
+}
+
+.stat-row,
+.country-grid,
+.review-grid,
+.gallery-grid,
+.story-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.stat-row {
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 1.6rem;
+}
+
+.stat-card,
+.country-card,
+.review-card,
+.story-card {
+  background: #fff;
+  border: 1px solid rgba(139, 90, 60, 0.14);
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(58, 33, 24, 0.06);
+}
+
+.stat-card {
+  padding: 1.1rem 1.15rem;
+}
+
+.stat-card strong {
+  display: block;
+  font-size: 1.55rem;
+  color: #8B5A3C;
+}
+
+.stat-card span {
+  color: #5c534c;
+  font-size: 0.92rem;
+}
+
+.story-grid,
+.review-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.country-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.gallery-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.story-card,
+.country-card,
+.review-card {
+  overflow: hidden;
+}
+
+.story-card img,
+.country-card img,
+.gallery-grid img {
+  width: 100%;
+  height: 210px;
+  object-fit: cover;
+  display: block;
+}
+
+.story-card div,
+.country-card div,
+.review-card {
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.story-card h3,
+.country-card h3,
+.review-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+  color: var(--text-primary, #1a1410);
+}
+
+.story-card p,
+.country-card p,
+.review-card p {
+  margin: 0;
+  color: #5c534c;
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.gallery-note {
+  margin: 1.25rem 0 0;
+}
+
+.country-card a,
+.gallery-note a {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #8B5A3C;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.review-card .review-text {
+  margin-top: 0.55rem;
+}
+
+.review-card .stars {
+  color: #d4a017;
+  letter-spacing: 1px;
+  margin-bottom: 0.45rem;
+}
+
+.gallery-grid figure {
+  margin: 0;
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(58, 33, 24, 0.08);
+}
+
+.gallery-grid figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.7rem 0.9rem;
+  color: #fff;
+  background: linear-gradient(transparent, rgba(18, 12, 8, 0.72));
+  font-weight: 600;
+}
+
+.dark-mode .stat-card,
+.dark-mode .country-card,
+.dark-mode .review-card,
+.dark-mode .story-card {
+  background: #241c18;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark-mode .fill-lead,
+.dark-mode .stat-card span,
+.dark-mode .story-card p,
+.dark-mode .country-card p,
+.dark-mode .review-card p {
+  color: #d9cfc6;
+}
+
+@media (max-width: 900px) {
+  .stat-row,
+  .country-grid,
+  .review-grid,
+  .gallery-grid,
+  .story-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .stat-row,
+  .country-grid,
+  .review-grid,
+  .gallery-grid,
+  .story-grid {
+    grid-template-columns: 1fr;
+  }
+}

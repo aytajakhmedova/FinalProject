@@ -124,6 +124,15 @@
   color: #ffffff;
 }
 
+.section-page {
+  min-height: 70vh;
+  padding: 0.5rem 0 1rem;
+}
+
+.section-page .holiday-section {
+  padding-top: 3.5rem;
+}
+
 .app-toast {
   position: fixed;
   bottom: 30px;

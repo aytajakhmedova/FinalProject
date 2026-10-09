@@ -1,3 +1,24 @@
+.light-mode .testimonials-title,
+.light-mode .testimonial-text,
+.light-mode .author-name {
+  color: #1a1410;
+}
+
+.light-mode .author-role {
+  color: #666;
+}
+
+.light-mode .testimonial-card {
+  background: #fff;
+  border-color: rgba(139, 90, 60, 0.16);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+}
+
+.light-mode .testimonial-nav {
+  color: #1a1410;
+  background: rgba(139, 90, 60, 0.08);
+}
+
 .testimonials-section {
   padding: 5rem 0;
   background: transparent;

@@ -13,6 +13,10 @@ import theme5 from '../assets/images/hotelimg1.jfif';
 import theme6 from '../assets/images/hotelimg6.jfif';
 import theme9 from '../assets/images/hotelimg7.jfif';
 import theme10 from '../assets/images/hotelimg2.jfif';
+import cityTowerVideo from '../assets/videos/aehotel-promo.mp4';
+import seaPoolVideo from '../assets/videos/videi2.mp4';
+import mountainVideo from '../assets/videos/video1.mp4';
+import cityNightVideo from '../assets/videos/video3.mp4';
 
 export const CITIES = [
   { name: 'Bakı', country: 'Azərbaycan' },
@@ -45,7 +49,7 @@ export const HOTELS = [
     nights: 1,
     amenities: ['Spa', 'Hovuz', 'Wi-Fi', 'Restoran'],
     tag: 'Yeni',
-    video: 'https://www.youtube.com/watch?v=a_G5ZaoZbvk',
+    video: cityTowerVideo,
   },
   {
     id: 2,
@@ -62,7 +66,7 @@ export const HOTELS = [
     nights: 1,
     amenities: ['Wellness', 'Plaj', 'Yoga', 'All-inclusive'],
     tag: 'Wellness',
-    video: 'https://www.youtube.com/watch?v=btwEbe-ztNE',
+    video: seaPoolVideo,
   },
   {
     id: 3,
@@ -79,7 +83,7 @@ export const HOTELS = [
     nights: 1,
     amenities: ['Overwater villa', 'Snorkel', 'Spa', 'Transfer'],
     tag: 'Lüks',
-    video: 'https://www.youtube.com/watch?v=G_3icYBpqC0',
+    video: seaPoolVideo,
   },
   {
     id: 4,
@@ -96,7 +100,7 @@ export const HOTELS = [
     nights: 1,
     amenities: ['Infinity pool', 'Sky bar', 'Gym', 'Valet'],
     tag: 'Populyar',
-    video: 'https://www.youtube.com/watch?v=A8p4t_YuZkU',
+    video: cityNightVideo,
   },
   {
     id: 5,
@@ -113,7 +117,7 @@ export const HOTELS = [
     nights: 1,
     amenities: ['Ailə', 'Aquapark', 'All-inclusive', 'Uşaq klubu'],
     tag: 'Ailə',
-    video: 'https://www.youtube.com/watch?v=LYTqsQF6OMQ',
+    video: seaPoolVideo,
   },
   {
     id: 6,
@@ -129,7 +133,7 @@ export const HOTELS = [
     nights: 1,
     amenities: ['Dəniz mənzərəsi', 'Wi-Fi', 'Parking', 'Restoran'],
     tag: 'Şəhər',
-    video: 'https://www.youtube.com/watch?v=Bdd9RAEo0YI',
+    video: cityNightVideo,
   },
   {
     id: 7,
@@ -145,7 +149,7 @@ export const HOTELS = [
     nights: 1,
     amenities: ['Dağ', 'Spa', 'Kayak', 'Şömine'],
     tag: 'Təbiət',
-    video: 'https://www.youtube.com/watch?v=DQ29-sgwMl0',
+    video: mountainVideo,
   },
   {
     id: 8,
@@ -161,7 +165,7 @@ export const HOTELS = [
     nights: 1,
     amenities: ['Boğaz', 'Rooftop', 'Spa', 'Transfer'],
     tag: 'Romantik',
-    video: 'https://www.youtube.com/watch?v=dFlsu5Fj46E',
+    video: cityTowerVideo,
   },
 ];
 

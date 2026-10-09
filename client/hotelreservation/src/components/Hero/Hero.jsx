@@ -4,10 +4,12 @@ import { MdHeadset } from 'react-icons/md';
 import SearchForm from '../SearchForm/SearchForm';
 import otaq1 from '../../assets/images/hotelimg6.jfif';
 import otaq2 from '../../assets/images/hotelimg7.jfif';
+import promoVideo from '../../assets/videos/aehotel-promo.mp4';
 import './Hero.css';
 
-const PIN_VIDEO = 'https://v1.pinimg.com/videos/iht/720p/e8/4c/0d/e84c0d91c22600f14860d58f849e364d.mp4';
-const PIN_POSTER = 'https://i.pinimg.com/videos/thumbnails/originals/e8/4c/0d/e84c0d91c22600f14860d58f849e364d.0000000.jpg';
+const slowVideo = (event) => {
+  event.currentTarget.playbackRate = 0.7;
+};
 
 const Hero = ({ onSearch, serviceType, onServiceChange }) => {
   const [storyOpen, setStoryOpen] = useState(false);
@@ -54,12 +56,12 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
             <div className="image-card">
               <video
                 className="hero-promo"
-                src={PIN_VIDEO}
-                poster={PIN_POSTER}
+                src={promoVideo}
                 autoPlay
                 muted
                 loop
                 playsInline
+                onLoadedMetadata={slowVideo}
                 aria-label="AEhotel tanıtım videosu"
               />
               <div className="floating-images">
@@ -90,7 +92,7 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
               <FaTimes />
             </button>
             <div className="story-film">
-              <video src={PIN_VIDEO} poster={PIN_POSTER} controls autoPlay muted loop playsInline />
+              <video src={promoVideo} controls autoPlay muted loop playsInline onLoadedMetadata={slowVideo} />
             </div>
             <h3>AE Hotel hekayəsi</h3>
             <p>

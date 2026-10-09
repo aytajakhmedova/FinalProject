@@ -3,6 +3,10 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Home from './pages/Home';
+import DestinationsPage from './pages/Destinations/DestinationsPage';
+import About from './pages/About/About';
+import ReviewsPage from './pages/Reviews/ReviewsPage';
+import Gallery from './pages/Gallery/Gallery';
 import Hotels from './pages/Hotels/Hotels';
 import HotelDetail from './pages/HotelDetail/HotelDetail';
 import RoomDetail from './pages/RoomDetail/RoomDetail';
@@ -17,6 +21,8 @@ import Flights from './pages/Flights/Flights';
 import FlightResults from './pages/FlightResults/FlightResults';
 import FlightBooking from './pages/FlightBooking/FlightBooking';
 import OccupancyCalendar from './pages/Admin/OccupancyCalendar/OccupancyCalendar';
+import Booking from './pages/Booking/Booking';
+import BookingSuccess from './pages/Booking/BookingSuccess';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import AdminDashboard from './pages/Admin/Dashboard/AdminDashboard';
 import AdminHotels from './pages/Admin/Hotels/AdminHotels';
@@ -99,6 +105,38 @@ function App() {
             </>
           } />
           
+          <Route path="/destinations" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <main className="section-page"><DestinationsPage /></main>
+              <Footer />
+            </>
+          } />
+
+          <Route path="/about" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <main className="section-page"><About /></main>
+              <Footer />
+            </>
+          } />
+
+          <Route path="/reviews" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <main className="section-page"><ReviewsPage /></main>
+              <Footer />
+            </>
+          } />
+
+          <Route path="/gallery" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <main className="section-page"><Gallery /></main>
+              <Footer />
+            </>
+          } />
+
           <Route path="/tours" element={
             <>
               <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
@@ -151,6 +189,22 @@ function App() {
             <>
               <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <RoomDetail />
+              <Footer />
+            </>
+          } />
+
+          <Route path="/booking" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Booking />
+              <Footer />
+            </>
+          } />
+
+          <Route path="/booking-success" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <BookingSuccess />
               <Footer />
             </>
           } />

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaHotel, FaPlane, FaCar, FaTaxi, FaBars, FaTimes, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { IoNotifications } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdDarkMode, MdLightMode } from 'react-icons/md';
-import logo from '../../assets/images/logo.png';
+import logo from '../../assets/images/AE_HOTEL_transparent_logo.png';
 import './Header.css';
 
 const Header = ({
@@ -43,11 +43,14 @@ const Header = ({
       if (notesOpen && !event.target.closest('.note-wrap')) {
         setNotesOpen(false);
       }
+      if (openMenu && !event.target.closest('.nav-item')) {
+        setOpenMenu(null);
+      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [userMenuOpen, notesOpen]);
+  }, [userMenuOpen, notesOpen, openMenu]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -60,16 +63,16 @@ const Header = ({
       name: 'Kəşf et',
       items: [
         { label: 'Otellər', href: '/hotels', isRoute: true },
-        { label: 'Təyinatlar', href: '#destinations' },
+        { label: 'Təyinatlar', href: '/destinations', isRoute: true },
         { label: 'Turlar', href: '/tours', isRoute: true },
       ],
     },
     {
       name: 'Səhifələr',
       items: [
-        { label: 'Haqqımızda', href: '#about' },
-        { label: 'Rəylər', href: '#reviews' },
-        { label: 'Qalereya', href: '#gallery' },
+        { label: 'Haqqımızda', href: '/about', isRoute: true },
+        { label: 'Rəylər', href: '/reviews', isRoute: true },
+        { label: 'Qalereya', href: '/gallery', isRoute: true },
       ],
     },
   ];
@@ -118,23 +121,28 @@ const Header = ({
       <div className="header-container">
         <div className="header-left">
           <Link className="logo" to="/">
-            <img src={logo} alt="OtelBurada" className="logo-image" />
+            <img src={logo} alt="AE Hotel" className="logo-image" />
           </Link>
 
           <nav className="main-nav">
             {menus.map((item) => (
               <div
                 key={item.name}
-                className="nav-item"
-                onMouseEnter={() => setOpenMenu(item.name)}
-                onMouseLeave={() => setOpenMenu(null)}
+                className={`nav-item ${openMenu === item.name ? 'open' : ''}`}
               >
-                <span>{item.name}</span>
-                <MdKeyboardArrowDown className={`dropdown-arrow ${openMenu === item.name ? 'open' : ''}`} />
+                <button
+                  type="button"
+                  className="nav-trigger"
+                  aria-expanded={openMenu === item.name}
+                  onClick={() => setOpenMenu((current) => (current === item.name ? null : item.name))}
+                >
+                  <span>{item.name}</span>
+                  <MdKeyboardArrowDown className={`dropdown-arrow ${openMenu === item.name ? 'open' : ''}`} />
+                </button>
                 {openMenu === item.name && (
                   <div className="dropdown-panel">
                     {item.items.map((link) => (
-                      <button key={link.href} onClick={() => go(link.href, link.isRoute)}>
+                      <button key={link.href} type="button" onClick={() => go(link.href, link.isRoute)}>
                         {link.label}
                       </button>
                     ))}

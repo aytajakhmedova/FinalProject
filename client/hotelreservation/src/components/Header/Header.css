@@ -56,78 +56,108 @@
 }
 
 .logo-image {
-  height: 72px;
-  width: auto;
-  max-width: 220px;
+  width: 65px;
+  height: auto;
   object-fit: contain;
-  transition: height 0.3s ease;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-image {
+  transform: scale(1.05);
 }
 
 .header.scrolled .logo-image {
-  height: 64px;
+  width: 60px;
 }
 
 .main-nav {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.6rem;
   align-items: center;
 }
 
 .nav-item {
+  position: relative;
+  color: white;
+}
+
+.nav-trigger {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.4rem;
   cursor: pointer;
-  font-size: 0.92rem;
+  font-size: 1.05rem;
   font-weight: 600;
-  position: relative;
-  padding: 0.55rem 0.85rem;
-  border-radius: 10px;
-  transition: all 0.25s ease;
-  color: white;
+  font-family: inherit;
+  padding: 0.65rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .light-mode .nav-item {
   color: #1a1410;
 }
 
-.nav-item:hover {
+.nav-trigger:hover,
+.nav-item.open .nav-trigger {
   background: rgba(139, 90, 60, 0.25);
   color: #D2691E;
-  transform: translateY(-1px);
 }
 
-.light-mode .nav-item:hover {
-  background: rgba(139, 90, 60, 0.1);
+.light-mode .nav-trigger:hover,
+.light-mode .nav-item.open .nav-trigger {
+  background: rgba(139, 90, 60, 0.12);
   color: #8B5A3C;
 }
 
 .dropdown-arrow {
   opacity: 0.7;
-  transition: transform 0.2s;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 1.1rem;
 }
 
 .dropdown-arrow.open {
   transform: rotate(180deg);
+  opacity: 1;
 }
 
 .dropdown-panel {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   left: 0;
-  min-width: 180px;
+  min-width: 200px;
   background: rgba(26, 20, 16, 0.98);
   border: 1px solid rgba(139, 90, 60, 0.3);
-  border-radius: 14px;
-  padding: 0.45rem;
-  box-shadow: 0 16px 40px rgba(58, 33, 24, 0.5);
-  animation: dropIn 0.18s ease;
-  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 0.6rem;
+  box-shadow: 0 20px 50px rgba(58, 33, 24, 0.6);
+  animation: dropIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(16px);
+  z-index: 1100;
+}
+
+.light-mode .dropdown-panel {
+  background: #fff;
+  border-color: rgba(139, 90, 60, 0.2);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+.light-mode .dropdown-panel button {
+  color: #1a1410;
 }
 
 @keyframes dropIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: none; }
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px) scale(0.95); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
 }
 
 .dropdown-panel button,
@@ -137,16 +167,37 @@
   border: none;
   color: #f5e6d3;
   text-align: left;
-  padding: 0.7rem 0.8rem;
-  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.98rem;
   font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-panel button::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 3px;
+  background: #D2691E;
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+
+.dropdown-panel button:hover::before {
+  transform: scaleY(1);
 }
 
 .dropdown-panel button:hover,
 .mobile-drawer button:hover {
-  background: rgba(139, 90, 60, 0.25);
+  background: rgba(139, 90, 60, 0.3);
+  padding-left: 1.2rem;
+  color: #D2691E;
 }
 
 .header-right {
@@ -157,15 +208,55 @@
 
 .quick-nav {
   display: flex;
-  gap: 0.3rem;
+  gap: 0.4rem;
 }
 
 .quick-nav-btn {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   background: transparent;
   border: none;
+  padding: 0.65rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.light-mode .quick-nav-btn {
+  color: #1a1410;
+}
+
+.quick-nav-btn:hover {
+  background: rgba(139, 90, 60, 0.2);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(139, 90, 60, 0.2);
+}
+
+.light-mode .quick-nav-btn:hover {
+  background: rgba(139, 90, 60, 0.12);
+}
+
+.quick-nav-btn:active {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.quick-nav-btn .icon {
+  color: #D2691E;
+  font-size: 1.1rem;
+  transition: transform 0.3s ease;
+}
+
+.quick-nav-btn:hover .icon {
+  transform: scale(1.15) rotate(5deg);
+}
+
+.light-mode .quick-nav-btn .icon {
+  color: #8B5A3C;
+}
   color: white;
   cursor: pointer;
   padding: 0.45rem 0.8rem;
