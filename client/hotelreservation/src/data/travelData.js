@@ -1,17 +1,18 @@
-import img1 from '../assets/images/img1.jpg';
-import img2 from '../assets/images/img2.jpg';
-import img3 from '../assets/images/img3.jpg';
-import img4 from '../assets/images/img4.jpg';
-import img5 from '../assets/images/img5.png';
-import theme1 from '../assets/images/hotelthme1.jpg';
-import theme2 from '../assets/images/hotelthme2.jpg';
-import theme3 from '../assets/images/hotelthme3.jpg';
-import theme4 from '../assets/images/hotelthme4.jpg';
-import theme5 from '../assets/images/hotelthme5.jpg';
-import theme6 from '../assets/images/hotelthme6.jpg';
-import theme8 from '../assets/images/hotelthme8.jpg';
-import theme9 from '../assets/images/hotelthme9.jpg';
-import theme10 from '../assets/images/hotelthme10.jpg';
+import img3 from '../assets/images/hotelimg3.jfif';
+import hotelimg1 from '../assets/images/hotelimg1.jfif';
+import hotelimg2 from '../assets/images/hotelimg2.jfif';
+import hotelimg3 from '../assets/images/hotelimg3.jfif';
+import hotelimg4 from '../assets/images/hotelimg4.jfif';
+import hotelimg5 from '../assets/images/hotelimg5.jfif';
+import hotelimg6 from '../assets/images/hotelimg6.jfif';
+import hotelimg7 from '../assets/images/hotelimg7.jfif';
+import theme2 from '../assets/images/hotelimg2.jfif';
+import theme3 from '../assets/images/hotelimg5.jfif';
+import theme4 from '../assets/images/hotelimg4.jfif';
+import theme5 from '../assets/images/hotelimg1.jfif';
+import theme6 from '../assets/images/hotelimg6.jfif';
+import theme9 from '../assets/images/hotelimg7.jfif';
+import theme10 from '../assets/images/hotelimg2.jfif';
 
 export const CITIES = [
   { name: 'Bakı', country: 'Azərbaycan' },
@@ -37,7 +38,7 @@ export const HOTELS = [
     year: '2028-ci ilin açılışı',
     description:
       'Gui Xi Şəhər Parkının yanında ucalan lüks otel — Çendu mədəniyyəti ilə müasir Corinthia ruhunu birləşdirir.',
-    image: img1,
+    image: hotelimg2,
     price: 420,
     rating: 4.8,
     reviews: 1284,
@@ -54,7 +55,7 @@ export const HOTELS = [
     year: '2028-ci ilin açılışı',
     description:
       'Aralıq dənizi sahilində wellness mərkəzi — sağlamlıq, spa və dəniz mənzərəsi bir ünvanda.',
-    image: img2,
+    image: hotelimg3,
     price: 510,
     rating: 4.9,
     reviews: 892,
@@ -71,7 +72,7 @@ export const HOTELS = [
     year: '2028-ci ilin açılışı',
     description:
       'Xurma ağacları və firuzəyi su ilə əhatə olunmuş iki ada təcrübəsi — okean üzərində villalar.',
-    image: img3,
+    image: hotelimg5,
     price: 890,
     rating: 5.0,
     reviews: 640,
@@ -88,7 +89,7 @@ export const HOTELS = [
     year: 'Açıqdır',
     description:
       'Sahilboyu lüks otel, dünya səviyyəli xidmət və panoramik şəhər-dəniz mənzərəsi.',
-    image: img4,
+    image: hotelimg1,
     price: 640,
     rating: 4.7,
     reviews: 2103,
@@ -105,7 +106,7 @@ export const HOTELS = [
     year: 'Açıqdır',
     description:
       'Tropik rahatlıq, ailə üçün ideal çimərlik və aktiv istirahət paketləri.',
-    image: img5,
+    image: hotelimg4,
     price: 280,
     rating: 4.6,
     reviews: 1750,
@@ -121,7 +122,7 @@ export const HOTELS = [
     country: 'Azərbaycan',
     year: 'Açıqdır',
     description: 'Xəzər mənzərəli penthouse otaqlar, şəhər mərkəzinə 8 dəqiqə.',
-    image: theme1,
+    image: hotelimg7,
     price: 195,
     rating: 4.7,
     reviews: 980,
@@ -172,7 +173,7 @@ export const getYoutubeId = (url = '') => {
 export const DESTINATIONS = [
   {
     country: 'Azərbaycan',
-    image: theme8,
+    image: hotelimg6,
     description: 'Qiymətlər 2 yetişkin üçün gecəlik orta göstəricidir.',
     months: [
       { name: 'Fevral', priceRange: '₼150 – ₼750' },
@@ -253,7 +254,7 @@ export const EXPERIENCES = [
     location: 'Bakı',
     duration: '4 saat',
     price: 45,
-    image: theme1,
+    image: hotelimg6,
     category: 'Şəhər',
   },
   {
@@ -280,7 +281,7 @@ export const EXPERIENCES = [
     location: 'Dubay',
     duration: '6 saat',
     price: 95,
-    image: img4,
+    image: hotelimg4,
     category: 'Macəra',
   },
   {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { FaUtensils, FaBolt, FaShieldAlt, FaClock, FaStar } from 'react-icons/fa';
-import holidayImage from '../../assets/images/Holiday Destination.jpg';
+import holidayImage from '../../assets/images/hotelimg2.jfif';
 import './HolidaySection.css';
 
 const HolidaySection = () => {

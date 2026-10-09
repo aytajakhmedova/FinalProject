@@ -1,17 +1,20 @@
-import img1 from '../assets/images/img1.jpg';
-import img2 from '../assets/images/img2.jpg';
-import img3 from '../assets/images/img3.jpg';
-import img4 from '../assets/images/img4.jpg';
-import img5 from '../assets/images/img5.png';
-import theme1 from '../assets/images/hotelthme1.jpg';
-import theme2 from '../assets/images/hotelthme2.jpg';
-import theme3 from '../assets/images/hotelthme3.jpg';
-import theme4 from '../assets/images/hotelthme4.jpg';
-import theme5 from '../assets/images/hotelthme5.jpg';
-import theme6 from '../assets/images/hotelthme6.jpg';
-import theme8 from '../assets/images/hotelthme8.jpg';
-import theme9 from '../assets/images/hotelthme9.jpg';
-import theme10 from '../assets/images/hotelthme10.jpg';
+import img5 from '../assets/images/hotelimg7.jfif';
+import hotelimg1 from '../assets/images/hotelimg1.jfif';
+import hotelimg2 from '../assets/images/hotelimg2.jfif';
+import hotelimg3 from '../assets/images/hotelimg3.jfif';
+import hotelimg4 from '../assets/images/hotelimg4.jfif';
+import hotelimg5 from '../assets/images/hotelimg5.jfif';
+import hotelimg6 from '../assets/images/hotelimg6.jfif';
+import hotelimg7 from '../assets/images/hotelimg7.jfif';
+import theme1 from '../assets/images/hotelimg1.jfif';
+import theme2 from '../assets/images/hotelimg2.jfif';
+import theme3 from '../assets/images/hotelimg3.jfif';
+import theme4 from '../assets/images/hotelimg4.jfif';
+import theme5 from '../assets/images/hotelimg5.jfif';
+import theme6 from '../assets/images/hotelimg6.jfif';
+import theme8 from '../assets/images/hotelimg7.jfif';
+import theme9 from '../assets/images/hotelimg3.jfif';
+import theme10 from '../assets/images/hotelimg5.jfif';
 
 export const HOTELS_EXTENDED = [
   {
@@ -25,8 +28,8 @@ export const HOTELS_EXTENDED = [
     rating: 4.8,
     reviews: 1284,
     description: 'Gui Xi Şəhər Parkının yanında ucalan lüks otel — Çendu mədəniyyəti ilə müasir Corinthia ruhunu birləşdirir. Şəhərin mərkəzində yerləşən bu otel qonaqlarımıza dünya standartında xidmət təqdim edir.',
-    images: [img1, theme1, theme2, theme3, theme4],
-    mainImage: img1,
+    images: [hotelimg2, hotelimg1, hotelimg4, theme1, theme2],
+    mainImage: hotelimg2,
     pricePerNight: 420,
     amenities: ['Spa', 'Hovuz', 'Wi-Fi', 'Restoran', 'Fitness', 'Bar', 'Room Service', 'Parking'],
     hotelType: 'Lüks',
@@ -53,7 +56,7 @@ export const HOTELS_EXTENDED = [
         bedType: '1 King yataq + 1 Sofa yataq',
         size: '45 m²',
         amenities: ['Wi-Fi', 'Smart TV', 'Minibar', 'Kondisioner', 'Çay/Qəhvə stansiyası', 'Safe', 'Şəhər mənzərəsi', 'Balkon', 'İş masası', 'Nespresso maşını'],
-        images: [theme8, theme9],
+        images: [hotelimg5, hotelimg3],
         pricePerNight: 580,
         available: true
       },
@@ -101,7 +104,7 @@ export const HOTELS_EXTENDED = [
         bedType: '2 King yataq + Qonaq otağı',
         size: '120 m²',
         amenities: ['Wi-Fi', 'Smart TV', 'Premium minibar', 'Kondisioner', 'Nespresso', 'Safe', '360° panorama', 'Terras', 'Jakuzzi', '24/7 Butler', 'Şəxsi hamam', 'Yemək otağı', 'Private lounge'],
-        images: [theme6, theme8],
+        images: [hotelimg7, theme6],
         pricePerNight: 1850,
         available: false
       }
@@ -118,8 +121,8 @@ export const HOTELS_EXTENDED = [
     rating: 4.9,
     reviews: 892,
     description: 'Aralıq dənizi sahilində wellness mərkəzi — sağlamlıq, spa və dəniz mənzərəsi bir ünvanda. Rahatlaşmaq və yenilənmək üçün ideal məkan.',
-    images: [img2, theme4, theme5, theme6],
-    mainImage: img2,
+    images: [hotelimg3, hotelimg5, theme4, theme5],
+    mainImage: hotelimg3,
     pricePerNight: 510,
     amenities: ['Wellness', 'Plaj', 'Yoga', 'All-inclusive', 'Spa', 'Fitness', 'Restoran'],
     hotelType: 'Wellness',
@@ -134,7 +137,7 @@ export const HOTELS_EXTENDED = [
         bedType: '1 King yataq',
         size: '38 m²',
         amenities: ['Wi-Fi', 'Smart TV', 'Minibar', 'Balkon', 'Dəniz mənzərəsi', 'Safe', 'Yoga matı'],
-        images: [theme1, theme2],
+        images: [hotelimg3, hotelimg5],
         pricePerNight: 510,
         available: true
       },
@@ -211,8 +214,8 @@ export const HOTELS_EXTENDED = [
     rating: 5.0,
     reviews: 640,
     description: 'Xurma ağacları və firuzəyi su ilə əhatə olunmuş iki ada təcrübəsi — okean üzərində villalar. Əsl tropik cənnət.',
-    images: [img3, theme8, theme9, theme10],
-    mainImage: img3,
+    images: [hotelimg5, hotelimg3, theme8, theme9],
+    mainImage: hotelimg5,
     pricePerNight: 890,
     amenities: ['Overwater villa', 'Snorkel', 'Spa', 'Transfer', 'Plaj', 'Su idmanları'],
     hotelType: 'Lüks',
@@ -227,7 +230,7 @@ export const HOTELS_EXTENDED = [
         bedType: '1 King yataq',
         size: '68 m²',
         amenities: ['Wi-Fi', 'Smart TV', 'Minibar', 'Şəxsi plaj', 'Açıq duş', 'Snorkel avadanlığı', 'Velosiped'],
-        images: [img3, theme1],
+        images: [hotelimg5, hotelimg3],
         pricePerNight: 780,
         available: true
       },
@@ -304,8 +307,8 @@ export const HOTELS_EXTENDED = [
     rating: 4.7,
     reviews: 2103,
     description: 'Sahilboyu lüks otel, dünya səviyyəli xidmət və panoramik şəhər-dəniz mənzərəsi. Dubayın ən məşhur otellərindən biri.',
-    images: [img4, theme5, theme6, theme8],
-    mainImage: img4,
+    images: [hotelimg1, hotelimg4, hotelimg2, hotelimg6],
+    mainImage: hotelimg1,
     pricePerNight: 640,
     amenities: ['Infinity pool', 'Sky bar', 'Gym', 'Valet', 'Spa', 'Plaj', 'Restoran'],
     hotelType: 'Lüks',
@@ -380,7 +383,7 @@ export const HOTELS_EXTENDED = [
         bedType: '2 King yataq + Qonaq otağı',
         size: '180 m²',
         amenities: ['Wi-Fi', 'Smart TV', 'Premium minibar', '360° panorama', 'Sky terras', 'Infinity jakuzzi', 'Private cinema', '24/7 Butler', 'Helicopter transfer', 'Personal trainer'],
-        images: [theme9, theme10],
+        images: [hotelimg7, hotelimg6],
         pricePerNight: 4200,
         available: false
       }
@@ -397,8 +400,8 @@ export const HOTELS_EXTENDED = [
     rating: 4.6,
     reviews: 1750,
     description: 'Tropik rahatlıq, ailə üçün ideal çimərlik və aktiv istirahət paketləri. All-inclusive sistem.',
-    images: [img5, theme2, theme3, theme4],
-    mainImage: img5,
+    images: [hotelimg4, hotelimg6, theme2, theme3],
+    mainImage: hotelimg4,
     pricePerNight: 280,
     amenities: ['Ailə', 'Aquapark', 'All-inclusive', 'Uşaq klubu', 'Animasiya', 'Plaj'],
     hotelType: 'Ailə',
@@ -481,12 +484,42 @@ export const HOTELS_EXTENDED = [
   }
 ];
 
+const INVENTORY_KEY = 'otelburada_inventory';
+
+const loadInventory = () => {
+  if (typeof localStorage === 'undefined') return {};
+  try {
+    return JSON.parse(localStorage.getItem(INVENTORY_KEY) || '{}');
+  } catch {
+    return {};
+  }
+};
+
+export const getHotels = () => {
+  const overlay = loadInventory();
+  return HOTELS_EXTENDED.map((hotel) => {
+    const extra = overlay[hotel.id];
+    if (!extra) return hotel;
+    return {
+      ...hotel,
+      ...extra,
+      rooms: extra.rooms || hotel.rooms,
+    };
+  });
+};
+
 export const getHotelById = (id) => {
-  return HOTELS_EXTENDED.find(hotel => hotel.id === parseInt(id));
+  return getHotels().find(hotel => hotel.id === parseInt(id));
 };
 
 export const getRoomById = (hotelId, roomId) => {
   const hotel = getHotelById(hotelId);
   if (!hotel) return null;
   return hotel.rooms.find(room => room.id === parseInt(roomId));
+};
+
+export const saveHotelRooms = (hotelId, rooms) => {
+  const overlay = loadInventory();
+  overlay[hotelId] = { ...(overlay[hotelId] || {}), rooms };
+  localStorage.setItem(INVENTORY_KEY, JSON.stringify(overlay));
 };

@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { FaGlobeAmericas, FaPlay, FaTimes } from 'react-icons/fa';
 import { MdHeadset } from 'react-icons/md';
 import SearchForm from '../SearchForm/SearchForm';
-import otelImage from '../../assets/images/otelimages.jpg';
-import otaq1 from '../../assets/images/otelotaq1.jpg';
-import otaq2 from '../../assets/images/otaq2.jpg';
+import otaq1 from '../../assets/images/hotelimg6.jfif';
+import otaq2 from '../../assets/images/hotelimg7.jfif';
 import './Hero.css';
+
+const PIN_VIDEO = 'https://v1.pinimg.com/videos/iht/720p/e8/4c/0d/e84c0d91c22600f14860d58f849e364d.mp4';
+const PIN_POSTER = 'https://i.pinimg.com/videos/thumbnails/originals/e8/4c/0d/e84c0d91c22600f14860d58f849e364d.0000000.jpg';
 
 const Hero = ({ onSearch, serviceType, onServiceChange }) => {
   const [storyOpen, setStoryOpen] = useState(false);
@@ -20,7 +22,7 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
       <div className="hero-container">
         <div className="hero-content">
           <div className="hero-text">
-            <p className="hero-kicker">Otel & Travel · OtelBurada</p>
+            <p className="hero-kicker">Otel & Travel · AE Hotel</p>
             <h1 className="hero-title">
               Yaxınlıqdakı ən yaxşı <span className="underline">otelləri</span> və turlari tapın.
             </h1>
@@ -50,7 +52,16 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
             </div>
 
             <div className="image-card">
-              <img src={otelImage} alt="Otel" />
+              <video
+                className="hero-promo"
+                src={PIN_VIDEO}
+                poster={PIN_POSTER}
+                autoPlay
+                muted
+                loop
+                playsInline
+                aria-label="AEhotel tanıtım videosu"
+              />
               <div className="floating-images">
                 <div className="float-img float-1">
                   <img src={otaq1} alt="Otaq 1" />
@@ -63,11 +74,13 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
           </div>
         </div>
 
-        <SearchForm
-          onSearch={onSearch}
-          serviceType={serviceType}
-          onServiceChange={onServiceChange}
-        />
+        <div className="hero-search">
+          <SearchForm
+            onSearch={onSearch}
+            serviceType={serviceType}
+            onServiceChange={onServiceChange}
+          />
+        </div>
       </div>
 
       {storyOpen && (
@@ -77,11 +90,9 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
               <FaTimes />
             </button>
             <div className="story-film">
-              <img src={otelImage} alt="" />
-              <img src={otaq1} alt="" />
-              <img src={otaq2} alt="" />
+              <video src={PIN_VIDEO} poster={PIN_POSTER} controls autoPlay muted loop playsInline />
             </div>
-            <h3>OtelBurada hekayəsi</h3>
+            <h3>AE Hotel hekayəsi</h3>
             <p>
               2018-dən bəri minlərlə səyahətçini lüks otellərlə, şəhər turları və wellness təcrübələri ilə
               birləşdiririk. Hər rezervasiya — şəxsi konsultasiya kimidir.

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaUsers, FaSearch, FaMapMarkerAlt } from 'react-icons/fa';
-import heroImage from '../../../assets/images/otelimages.jpg';
+import heroImage from '../../../assets/images/hotelimg1.jfif';
 import './Hero.css';
 
 const Hero = () => {
@@ -63,7 +63,7 @@ const Hero = () => {
         <div className="hero-text">
           <h1 className="hero-title">
             Lüks və Rahatlıq <br />
-            <span className="hero-highlight">OtelBurada</span> ilə
+            <span className="hero-highlight">AE Hotel</span> ilə
           </h1>
           <p className="hero-subtitle">
             Azərbaycanda və dünyada ən yaxşı otelləri kəşf edin
