@@ -61,12 +61,14 @@ const ReviewCard = ({ review }) => {
 
       <p className="review-text">{review.comment}</p>
 
-      {review.stayDate && (
+      {(review.stayDate || review.roomType) && (
         <div className="review-stay-info">
-          Qalma tarixi: {new Date(review.stayDate).toLocaleDateString('az-AZ', { 
-            year: 'numeric', 
-            month: 'long' 
-          })}
+          {review.roomType ? `${review.roomType}` : ''}
+          {review.roomType && review.stayDate ? ' · ' : ''}
+          {review.stayDate ? `Qalma: ${new Date(review.stayDate).toLocaleDateString('az-AZ', {
+            year: 'numeric',
+            month: 'long'
+          })}` : ''}
         </div>
       )}
 

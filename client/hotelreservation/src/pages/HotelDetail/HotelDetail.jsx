@@ -1,23 +1,23 @@
 import React, { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaMapMarkerAlt, FaStar, FaWifi, FaParking, FaSwimmingPool, FaDumbbell, FaUtensils, FaCocktail, FaCheck, FaArrowLeft, FaBed } from 'react-icons/fa';
 import RatingStars from '../../components/common/RatingStars/RatingStars';
 import RoomCard from '../../components/common/RoomCard/RoomCard';
 import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
 import ReviewsSection from '../../components/common/ReviewsSection/ReviewsSection';
 import { getHotelById } from '../../data/hotelsData';
-import { getHotelReviews, getAverageRating, getTotalReviews } from '../../data/reviewsData';
+import { checkRoomAvailability } from '../../data/roomsData';
 import './HotelDetail.css';
 
 const HotelDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const hotel = getHotelById(id);
-
-  // Get reviews data
-  const reviews = getHotelReviews(id);
-  const averageRating = getAverageRating(id);
-  const totalReviews = getTotalReviews(id);
+  const checkIn = searchParams.get('checkIn') || '';
+  const checkOut = searchParams.get('checkOut') || '';
+  const guests = parseInt(searchParams.get('guests') || '0', 10);
+  const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
 
   const handleScrollToRooms = () => {
     const roomsSection = document.getElementById('rooms');
@@ -128,21 +128,36 @@ const HotelDetail = () => {
             {/* Available Rooms */}
             <section className="hotel-section" id="rooms">
               <h2 className="section-title">Mövcud Otaqlar</h2>
-              <p className="section-subtitle">Rezervasiya etmək üçün otaq seçin</p>
+              <p className="section-subtitle">
+                {checkIn && checkOut
+                  ? `${checkIn} — ${checkOut} tarixləri üçün boş otaqlar`
+                  : 'Rezervasiya etmək üçün otaq seçin'}
+              </p>
               <div className="rooms-grid">
-                {hotel.rooms.map(room => (
-                  <RoomCard key={room.id} room={room} hotelId={hotel.id} />
+                {hotel.rooms
+                  .filter((room) => {
+                    if (room.available === false) return false;
+                    if (guests && room.capacity < guests) return false;
+                    if (checkIn && checkOut && !checkRoomAvailability(room.id, checkIn, checkOut)) return false;
+                    return true;
+                  })
+                  .map(room => (
+                  <RoomCard key={room.id} room={room} hotelId={hotel.id} queryString={queryString} />
                 ))}
               </div>
+              {hotel.rooms.filter((room) => {
+                if (room.available === false) return false;
+                if (guests && room.capacity < guests) return false;
+                if (checkIn && checkOut && !checkRoomAvailability(room.id, checkIn, checkOut)) return false;
+                return true;
+              }).length === 0 && (
+                <p className="section-subtitle">Bu tarix və qonaq sayı üçün boş otaq yoxdur.</p>
+              )}
             </section>
 
             {/* Reviews */}
-            <section className="hotel-section">
-              <ReviewsSection 
-                reviews={reviews}
-                averageRating={averageRating || hotel.rating}
-                totalReviews={totalReviews || hotel.reviews}
-              />
+            <section className="hotel-section" id="reviews">
+              <ReviewsSection hotelId={hotel.id} />
             </section>
           </div>
 

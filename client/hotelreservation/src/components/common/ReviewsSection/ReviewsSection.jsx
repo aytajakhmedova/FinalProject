@@ -4,21 +4,35 @@ import { FaStar, FaEdit } from 'react-icons/fa';
 import RatingStars from '../RatingStars/RatingStars';
 import ReviewCard from '../ReviewCard/ReviewCard';
 import ReviewForm from '../ReviewForm/ReviewForm';
+import { addStayReview, getReviewableStays, getReviewsForHotel } from '../../../utils/reviewsStore';
 import './ReviewsSection.css';
 
-const ReviewsSection = ({ reviews = [], averageRating = 0, totalReviews = 0 }) => {
+const currentUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('user') || 'null');
+  } catch {
+    return null;
+  }
+};
+
+const ReviewsSection = ({ hotelId }) => {
   const navigate = useNavigate();
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewsList, setReviewsList] = useState(reviews);
+  const [reviewsList, setReviewsList] = useState(() => getReviewsForHotel(hotelId));
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [stays, setStays] = useState([]);
+
+  const refresh = () => {
+    const loggedIn = localStorage.getItem('isAuthenticated') === 'true';
+    const email = currentUser()?.email || '';
+    setIsAuthenticated(loggedIn);
+    setReviewsList(getReviewsForHotel(hotelId));
+    setStays(loggedIn ? getReviewableStays(hotelId, email) : []);
+  };
 
   useEffect(() => {
-    // Check authentication status
-    const authStatus = localStorage.getItem('isAuthenticated');
-    if (authStatus === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
+    refresh();
+  }, [hotelId]);
 
   // Calculate rating breakdown
   const getRatingBreakdown = () => {
@@ -31,7 +45,11 @@ const ReviewsSection = ({ reviews = [], averageRating = 0, totalReviews = 0 }) =
   };
 
   const ratingBreakdown = getRatingBreakdown();
-  const total = reviewsList.length || totalReviews;
+  const total = reviewsList.length;
+  const averageRating = total
+    ? reviewsList.reduce((sum, review) => sum + Number(review.rating || 0), 0) / total
+    : 0;
+  const canReview = stays.length > 0;
 
   const getPercentage = (count) => {
     return total > 0 ? (count / total) * 100 : 0;
@@ -46,19 +64,27 @@ const ReviewsSection = ({ reviews = [], averageRating = 0, totalReviews = 0 }) =
       return;
     }
     
-    setReviewsList(prev => [newReview, ...prev]);
+    try {
+      addStayReview({ ...newReview, hotelId });
+    } catch (error) {
+      alert(error.message);
+      return;
+    }
     setShowReviewForm(false);
-    // Show success message (you can add toast notification here)
-    alert('Rəyiniz uğurla əlavə edildi! Təşəkkür edirik.');
+    refresh();
+    alert('Rəyiniz yadda saxlandı. Təşəkkür edirik.');
   };
 
   const handleWriteReviewClick = () => {
-    // Always check authentication from localStorage directly
     const authStatus = localStorage.getItem('isAuthenticated');
     if (authStatus !== 'true') {
       if (window.confirm('Rəy yazmaq üçün daxil olmalısınız. Login səhifəsinə keçmək istəyirsiniz?')) {
         navigate('/login', { state: { from: window.location.pathname } });
       }
+      return;
+    }
+    if (!stays.length) {
+      alert('Rəy yalnız sizin çıxış edilmiş qalmanız üçün yazıla bilər. Hər qalma üçün bir rəy ola bilər.');
       return;
     }
     setShowReviewForm(!showReviewForm);
@@ -74,7 +100,7 @@ const ReviewsSection = ({ reviews = [], averageRating = 0, totalReviews = 0 }) =
       <div className="rating-overview">
         <div className="rating-summary">
           <div className="rating-score">
-            <span className="score-value">{averageRating.toFixed(1)}</span>
+            <span className="score-value">{averageRating ? averageRating.toFixed(1) : '0.0'}</span>
             <RatingStars rating={averageRating} size="large" showValue={false} />
             <span className="total-reviews">{total} rəy</span>
           </div>
@@ -103,16 +129,19 @@ const ReviewsSection = ({ reviews = [], averageRating = 0, totalReviews = 0 }) =
           onClick={handleWriteReviewClick}
         >
           <FaEdit />
-          {isAuthenticated 
-            ? (showReviewForm ? 'Rəyi bağla' : 'Rəy yaz')
-            : '🔒 Rəy yaz (Giriş tələb olunur)'
+          {!isAuthenticated
+            ? 'Rəy yaz (Giriş tələb olunur)'
+            : !canReview
+              ? 'Rəy yalnız tamamlanmış qalma üçün'
+              : (showReviewForm ? 'Rəyi bağla' : 'Rəy yaz')
           }
         </button>
       </div>
 
       {/* Review Form - Only show if authenticated */}
-      {showReviewForm && isAuthenticated && (
+      {showReviewForm && isAuthenticated && canReview && (
         <ReviewForm 
+          stays={stays}
           onSubmit={handleSubmitReview}
           onCancel={() => setShowReviewForm(false)}
         />

@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import RatingStars from '../RatingStars/RatingStars';
 import './ReviewForm.css';
 
-const ReviewForm = ({ onSubmit, onCancel }) => {
+const ReviewForm = ({ onSubmit, onCancel, stays = [] }) => {
   const navigate = useNavigate();
+  const [bookingId, setBookingId] = useState(stays[0]?.id || '');
   const [formData, setFormData] = useState({
     rating: 0,
     title: '',
@@ -40,6 +41,10 @@ const ReviewForm = ({ onSubmit, onCancel }) => {
 
   const validate = () => {
     const newErrors = {};
+
+    if (!bookingId) {
+      newErrors.bookingId = 'Rəy yazmaq üçün tamamlanmış qalma seçin';
+    }
 
     if (formData.rating === 0) {
       newErrors.rating = 'Qiymət tələb olunur';
@@ -77,16 +82,20 @@ const ReviewForm = ({ onSubmit, onCancel }) => {
     const userData = localStorage.getItem('user');
     const user = userData ? JSON.parse(userData) : null;
 
-    // Mock submit
+    const stay = stays.find((item) => String(item.id) === String(bookingId));
     const newReview = {
       id: Date.now(),
+      bookingId,
       userName: user?.name || 'İstifadəçi',
+      userEmail: user?.email || '',
       rating: formData.rating,
       title: formData.title,
       comment: formData.comment,
       pros: formData.pros,
       cons: formData.cons,
       date: new Date().toISOString(),
+      stayDate: stay?.checkIn || '',
+      roomType: stay?.roomType || stay?.room?.name || '',
       verified: true,
       helpful: 0,
     };
@@ -108,6 +117,25 @@ const ReviewForm = ({ onSubmit, onCancel }) => {
       <h3 className="form-title">Rəyinizi yazın</h3>
       
       <form onSubmit={handleSubmit} className="review-form">
+        <div className="form-group">
+          <label htmlFor="stay" className="form-label">
+            Tamamlanmış qalma <span className="required">*</span>
+          </label>
+          <select
+            id="stay"
+            className={`form-input ${errors.bookingId ? 'error' : ''}`}
+            value={bookingId}
+            onChange={(e) => setBookingId(e.target.value)}
+          >
+            {stays.map((stay) => (
+              <option key={stay.id} value={stay.id}>
+                {stay.confirmationNumber || stay.id} · {stay.roomType || stay.room?.name || 'Otaq'} · {stay.checkIn} — {stay.checkOut}
+              </option>
+            ))}
+          </select>
+          {errors.bookingId && <span className="error-message">{errors.bookingId}</span>}
+        </div>
+
         {/* Rating */}
         <div className="form-group">
           <label className="form-label">
