@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaPhone, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useLanguage } from '../../context/LanguageContext';
+import LanguageSwitch from '../../components/LanguageSwitch/LanguageSwitch';
 import './Auth.css';
 
 const Register = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -34,37 +37,37 @@ const Register = () => {
     const newErrors = {};
     
     if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Ad və soyad tələb olunur';
+      newErrors.fullName = t('auth.nameReq');
     } else if (formData.fullName.trim().length < 3) {
-      newErrors.fullName = 'Ad və soyad ən azı 3 simvoldan ibarət olmalıdır';
+      newErrors.fullName = t('auth.nameShort');
     }
 
     if (!formData.email) {
-      newErrors.email = 'Email tələb olunur';
+      newErrors.email = t('auth.emailReq');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Düzgün email daxil edin';
+      newErrors.email = t('auth.emailBad');
     }
 
     if (!formData.phone) {
-      newErrors.phone = 'Telefon nömrəsi tələb olunur';
+      newErrors.phone = t('profile.phoneReq');
     } else if (!/^[\d\s\+\-\(\)]+$/.test(formData.phone)) {
-      newErrors.phone = 'Düzgün telefon nömrəsi daxil edin';
+      newErrors.phone = t('auth.phoneBad');
     }
 
     if (!formData.password) {
-      newErrors.password = 'Şifrə tələb olunur';
+      newErrors.password = t('auth.passReq');
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Şifrə ən azı 6 simvoldan ibarət olmalıdır';
+      newErrors.password = t('auth.passShort');
     }
 
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Şifrə təkrarı tələb olunur';
+      newErrors.confirmPassword = t('auth.passRepeatReq');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Şifrələr uyğun gəlmir';
+      newErrors.confirmPassword = t('auth.passMismatch');
     }
 
     if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = 'Şərtləri qəbul etməlisiniz';
+      newErrors.agreeToTerms = t('auth.terms');
     }
 
     setErrors(newErrors);
@@ -104,15 +107,18 @@ const Register = () => {
       <div className="auth-container">
         <div className="auth-card register-card">
           <div className="auth-header">
-            <h1 className="auth-title">Qeydiyyat</h1>
-            <p className="auth-subtitle">Yeni hesab yaradın</p>
+            <div className="auth-lang">
+              <LanguageSwitch />
+            </div>
+            <h1 className="auth-title">{t('auth.register')}</h1>
+            <p className="auth-subtitle">{t('auth.registerSub')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
             {/* Full Name */}
             <div className="form-group">
               <label htmlFor="fullName" className="form-label">
-                Ad və Soyad
+                {t('auth.fullName')}
               </label>
               <div className={`input-wrapper ${errors.fullName ? 'error' : ''}`}>
                 <FaUser className="input-icon" />
@@ -122,7 +128,7 @@ const Register = () => {
                   name="fullName"
                   value={formData.fullName}
                   onChange={handleChange}
-                  placeholder="Adınız və Soyadınız"
+                  placeholder={t('auth.fullNamePh')}
                   className="form-input"
                 />
               </div>
@@ -132,7 +138,7 @@ const Register = () => {
             {/* Email */}
             <div className="form-group">
               <label htmlFor="email" className="form-label">
-                Email
+                {t('auth.email')}
               </label>
               <div className={`input-wrapper ${errors.email ? 'error' : ''}`}>
                 <FaEnvelope className="input-icon" />
@@ -152,7 +158,7 @@ const Register = () => {
             {/* Phone */}
             <div className="form-group">
               <label htmlFor="phone" className="form-label">
-                Telefon
+                {t('auth.phone')}
               </label>
               <div className={`input-wrapper ${errors.phone ? 'error' : ''}`}>
                 <FaPhone className="input-icon" />
@@ -172,7 +178,7 @@ const Register = () => {
             {/* Password */}
             <div className="form-group">
               <label htmlFor="password" className="form-label">
-                Şifrə
+                {t('auth.password')}
               </label>
               <div className={`input-wrapper ${errors.password ? 'error' : ''}`}>
                 <FaLock className="input-icon" />
@@ -190,7 +196,7 @@ const Register = () => {
                   className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
               </div>
               {errors.password && <span className="error-message">{errors.password}</span>}
@@ -199,7 +205,7 @@ const Register = () => {
             {/* Confirm Password */}
             <div className="form-group">
               <label htmlFor="confirmPassword" className="form-label">
-                Şifrə Təkrarı
+                {t('auth.passRepeat')}
               </label>
               <div className={`input-wrapper ${errors.confirmPassword ? 'error' : ''}`}>
                 <FaLock className="input-icon" />
@@ -217,7 +223,7 @@ const Register = () => {
                   className="password-toggle"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
-                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
               </div>
               {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
@@ -250,10 +256,10 @@ const Register = () => {
               {isLoading ? (
                 <span className="btn-loading">
                   <span className="spinner"></span>
-                  Qeydiyyat olunur...
+                  {t('auth.registering')}
                 </span>
               ) : (
-                'Qeydiyyatdan keç'
+                t('auth.registerBtn')
               )}
             </button>
           </form>
@@ -261,9 +267,9 @@ const Register = () => {
           {/* Login Link */}
           <div className="auth-footer">
             <p>
-              Artıq hesabınız var? {' '}
+              {t('auth.hasAccount')} {' '}
               <Link to="/login" className="auth-link">
-                Daxil olun
+                {t('auth.loginLink')}
               </Link>
             </p>
           </div>

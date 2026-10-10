@@ -1,32 +1,34 @@
 import React from 'react';
 import { FaUtensils, FaBolt, FaShieldAlt, FaClock, FaStar } from 'react-icons/fa';
 import holidayImage from '../../assets/images/hotelimg2.jfif';
+import { useLanguage } from '../../context/LanguageContext';
 import './HolidaySection.css';
 
 const HolidaySection = () => {
+  const { t } = useLanguage();
   const features = [
     {
       icon: <FaUtensils />,
-      title: 'Keyfiyyətli yemək',
-      description: 'Yerli və beynəlxalq mətbəx — chef menyusu və halal seçimlər.',
+      title: t('holiday.food'),
+      description: t('holiday.foodDesc'),
       color: '#4ade80'
     },
     {
       icon: <FaBolt />,
-      title: 'Sürətli xidmət',
-      description: 'Dəqiqəlik check-in, ani təsdiq və 24 saat otaq xidməti.',
+      title: t('holiday.fast'),
+      description: t('holiday.fastDesc'),
       color: '#f43f5e'
     },
     {
       icon: <FaShieldAlt />,
-      title: 'Təhlükəsiz ödəniş',
-      description: 'SSL bron, geri qaytarılan tariflər və sığorta paketləri.',
+      title: t('holiday.pay'),
+      description: t('holiday.payDesc'),
       color: '#fb923c'
     },
     {
       icon: <FaClock />,
-      title: '7/24 dəstək',
-      description: 'Səyahət boyu Azərbaycan dilində canlı dəstək.',
+      title: t('holiday.support'),
+      description: t('holiday.supportDesc'),
       color: '#3b82f6'
     }
   ];
@@ -49,8 +51,8 @@ const HolidaySection = () => {
                 ))}
               </div>
               <div className="rating-info">
-                <div className="rating-label">Qonaqlar</div>
-                <div className="rating-text">Reytinq</div>
+                <div className="rating-label">{t('holiday.guests')}</div>
+                <div className="rating-text">{t('holiday.rating')}</div>
                 <div className="rating-stars">4.8 ⭐</div>
               </div>
             </div>
@@ -58,10 +60,9 @@ const HolidaySection = () => {
         </div>
 
         <div className="holiday-right">
-          <h2 className="holiday-title">Ən yaxşı tətil buradan başlayır</h2>
+          <h2 className="holiday-title">{t('holiday.title')}</h2>
           <p className="holiday-description">
-            Oteli bron edin, eyni anda uçuş, tur və transfer əlavə edin — kampaniya kodları ilə
-            qalmanızı daha sərfəli edin.
+            {t('holiday.desc')}
           </p>
 
           <div className="features-grid">

@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaHeart, FaPlay, FaRegHeart, FaStar } from 'react-icons/fa';
 import { HOTELS, formatPrice } from '../../data/travelData';
+import { useLanguage } from '../../context/LanguageContext';
 import './FeaturedHotels.css';
 
 const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onPlayVideo }) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [activeIndex, setActiveIndex] = useState(0);
   const featured = HOTELS.slice(0, 5);
   const hotel = featured[activeIndex];
@@ -44,11 +46,11 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
   return (
     <section className="featured-hotels-section" id="featured">
       <div className="featured-hotels-container">
-        <p className="eyebrow center">Seçilmiş kolleksiya</p>
-        <h2 className="section-title">Önə çıxan otellər</h2>
+        <p className="eyebrow center">{t('feat.eyebrow')}</p>
+        <h2 className="section-title">{t('feat.title')}</h2>
 
         <div className="hotels-slider-wrapper">
-          <button className="nav-btn nav-prev" onClick={handlePrev} aria-label="Əvvəlki">
+          <button className="nav-btn nav-prev" onClick={handlePrev} aria-label={t('feat.prev')}>
             <FaChevronLeft />
           </button>
 
@@ -79,10 +81,10 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
                     e.stopPropagation(); // Prevent card click
                     onPlayVideo(hotel);
                   }}
-                  aria-label="Video turu izlə"
+                  aria-label={t('feat.video')}
                 >
                   <FaPlay />
-                  Video tur
+                  {t('feat.video')}
                 </button>
               )}
               <div className="info-card" key={`info-${hotel.id}`}>
@@ -102,13 +104,13 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
                 <p className="hotel-description">{hotel.description}</p>
                 <div className="info-meta">
                   <span><FaStar /> {hotel.rating}</span>
-                  <strong>{formatPrice(hotel.price, currency)} / gecə</strong>
+                  <strong>{formatPrice(hotel.price, currency)} {t('feat.perNight')}</strong>
                 </div>
                 <button 
                   className="discover-btn" 
                   onClick={handleDiscoverClick}
                 >
-                  KƏŞF EDİN
+                  {t('feat.discover')}
                 </button>
               </div>
             </div>
@@ -130,7 +132,7 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
             })}
           </div>
 
-          <button className="nav-btn nav-next" onClick={handleNext} aria-label="Növbəti">
+          <button className="nav-btn nav-next" onClick={handleNext} aria-label={t('feat.next')}>
             <FaChevronRight />
           </button>
         </div>

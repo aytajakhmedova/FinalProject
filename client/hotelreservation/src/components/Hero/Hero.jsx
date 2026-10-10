@@ -5,6 +5,7 @@ import SearchForm from '../SearchForm/SearchForm';
 import otaq1 from '../../assets/images/hotelimg6.jfif';
 import otaq2 from '../../assets/images/hotelimg7.jfif';
 import promoVideo from '../../assets/videos/aehotel-promo.mp4';
+import { useLanguage } from '../../context/LanguageContext';
 import './Hero.css';
 
 const slowVideo = (event) => {
@@ -13,6 +14,7 @@ const slowVideo = (event) => {
 
 const Hero = ({ onSearch, serviceType, onServiceChange }) => {
   const [storyOpen, setStoryOpen] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <section className="hero-section" id="top">
@@ -24,22 +26,22 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
       <div className="hero-container">
         <div className="hero-content">
           <div className="hero-text">
-            <p className="hero-kicker">Otel & Travel · AE Hotel</p>
+            <p className="hero-kicker">{t('hero.kicker')}</p>
             <h1 className="hero-title">
-              Yaxınlıqdakı ən yaxşı <span className="underline">otelləri</span> və turlari tapın.
+              {t('hero.titleBefore')} <span className="underline">{t('hero.titleAccent')}</span> {t('hero.titleAfter')}
             </h1>
             <p className="hero-description">
-              Yalnız yer yox — büdcənizə uyğun lüks təcrübə, uçuş, tur və transferi bir yerdə bron edin.
+              {t('hero.desc')}
             </p>
 
             <div className="discover-buttons">
               <button className="discover-btn" onClick={() => document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' })}>
                 <FaGlobeAmericas className="btn-icon" />
-                <span className="btn-text">İndi kəşf et</span>
+                <span className="btn-text">{t('hero.discover')}</span>
               </button>
               <button className="discover-btn" onClick={() => setStoryOpen(true)}>
                 <FaPlay className="btn-icon" />
-                <span className="btn-text">Hekayəmizi izlə</span>
+                <span className="btn-text">{t('hero.story')}</span>
               </button>
             </div>
           </div>
@@ -49,7 +51,7 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
               <MdHeadset className="badge-icon" />
               <div className="badge-content">
                 <div className="badge-time">7/24</div>
-                <div className="badge-text">Müştəri dəstəyi</div>
+                <div className="badge-text">{t('hero.support')}</div>
               </div>
             </div>
 
@@ -88,17 +90,14 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
       {storyOpen && (
         <div className="story-overlay" onClick={() => setStoryOpen(false)}>
           <div className="story-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="story-close" onClick={() => setStoryOpen(false)} aria-label="Bağla">
+            <button className="story-close" onClick={() => setStoryOpen(false)} aria-label={t('hero.close')}>
               <FaTimes />
             </button>
             <div className="story-film">
               <video src={promoVideo} controls autoPlay muted loop playsInline onLoadedMetadata={slowVideo} />
             </div>
-            <h3>AE Hotel hekayəsi</h3>
-            <p>
-              2018-dən bəri minlərlə səyahətçini lüks otellərlə, şəhər turları və wellness təcrübələri ilə
-              birləşdiririk. Hər rezervasiya — şəxsi konsultasiya kimidir.
-            </p>
+            <h3>{t('hero.storyTitle')}</h3>
+            <p>{t('hero.storyText')}</p>
           </div>
         </div>
       )}

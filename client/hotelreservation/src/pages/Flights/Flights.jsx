@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FaExchangeAlt, FaCalendarAlt, FaPlane } from 'react-icons/fa';
+import { FaExchangeAlt, FaCalendarAlt, FaPlane, FaGlobeAmericas, FaMapMarkerAlt, FaLock } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import ucakImage from '../../assets/images/ucakk.jpg';
+import { useLanguage } from '../../context/LanguageContext';
 import './Flights.css';
 
 const Flights = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [tripType, setTripType] = useState('one-way');
   const [formData, setFormData] = useState({
     from: '',
@@ -146,26 +148,26 @@ const Flights = () => {
     {
       id: 1,
       airline: 'AZAL',
-      discount: '$899 endirim',
+      discount: '899 AZN endirim',
       type: 'Daxili uçuşlar',
       code: 'AZAL125F',
-      color: '#1e6f5c'
+      color: 'linear-gradient(135deg, #8B5A3C 0%, #3A2118 100%)'
     },
     {
       id: 2,
       airline: 'Turkish Airlines',
       discount: '13% endirim',
-      type: 'Daxili uçuşlar',
+      type: 'Beynəlxalq uçuşlar',
       code: 'TK125F',
-      color: '#7f2982'
+      color: 'linear-gradient(135deg, #A0522D 0%, #6B4423 100%)'
     },
     {
       id: 3,
       airline: 'Emirates',
-      discount: '$2,400 endirim',
+      discount: '2.400 AZN endirim',
       type: 'Beynəlxalq uçuşlar',
       code: 'EK125F',
-      color: '#2d545e'
+      color: 'linear-gradient(135deg, #D2691E 0%, #8B5A3C 100%)'
     },
   ];
 
@@ -227,7 +229,9 @@ const Flights = () => {
       <section className="flights-hero" style={{ backgroundImage: `url(${ucakImage})` }}>
         <div className="flights-hero-overlay">
           <div className="flights-hero-content">
-            <h1 className="flights-hero-title">Uçmağa Hazırsınız?</h1>
+            <p className="flights-hero-kicker">AE Hotel Uçuşlar</p>
+            <h1 className="flights-hero-title">{t('flights.title')}</h1>
+            <p className="flights-hero-subtitle">Ən sərfəli biletlər — 630+ istiqamət, bir axtarış</p>
 
             {/* Search Form */}
             <div className="flights-search-card">
@@ -275,7 +279,7 @@ const Flights = () => {
 
               {/* Search Inputs */}
               <form onSubmit={handleSubmit} className="flights-search-form">
-                <div className="flight-inputs-row">
+                <div className={`flight-inputs-row ${tripType === 'round-trip' ? 'with-return' : ''}`}>
                   <div className="flight-input-group" ref={fromRef}>
                     <label className="flight-label">
                       <FaPlane className="flight-icon" />
@@ -397,12 +401,12 @@ const Flights = () => {
                       />
                     </div>
                   )}
-                </div>
 
-                <button type="submit" className="flight-search-button">
-                  Bilet Tap
-                  <FaPlane />
-                </button>
+                  <button type="submit" className="flight-search-button">
+                    Bilet Tap
+                    <FaPlane />
+                  </button>
+                </div>
               </form>
             </div>
           </div>
@@ -412,10 +416,10 @@ const Flights = () => {
       {/* Special Offers */}
       <section className="special-offers-section">
         <div className="container">
-          <h2 className="section-title">Xüsusi Təkliflər</h2>
+          <h2 className="section-title">{t('flights.offers')}</h2>
           <div className="offers-grid">
             {specialOffers.map(offer => (
-              <div key={offer.id} className="offer-card" style={{ backgroundColor: offer.color }}>
+              <div key={offer.id} className="offer-card" style={{ background: offer.color }}>
                 <div className="offer-badge">Endirim</div>
                 <h3 className="offer-airline">{offer.airline}</h3>
                 <p className="offer-discount">{offer.discount}</p>
@@ -433,7 +437,7 @@ const Flights = () => {
       {/* Popular Destinations */}
       <section className="popular-destinations-section">
         <div className="container">
-          <h2 className="section-title">Populyar İstiqamətlər</h2>
+          <h2 className="section-title">{t('flights.popular')}</h2>
           <div className="destinations-grid">
             {popularDestinations.map(destination => (
               <div 
@@ -464,17 +468,17 @@ const Flights = () => {
         <div className="container">
           <div className="why-grid">
             <div className="why-item">
-              <div className="why-icon">🌍</div>
+              <div className="why-icon"><FaGlobeAmericas /></div>
               <h3>Geniş Seçim</h3>
               <p>630+ istiqamət ilə işləyirik</p>
             </div>
             <div className="why-item">
-              <div className="why-icon">📍</div>
+              <div className="why-icon"><FaMapMarkerAlt /></div>
               <h3>İstiqaməti Seçin</h3>
               <p>Ən sərfəli marşrutlar</p>
             </div>
             <div className="why-item">
-              <div className="why-icon">✈️</div>
+              <div className="why-icon"><FaLock /></div>
               <h3>Asan Rezervasiya</h3>
               <p>Sürətli və təhlükəsiz bilet alışı</p>
             </div>
@@ -485,11 +489,13 @@ const Flights = () => {
       {/* CTA Section */}
       <section className="cta-section">
         <div className="container">
-          <h2 className="cta-title">Kəşf etmək vaxtıdır ✈️</h2>
+          <h2 className="cta-title">{t('flights.cta')} ✈️</h2>
           <p className="cta-text">
             Dünyanın ən gözəl yerlərini kəşf edin və unudulmaz səyahətlər yaşayın
           </p>
-          <button className="cta-button">Uçuş Rezerv Et</button>
+          <button className="cta-button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            Uçuş Rezerv Et
+          </button>
         </div>
       </section>
     </div>

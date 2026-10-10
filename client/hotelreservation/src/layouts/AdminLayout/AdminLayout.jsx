@@ -9,11 +9,14 @@ import {
   FaBars, 
   FaTimes,
   FaSignOutAlt,
-  FaChartBar
+  FaChartBar,
+  FaCalendarAlt
 } from 'react-icons/fa';
 import './AdminLayout.css';
+import { useLanguage } from '../../context/LanguageContext';
 
 const AdminLayout = () => {
+  const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -21,11 +24,12 @@ const AdminLayout = () => {
 
   const menuItems = [
     { path: '/admin', icon: <FaHome />, label: 'Dashboard', exact: true },
-    { path: '/admin/hotels', icon: <FaHotel />, label: 'Otellər' },
-    { path: '/admin/bookings', icon: <FaCalendarCheck />, label: 'Rezervasiyalar' },
-    { path: '/admin/users', icon: <FaUsers />, label: 'İstifadəçilər' },
-    { path: '/admin/analytics', icon: <FaChartBar />, label: 'Analitika' },
-    { path: '/admin/settings', icon: <FaCog />, label: 'Parametrlər' },
+    { path: '/admin/hotels', icon: <FaHotel />, label: t('admin.rooms') },
+    { path: '/admin/bookings', icon: <FaCalendarCheck />, label: t('admin.bookings') },
+    { path: '/admin/occupancy', icon: <FaCalendarAlt />, label: t('admin.occupancy') },
+    { path: '/admin/users', icon: <FaUsers />, label: t('admin.users') },
+    { path: '/admin/analytics', icon: <FaChartBar />, label: t('admin.analytics') },
+    { path: '/admin/settings', icon: <FaCog />, label: t('admin.settings') },
   ];
 
   const isActive = (path, exact = false) => {
@@ -48,7 +52,7 @@ const AdminLayout = () => {
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <FaHotel className="logo-icon" />
-            {sidebarOpen && <span className="logo-text">OtelBurada Admin</span>}
+            {sidebarOpen && <span className="logo-text">AE Hotel Admin</span>}
           </div>
           <button 
             className="sidebar-toggle desktop-toggle" 
@@ -75,7 +79,7 @@ const AdminLayout = () => {
         <div className="sidebar-footer">
           <button className="logout-btn" onClick={handleLogout}>
             <span className="nav-icon"><FaSignOutAlt /></span>
-            {sidebarOpen && <span className="nav-label">Çıxış</span>}
+            {sidebarOpen && <span className="nav-label">{t('admin.logout')}</span>}
           </button>
         </div>
       </aside>
@@ -96,7 +100,7 @@ const AdminLayout = () => {
               <div className="admin-avatar">A</div>
               <div className="admin-user-info">
                 <span className="admin-user-name">Admin</span>
-                <span className="admin-user-role">Administrator</span>
+                <span className="admin-user-role">{t('admin.role')}</span>
               </div>
             </div>
           </div>

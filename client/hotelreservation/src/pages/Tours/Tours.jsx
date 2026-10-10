@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaStar, FaClock, FaMapMarkerAlt, FaUsers, FaSearch, FaFilter } from 'react-icons/fa';
 import { TOURS_DATA, getTourCategories } from '../../data/toursData';
+import { useLanguage } from '../../context/LanguageContext';
 import './Tours.css';
 
 const Tours = () => {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('popular');
@@ -40,7 +42,7 @@ const Tours = () => {
       {/* Hero Section */}
       <section className="tours-hero">
         <div className="tours-hero-content">
-          <h1 className="tours-hero-title">Turları Kəşf Et</h1>
+          <h1 className="tours-hero-title">{t('tours.title')}</h1>
           <p className="tours-hero-subtitle">
             Azərbaycanın gözəl yerlərini kəşf edin
           </p>

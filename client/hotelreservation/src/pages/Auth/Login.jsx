@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { useLanguage } from '../../context/LanguageContext';
+import LanguageSwitch from '../../components/LanguageSwitch/LanguageSwitch';
 import './Auth.css';
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -31,15 +34,15 @@ const Login = () => {
     const newErrors = {};
     
     if (!formData.email) {
-      newErrors.email = 'Email tələb olunur';
+      newErrors.email = t('auth.emailReq');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Düzgün email daxil edin';
+      newErrors.email = t('auth.emailBad');
     }
 
     if (!formData.password) {
-      newErrors.password = 'Şifrə tələb olunur';
+      newErrors.password = t('auth.passReq');
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Şifrə ən azı 6 simvoldan ibarət olmalıdır';
+      newErrors.password = t('auth.passShort');
     }
 
     setErrors(newErrors);
@@ -73,7 +76,25 @@ const Login = () => {
 
       setIsLoading(false);
 
-      // Redirect
+      const pendingRaw = localStorage.getItem('pendingBooking');
+      if (pendingRaw) {
+        try {
+          const pending = JSON.parse(pendingRaw);
+          localStorage.removeItem('pendingBooking');
+          const params = new URLSearchParams();
+          if (pending.hotelId) params.set('hotel', pending.hotelId);
+          if (pending.checkIn) params.set('checkIn', pending.checkIn);
+          if (pending.checkOut) params.set('checkOut', pending.checkOut);
+          if (pending.guests) params.set('guests', pending.guests);
+          if (pending.roomId) {
+            navigate(`/rooms/${pending.roomId}?${params.toString()}`, { replace: true });
+            return;
+          }
+        } catch {
+          localStorage.removeItem('pendingBooking');
+        }
+      }
+
       const from = location.state?.from || '/dashboard';
       navigate(from, { replace: true });
     }, 1500);
@@ -84,15 +105,18 @@ const Login = () => {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <h1 className="auth-title">Xoş gəlmisiniz</h1>
-            <p className="auth-subtitle">Hesabınıza daxil olun</p>
+            <div className="auth-lang">
+              <LanguageSwitch />
+            </div>
+            <h1 className="auth-title">{t('auth.welcome')}</h1>
+            <p className="auth-subtitle">{t('auth.loginSub')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="auth-form">
             {/* Email */}
             <div className="form-group">
               <label htmlFor="email" className="form-label">
-                Email
+                {t('auth.email')}
               </label>
               <div className={`input-wrapper ${errors.email ? 'error' : ''}`}>
                 <FaEnvelope className="input-icon" />
@@ -112,7 +136,7 @@ const Login = () => {
             {/* Password */}
             <div className="form-group">
               <label htmlFor="password" className="form-label">
-                Şifrə
+                {t('auth.password')}
               </label>
               <div className={`input-wrapper ${errors.password ? 'error' : ''}`}>
                 <FaLock className="input-icon" />
@@ -130,7 +154,7 @@ const Login = () => {
                   className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
               </div>
               {errors.password && <span className="error-message">{errors.password}</span>}
@@ -146,10 +170,10 @@ const Login = () => {
                   onChange={handleChange}
                   className="checkbox-input"
                 />
-                <span>Məni xatırla</span>
+                <span>{t('auth.remember')}</span>
               </label>
               <Link to="/forgot-password" className="forgot-link">
-                Şifrəni unutmusunuz?
+                {t('auth.forgot')}
               </Link>
             </div>
 
@@ -162,10 +186,10 @@ const Login = () => {
               {isLoading ? (
                 <span className="btn-loading">
                   <span className="spinner"></span>
-                  Daxil olunur...
+                  {t('auth.loggingIn')}
                 </span>
               ) : (
-                'Daxil ol'
+                t('auth.login')
               )}
             </button>
           </form>
@@ -173,9 +197,9 @@ const Login = () => {
           {/* Register Link */}
           <div className="auth-footer">
             <p>
-              Hesabınız yoxdur? {' '}
+              {t('auth.noAccount')} {' '}
               <Link to="/register" className="auth-link">
-                Qeydiyyatdan keçin
+                {t('auth.registerLink')}
               </Link>
             </p>
           </div>

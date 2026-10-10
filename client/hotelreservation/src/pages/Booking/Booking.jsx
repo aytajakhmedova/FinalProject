@@ -5,9 +5,11 @@ import { MdEmail } from 'react-icons/md';
 import { formatDate } from '../../data/roomsData';
 import { addBooking, generateConfirmationNumber, normalizeBooking } from '../../utils/bookingsStore';
 import roomPhoto from '../../assets/images/otaq2.jpg';
+import { useLanguage } from '../../context/LanguageContext';
 import './Booking.css';
 
 const Booking = () => {
+  const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const bookingData = location.state;
@@ -43,8 +45,8 @@ const Booking = () => {
         <div className="booking-container">
           <div className="no-booking-data">
             <FaInfoCircle className="no-data-icon" />
-            <h2>Rezervasiya məlumatı tapılmadı</h2>
-            <p>Rezervasiya etmək üçün əvvəlcə otaq seçin.</p>
+            <h2>{t('pay.missingTitle')}</h2>
+            <p>{t('pay.missingText')}</p>
             <Link to="/hotels" className="btn-back-hotels">
               Otellərə qayıt
             </Link>
@@ -165,9 +167,9 @@ const Booking = () => {
 
           <form className="pay-panel" onSubmit={handleSubmitBooking}>
             <button type="button" className="pay-back" onClick={() => navigate(-1)}>
-              <FaArrowLeft /> Ödəniş məlumatları
+              <FaArrowLeft /> {t('pay.back')}
             </button>
-            <p className="pay-context">Rezervasiya: {room.name} · {priceBreakdown.nights} gecə</p>
+            <p className="pay-context">{t('pay.context', { room: room.name, nights: priceBreakdown.nights })}</p>
 
             <label className="pay-field">
               <span>Ad</span>
@@ -218,7 +220,7 @@ const Booking = () => {
               >
                 <span className="pay-choice-icon"><FaCreditCard /></span>
                 <span className="pay-choice-body">
-                  <strong>1. Kartla indi ödə</strong>
+                  <strong>{t('pay.cardNow')}</strong>
                   <span className="pay-choice-amount">₼ {money(priceBreakdown.total)}</span>
                   <span className="pay-choice-note">Müştəri rezervasiya zamanı ödəniş edir. Real kart ödənişi üçün ödəniş provayderi lazımdır.</span>
                 </span>
@@ -227,7 +229,7 @@ const Booking = () => {
               {paymentMethod === 'card' && (
                 <div className="pay-card-fields">
                   <label className="pay-field">
-                    <span>Ödəniş üsulu</span>
+                    <span>{t('pay.method')}</span>
                     <select className="pay-select" defaultValue="mastercard">
                       <option value="mastercard">Mastercard ilə</option>
                       <option value="visa">Visa ilə</option>
@@ -307,7 +309,7 @@ const Booking = () => {
               >
                 <span className="pay-choice-icon"><FaHotel /></span>
                 <span className="pay-choice-body">
-                  <strong>2. Oteldə ödə</strong>
+                  <strong>{t('pay.atHotel')}</strong>
                   <span className="pay-choice-amount">₼ {money(priceBreakdown.total)}</span>
                   <span className="pay-choice-note">Müştəri otağı indi rezervasiya edir, pulu isə otelə çatanda ödəyir.</span>
                 </span>
@@ -330,7 +332,7 @@ const Booking = () => {
                 checked={agreedToTerms}
                 onChange={(e) => setAgreedToTerms(e.target.checked)}
               />
-              <span>Rezervasiya şərtlərini qəbul edirəm</span>
+              <span>{t('pay.terms')}</span>
             </label>
 
             <div className="pay-totals">
@@ -352,8 +354,8 @@ const Booking = () => {
 
             <button type="submit" className="pay-submit">
               {paymentMethod === 'card'
-                ? `₼ ${money(priceBreakdown.total)} ödə`
-                : 'Rezervasiyanı təsdiqlə'}
+                ? t('pay.pay', { amount: `₼ ${money(priceBreakdown.total)}` })
+                : t('pay.confirm')}
             </button>
             <p className="pay-secure"><FaLock /> Kart məlumatı saxlanılmır və şifrələnmiş formada yoxlanılır</p>
           </form>

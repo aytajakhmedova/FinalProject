@@ -1,0 +1,33 @@
+.language-select {
+  background: rgba(139, 90, 60, 0.08);
+  border: 1px solid rgba(139, 90, 60, 0.28);
+  color: #3a2118;
+  border-radius: 10px;
+  padding: 0.45rem 0.55rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.language-select option {
+  color: #111;
+}
+
+.header .language-select {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.light-mode .header .language-select {
+  background: rgba(139, 90, 60, 0.08);
+  border: 1px solid rgba(139, 90, 60, 0.2);
+  color: #1a1410;
+}
+
+.auth-lang {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}

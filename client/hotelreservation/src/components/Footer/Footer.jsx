@@ -1,9 +1,11 @@
 import React from 'react';
 import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaMapMarkerAlt, FaEnvelope, FaPhone, FaArrowUp } from 'react-icons/fa';
-import logo from '../../assets/images/logo.png';
+import logo from '../../assets/images/AE_HOTEL_transparent_logo.png';
+import { useLanguage } from '../../context/LanguageContext';
 import './Footer.css';
 
 const Footer = () => {
+  const { t } = useLanguage();
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -15,10 +17,10 @@ const Footer = () => {
           {/* Logo and Description */}
           <div className="footer-col">
             <div className="footer-logo">
-              <img src={logo} alt="OtelBurada" />
+              <img src={logo} alt="AE Hotel" />
             </div>
             <p className="footer-description">
-              OtelBurada-da lüks sadəcə ünvan deyil — hiss, təcrübə və həyat tərzidir. Otel, uçuş, tur və taksi bir platformada.
+              {t('footer.desc')}
             </p>
             <div className="footer-social">
               <a href="#" className="social-icon"><FaLinkedin /></a>
@@ -30,37 +32,37 @@ const Footer = () => {
 
           {/* Useful Links */}
           <div className="footer-col">
-            <h3 className="footer-heading">Keçidlər</h3>
+            <h3 className="footer-heading">{t('footer.links')}</h3>
             <ul className="footer-links">
-              <li><a href="#top">Ana səhifə</a></li>
-              <li><a href="#about">Haqqımızda</a></li>
-              <li><a href="#results">Otellər</a></li>
-              <li><a href="#tours">Turlar</a></li>
+              <li><a href="#top">{t('footer.home')}</a></li>
+              <li><a href="#about">{t('footer.about')}</a></li>
+              <li><a href="#results">{t('footer.hotels')}</a></li>
+              <li><a href="#tours">{t('footer.tours')}</a></li>
             </ul>
           </div>
 
           {/* Working Hours */}
           <div className="footer-col">
-            <h3 className="footer-heading">Dəstək saatları</h3>
+            <h3 className="footer-heading">{t('footer.hours')}</h3>
             <ul className="footer-hours">
               <li>
-                <span>Bazar ertəsi – Cümə</span>
-                <span>24 saat</span>
+                <span>{t('footer.monFri')}</span>
+                <span>{t('footer.allDay')}</span>
               </li>
               <li>
-                <span>Şənbə</span>
-                <span>24 saat</span>
+                <span>{t('footer.sat')}</span>
+                <span>{t('footer.allDay')}</span>
               </li>
               <li>
-                <span>Bazar</span>
-                <span>24 saat</span>
+                <span>{t('footer.sun')}</span>
+                <span>{t('footer.allDay')}</span>
               </li>
             </ul>
           </div>
 
           {/* Contact Us */}
           <div className="footer-col">
-            <h3 className="footer-heading">Əlaqə</h3>
+            <h3 className="footer-heading">{t('footer.contact')}</h3>
             <ul className="footer-contact">
               <li>
                 <FaMapMarkerAlt className="contact-icon" />
@@ -68,7 +70,7 @@ const Footer = () => {
               </li>
               <li>
                 <FaEnvelope className="contact-icon" />
-                <span>info@otelburada.com</span>
+                <span>info@aehotel.com</span>
               </li>
               <li>
                 <FaPhone className="contact-icon" />
@@ -80,10 +82,10 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="footer-bottom">
-          <p>&copy; 2026 OtelBurada. All rights reserved.</p>
+          <p>&copy; 2026 AE Hotel. All rights reserved.</p>
           <div className="footer-bottom-links">
-            <a href="#">Məxfilik</a>
-            <a href="#">Şərtlər</a>
+            <a href="#">{t('footer.privacy')}</a>
+            <a href="#">{t('footer.terms')}</a>
           </div>
         </div>
       </div>

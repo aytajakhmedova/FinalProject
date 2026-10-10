@@ -4,6 +4,8 @@ import { FaHotel, FaPlane, FaCar, FaTaxi, FaBars, FaTimes, FaUser, FaSignOutAlt 
 import { IoNotifications } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdDarkMode, MdLightMode } from 'react-icons/md';
 import logo from '../../assets/images/AE_HOTEL_transparent_logo.png';
+import LanguageSwitch from '../LanguageSwitch/LanguageSwitch';
+import { useLanguage } from '../../context/LanguageContext';
 import './Header.css';
 
 const Header = ({
@@ -15,6 +17,7 @@ const Header = ({
   favoriteCount,
 }) => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -26,12 +29,25 @@ const Header = ({
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const authStatus = localStorage.getItem('isAuthenticated');
-    const userData = localStorage.getItem('user');
-    if (authStatus === 'true' && userData) {
-      setIsAuthenticated(true);
-      setUser(JSON.parse(userData));
-    }
+    const syncUser = () => {
+      const authStatus = localStorage.getItem('isAuthenticated');
+      const userData = localStorage.getItem('user');
+      if (authStatus === 'true' && userData) {
+        setIsAuthenticated(true);
+        setUser(JSON.parse(userData));
+      } else {
+        setIsAuthenticated(false);
+        setUser(null);
+      }
+    };
+
+    syncUser();
+    window.addEventListener('user-updated', syncUser);
+    window.addEventListener('storage', syncUser);
+    return () => {
+      window.removeEventListener('user-updated', syncUser);
+      window.removeEventListener('storage', syncUser);
+    };
   }, []);
 
   // Close dropdown when clicking outside
@@ -60,28 +76,30 @@ const Header = ({
 
   const menus = [
     {
-      name: 'Kəşf et',
+      id: 'discover',
+      name: t('nav.discover'),
       items: [
-        { label: 'Otellər', href: '/hotels', isRoute: true },
-        { label: 'Təyinatlar', href: '/destinations', isRoute: true },
-        { label: 'Turlar', href: '/tours', isRoute: true },
+        { label: t('nav.hotels'), href: '/hotels', isRoute: true },
+        { label: t('nav.destinations'), href: '/destinations', isRoute: true },
+        { label: t('nav.tours'), href: '/tours', isRoute: true },
       ],
     },
     {
-      name: 'Səhifələr',
+      id: 'pages',
+      name: t('nav.pages'),
       items: [
-        { label: 'Haqqımızda', href: '/about', isRoute: true },
-        { label: 'Rəylər', href: '/reviews', isRoute: true },
-        { label: 'Qalereya', href: '/gallery', isRoute: true },
+        { label: t('nav.about'), href: '/about', isRoute: true },
+        { label: t('nav.reviews'), href: '/reviews', isRoute: true },
+        { label: t('nav.gallery'), href: '/gallery', isRoute: true },
       ],
     },
   ];
 
   const navItems = [
-    { icon: <FaHotel />, text: 'Otel', type: 'hotel', route: '/hotels' },
-    { icon: <FaPlane />, text: 'Uçuş', type: 'flight', route: '/flights' },
-    { icon: <FaCar />, text: 'Tur', type: 'tour', route: '/tours' },
-    { icon: <FaTaxi />, text: 'Taksi', type: 'taxi', route: '#' },
+    { icon: <FaHotel />, text: t('nav.hotel'), type: 'hotel', route: '/hotels' },
+    { icon: <FaPlane />, text: t('nav.flight'), type: 'flight', route: '/flights' },
+    { icon: <FaCar />, text: t('nav.tour'), type: 'tour', route: '/tours' },
+    { icon: <FaTaxi />, text: t('nav.taxi'), type: 'taxi', route: '#' },
   ];
 
   const go = (href, isRoute = false) => {
@@ -117,6 +135,7 @@ const Header = ({
   };
 
   return (
+    <>
     <header className={`header ${scrolled ? 'scrolled' : ''}`}>
       <div className="header-container">
         <div className="header-left">
@@ -127,19 +146,19 @@ const Header = ({
           <nav className="main-nav">
             {menus.map((item) => (
               <div
-                key={item.name}
-                className={`nav-item ${openMenu === item.name ? 'open' : ''}`}
+                key={item.id}
+                className={`nav-item ${openMenu === item.id ? 'open' : ''}`}
               >
                 <button
                   type="button"
                   className="nav-trigger"
-                  aria-expanded={openMenu === item.name}
-                  onClick={() => setOpenMenu((current) => (current === item.name ? null : item.name))}
+                  aria-expanded={openMenu === item.id}
+                  onClick={() => setOpenMenu((current) => (current === item.id ? null : item.id))}
                 >
                   <span>{item.name}</span>
-                  <MdKeyboardArrowDown className={`dropdown-arrow ${openMenu === item.name ? 'open' : ''}`} />
+                  <MdKeyboardArrowDown className={`dropdown-arrow ${openMenu === item.id ? 'open' : ''}`} />
                 </button>
-                {openMenu === item.name && (
+                {openMenu === item.id && (
                   <div className="dropdown-panel">
                     {item.items.map((link) => (
                       <button key={link.href} type="button" onClick={() => go(link.href, link.isRoute)}>
@@ -175,18 +194,19 @@ const Header = ({
           </div>
 
           <div className="user-actions">
+            <LanguageSwitch />
             <select
               className="currency-select"
               value={currency}
               onChange={(e) => onCurrencyChange(e.target.value)}
-              aria-label="Valyuta"
+              aria-label={t('nav.currency')}
             >
               <option value="AZN">₼ AZN</option>
               <option value="USD">$ USD</option>
               <option value="EUR">€ EUR</option>
             </select>
 
-            <button className="theme-toggle-btn" onClick={toggleDarkMode} aria-label="Tema">
+            <button className="theme-toggle-btn" onClick={toggleDarkMode} aria-label={t('nav.theme')}>
               {darkMode ? <MdLightMode /> : <MdDarkMode />}
             </button>
 
@@ -197,9 +217,9 @@ const Header = ({
               </button>
               {notesOpen && (
                 <div className="notes-panel">
-                  <p>Yay endirimi — otellərdə 20%-dək</p>
-                  <p>Seçilmiş otellər: {favoriteCount}</p>
-                  <p>7/24 dəstək aktivdir</p>
+                  <p>{t('note.summer')}</p>
+                  <p>{t('note.favorites', { count: favoriteCount })}</p>
+                  <p>{t('note.support')}</p>
                 </div>
               )}
             </div>
@@ -208,13 +228,25 @@ const Header = ({
               <div 
                 className="user-profile" 
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                title={user?.name || 'Hesab'}
+                title={user?.name || t('nav.account')}
               >
-                <div className="avatar-fallback">{getUserInitials()}</div>
+                <div className="avatar-fallback">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt={user.name || 'Profil'} />
+                  ) : (
+                    getUserInitials()
+                  )}
+                </div>
                 {userMenuOpen && (
                   <div className="user-menu-dropdown">
                     <div className="user-menu-header">
-                      <div className="user-menu-avatar">{getUserInitials()}</div>
+                      <div className="user-menu-avatar">
+                        {user?.avatar ? (
+                          <img src={user.avatar} alt={user.name || 'Profil'} />
+                        ) : (
+                          getUserInitials()
+                        )}
+                      </div>
                       <div className="user-menu-info">
                         <span className="user-menu-name">{user?.name}</span>
                         <span className="user-menu-email">{user?.email}</span>
@@ -223,19 +255,19 @@ const Header = ({
                     <div className="user-menu-divider"></div>
                     <Link to="/profile" className="user-menu-item" onClick={() => setUserMenuOpen(false)}>
                       <FaUser />
-                      <span>Profil</span>
+                      <span>{t('nav.profile')}</span>
                     </Link>
                     <div className="user-menu-divider"></div>
                     <button className="user-menu-item logout" onClick={handleLogout}>
                       <FaSignOutAlt />
-                      <span>Çıxış</span>
+                      <span>{t('nav.logout')}</span>
                     </button>
                   </div>
                 )}
               </div>
             ) : (
               <Link to="/login" className="login-btn">
-                Daxil ol
+                {t('nav.login')}
               </Link>
             )}
 
@@ -256,6 +288,8 @@ const Header = ({
         </div>
       )}
     </header>
+    <div className="header-spacer" aria-hidden="true" />
+    </>
   );
 };
 

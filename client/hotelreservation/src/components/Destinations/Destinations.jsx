@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { DESTINATIONS } from '../../data/travelData';
+import { useLanguage } from '../../context/LanguageContext';
 import './Destinations.css';
 
 const Destinations = ({ onPickCity }) => {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState(DESTINATIONS[0].country);
 
   const activeDestination = DESTINATIONS.find((d) => d.country === activeTab);
@@ -10,9 +12,9 @@ const Destinations = ({ onPickCity }) => {
   return (
     <section className="destinations-section" id="destinations">
       <div className="destinations-container">
-        <p className="eyebrow center">Mövsüm qiymətləri</p>
+        <p className="eyebrow center">{t('dest.eyebrow')}</p>
         <h2 className="destinations-title">
-          Növbəti səyahəti nə vaxt bron etmək daha sərfəlidir?
+          {t('dest.title')}
         </h2>
 
         <div className="destinations-tabs">

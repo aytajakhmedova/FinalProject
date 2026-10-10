@@ -12,6 +12,7 @@ import {
   FaPlus,
 } from 'react-icons/fa';
 import { CITIES } from '../../data/travelData';
+import { useLanguage } from '../../context/LanguageContext';
 import './SearchForm.css';
 
 const todayISO = () => new Date().toISOString().split('T')[0];
@@ -30,12 +31,13 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
   const [showCities, setShowCities] = useState(false);
   const [error, setError] = useState('');
   const wrapRef = useRef(null);
+  const { t } = useLanguage();
 
   const tabs = [
-    { id: 'hotel', label: 'Otel', icon: <FaHotel /> },
-    { id: 'flight', label: 'Uçuş', icon: <FaPlane /> },
-    { id: 'tour', label: 'Tur', icon: <FaRoute /> },
-    { id: 'taxi', label: 'Taksi', icon: <FaTaxi /> },
+    { id: 'hotel', label: t('search.hotel'), icon: <FaHotel /> },
+    { id: 'flight', label: t('search.flight'), icon: <FaPlane /> },
+    { id: 'tour', label: t('search.tour'), icon: <FaRoute /> },
+    { id: 'taxi', label: t('search.taxi'), icon: <FaTaxi /> },
   ];
 
   const filteredCities = CITIES.filter((c) =>
@@ -73,8 +75,12 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (checkOut <= checkIn && serviceType !== 'taxi' && serviceType !== 'flight') {
-      setError('Çıxış tarixi girişdən sonra olmalıdır');
+    if (serviceType === 'hotel' && (!checkIn || !checkOut)) {
+      setError(t('search.needDates'));
+      return;
+    }
+    if (checkIn && checkOut && checkOut <= checkIn && serviceType !== 'taxi' && serviceType !== 'flight') {
+      setError(t('search.dateOrder'));
       return;
     }
     setError('');
@@ -88,40 +94,39 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
   };
 
   const titles = {
-    hotel: 'Otel əlçatanlığını yoxla',
-    flight: 'Uçuş axtar',
-    tour: 'Tur və təcrübə tap',
-    taxi: 'Hava limanı taksisi',
+    hotel: t('search.hotelTitle'),
+    flight: t('search.flightTitle'),
+    tour: t('search.tourTitle'),
+    taxi: t('search.taxiTitle'),
   };
 
   return (
     <div className="search-form-container" id="search" ref={wrapRef}>
-      <div className="search-tabs">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            className={`search-tab ${serviceType === tab.id ? 'active' : ''}`}
-            onClick={() => onServiceChange?.(tab.id)}
-          >
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="form-header">
+      <div className="search-form-top">
         <h3 className="form-title">{titles[serviceType]}</h3>
+        <div className="search-tabs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className={`search-tab ${serviceType === tab.id ? 'active' : ''}`}
+              onClick={() => onServiceChange?.(tab.id)}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <form className="search-form" onSubmit={handleSubmit}>
         <div className="form-field location-field">
           <FaMapMarkerAlt className="field-icon" />
           <div className="field-content">
-            <label>{serviceType === 'flight' ? 'Haradan / hara' : 'Məkan'}</label>
+            <label>{serviceType === 'flight' ? t('search.fromTo') : t('search.place')}</label>
             <input
               type="text"
-              placeholder="Şəhər və ya ölkə yazın"
+              placeholder={t('search.cityPh')}
               value={location}
               onChange={(e) => {
                 setLocation(e.target.value);
@@ -157,7 +162,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
         <div className="form-field date-field">
           <FaCalendarAlt className="field-icon" />
           <div className="field-content">
-            <label>{serviceType === 'taxi' ? 'Tarix' : 'Giriş'}</label>
+            <label>{serviceType === 'taxi' ? t('search.date') : t('search.checkIn')}</label>
             <input
               type="date"
               value={checkIn}
@@ -175,7 +180,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
             <div className="form-field date-field">
               <FaCalendarAlt className="field-icon" />
               <div className="field-content">
-                <label>{serviceType === 'flight' ? 'Dönüş' : 'Çıxış'}</label>
+                <label>{serviceType === 'flight' ? t('search.return') : t('search.checkOut')}</label>
                 <input
                   type="date"
                   value={checkOut}
@@ -195,21 +200,21 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
         <div className="form-field guests-field">
           <FaUsers className="field-icon" />
           <div className="field-content">
-            <label>Qonaqlar</label>
+            <label>{t('search.guests')}</label>
             <button
               type="button"
               className="guest-trigger"
               onClick={() => setShowGuests((v) => !v)}
             >
-              {guests.adults} böyük · {guests.children} uşaq · {guests.rooms} otaq
+              {t('search.guestLine', { adults: guests.adults, children: guests.children, rooms: guests.rooms })}
             </button>
           </div>
           {showGuests && (
             <div className="guest-popover">
               {[
-                { key: 'adults', label: 'Böyüklər' },
-                { key: 'children', label: 'Uşaqlar' },
-                { key: 'rooms', label: 'Otaqlar' },
+                { key: 'adults', label: t('search.adults') },
+                { key: 'children', label: t('search.children') },
+                { key: 'rooms', label: t('search.rooms') },
               ].map((row) => (
                 <div className="guest-row" key={row.key}>
                   <span>{row.label}</span>
@@ -228,9 +233,9 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
           )}
         </div>
 
-        <button className="search-button" type="submit" aria-label="Axtar">
+        <button className="search-button" type="submit" aria-label={t('search.search')}>
           <FaSearch className="search-icon" />
-          <span className="search-btn-text">Axtar</span>
+          <span className="search-btn-text">{t('search.search')}</span>
         </button>
       </form>
       {error && <p className="search-error">{error}</p>}

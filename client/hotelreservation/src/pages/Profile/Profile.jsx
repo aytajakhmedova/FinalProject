@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { FaUser, FaEnvelope, FaPhone, FaLock, FaEdit, FaCamera, FaCheckCircle } from 'react-icons/fa';
+import { useLanguage } from '../../context/LanguageContext';
 import './Profile.css';
 
 const Profile = () => {
+  const { t, locale } = useLanguage();
   // Mock user data from localStorage
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem('user');
@@ -52,17 +54,17 @@ const Profile = () => {
     const newErrors = {};
     
     if (!editForm.name.trim()) {
-      newErrors.name = 'Ad və soyad tələb olunur';
+      newErrors.name = t('profile.nameReq');
     }
 
     if (!editForm.email) {
-      newErrors.email = 'Email tələb olunur';
+      newErrors.email = t('auth.emailReq');
     } else if (!/\S+@\S+\.\S+/.test(editForm.email)) {
-      newErrors.email = 'Düzgün email daxil edin';
+      newErrors.email = t('auth.emailBad');
     }
 
     if (!editForm.phone) {
-      newErrors.phone = 'Telefon nömrəsi tələb olunur';
+      newErrors.phone = t('profile.phoneReq');
     }
 
     setErrors(newErrors);
@@ -73,19 +75,19 @@ const Profile = () => {
     const newErrors = {};
     
     if (!passwordForm.currentPassword) {
-      newErrors.currentPassword = 'Cari şifrə tələb olunur';
+      newErrors.currentPassword = t('profile.currentReq');
     }
 
     if (!passwordForm.newPassword) {
-      newErrors.newPassword = 'Yeni şifrə tələb olunur';
+      newErrors.newPassword = t('profile.newReq');
     } else if (passwordForm.newPassword.length < 6) {
-      newErrors.newPassword = 'Şifrə ən azı 6 simvoldan ibarət olmalıdır';
+      newErrors.newPassword = t('auth.passShort');
     }
 
     if (!passwordForm.confirmPassword) {
-      newErrors.confirmPassword = 'Şifrə təkrarı tələb olunur';
+      newErrors.confirmPassword = t('auth.passRepeatReq');
     } else if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      newErrors.confirmPassword = 'Şifrələr uyğun gəlmir';
+      newErrors.confirmPassword = t('auth.passMismatch');
     }
 
     setErrors(newErrors);
@@ -101,8 +103,9 @@ const Profile = () => {
     const updatedUser = { ...user, ...editForm };
     setUser(updatedUser);
     localStorage.setItem('user', JSON.stringify(updatedUser));
+    window.dispatchEvent(new Event('user-updated'));
     setIsEditing(false);
-    setSuccessMessage('Profil məlumatları uğurla yeniləndi');
+    setSuccessMessage(t('profile.saved'));
     setTimeout(() => setSuccessMessage(''), 3000);
   };
 
@@ -118,7 +121,7 @@ const Profile = () => {
       confirmPassword: '',
     });
     setShowPasswordForm(false);
-    setSuccessMessage('Şifrə uğurla dəyişdirildi');
+    setSuccessMessage(t('profile.passSaved'));
     setTimeout(() => setSuccessMessage(''), 3000);
   };
 
@@ -131,7 +134,8 @@ const Profile = () => {
         const updatedUser = { ...user, avatar: reader.result };
         setUser(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
-        setSuccessMessage('Profil şəkli yeniləndi');
+        window.dispatchEvent(new Event('user-updated'));
+        setSuccessMessage(t('profile.avatarSaved'));
         setTimeout(() => setSuccessMessage(''), 3000);
       };
       reader.readAsDataURL(file);
@@ -140,11 +144,21 @@ const Profile = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('az-AZ', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    if (!dateString || Number.isNaN(date.getTime())) return null;
+    return date.toLocaleDateString(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
+  };
+
+  const memberSinceLabel = () => {
+    const fromField = formatDate(user.memberSince);
+    if (fromField) return fromField;
+    if (typeof user.id === 'number' && user.id > 1e11) {
+      return formatDate(user.id);
+    }
+    return t('profile.newMember');
   };
 
   return (
@@ -185,15 +199,15 @@ const Profile = () => {
               {user.verified && (
                 <div className="verified-badge">
                   <FaCheckCircle />
-                  <span>Təsdiqlənmiş Hesab</span>
+                  <span>{t('profile.verified')}</span>
                 </div>
               )}
             </div>
           </div>
           <div className="profile-stats">
             <div className="stat-item">
-              <span className="stat-label">Üzv oldu</span>
-              <span className="stat-value">{formatDate(user.memberSince)}</span>
+              <span className="stat-label">{t('profile.memberSince')}</span>
+              <span className="stat-value">{memberSinceLabel()}</span>
             </div>
           </div>
         </div>
@@ -202,14 +216,14 @@ const Profile = () => {
           {/* Personal Information */}
           <div className="profile-section">
             <div className="section-header">
-              <h2 className="section-title">Şəxsi Məlumatlar</h2>
+              <h2 className="section-title">{t('profile.personal')}</h2>
               {!isEditing && (
                 <button 
                   className="btn-edit"
                   onClick={() => setIsEditing(true)}
                 >
                   <FaEdit />
-                  Redaktə et
+                  {t('profile.edit')}
                 </button>
               )}
             </div>
@@ -218,7 +232,7 @@ const Profile = () => {
               <form onSubmit={handleSaveProfile} className="profile-form">
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">Ad və Soyad</label>
+                    <label className="form-label">{t('profile.name')}</label>
                     <div className={`input-wrapper ${errors.name ? 'error' : ''}`}>
                       <FaUser className="input-icon" />
                       <input
@@ -236,7 +250,7 @@ const Profile = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">Email</label>
+                    <label className="form-label">{t('profile.email')}</label>
                     <div className={`input-wrapper ${errors.email ? 'error' : ''}`}>
                       <FaEnvelope className="input-icon" />
                       <input
@@ -254,7 +268,7 @@ const Profile = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">Telefon</label>
+                    <label className="form-label">{t('profile.phone')}</label>
                     <div className={`input-wrapper ${errors.phone ? 'error' : ''}`}>
                       <FaPhone className="input-icon" />
                       <input
@@ -272,7 +286,7 @@ const Profile = () => {
 
                 <div className="form-actions">
                   <button type="submit" className="btn-save">
-                    Yadda saxla
+                    {t('profile.save')}
                   </button>
                   <button 
                     type="button" 
@@ -287,7 +301,7 @@ const Profile = () => {
                       setErrors({});
                     }}
                   >
-                    Ləğv et
+                    {t('profile.cancel')}
                   </button>
                 </div>
               </form>
@@ -298,7 +312,7 @@ const Profile = () => {
                     <FaUser />
                   </div>
                   <div className="info-content">
-                    <span className="info-label">Ad və Soyad</span>
+                    <span className="info-label">{t('profile.name')}</span>
                     <span className="info-value">{user.name}</span>
                   </div>
                 </div>
@@ -308,7 +322,7 @@ const Profile = () => {
                     <FaEnvelope />
                   </div>
                   <div className="info-content">
-                    <span className="info-label">Email</span>
+                    <span className="info-label">{t('profile.email')}</span>
                     <span className="info-value">{user.email}</span>
                   </div>
                 </div>
@@ -318,7 +332,7 @@ const Profile = () => {
                     <FaPhone />
                   </div>
                   <div className="info-content">
-                    <span className="info-label">Telefon</span>
+                    <span className="info-label">{t('profile.phone')}</span>
                     <span className="info-value">{user.phone}</span>
                   </div>
                 </div>
@@ -329,14 +343,14 @@ const Profile = () => {
           {/* Change Password */}
           <div className="profile-section">
             <div className="section-header">
-              <h2 className="section-title">Təhlükəsizlik</h2>
+              <h2 className="section-title">{t('profile.security')}</h2>
               {!showPasswordForm && (
                 <button 
                   className="btn-edit"
                   onClick={() => setShowPasswordForm(true)}
                 >
                   <FaLock />
-                  Şifrəni dəyiş
+                  {t('profile.changePass')}
                 </button>
               )}
             </div>
@@ -345,7 +359,7 @@ const Profile = () => {
               <form onSubmit={handleChangePassword} className="profile-form">
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">Cari Şifrə</label>
+                    <label className="form-label">{t('profile.currentPass')}</label>
                     <div className={`input-wrapper ${errors.currentPassword ? 'error' : ''}`}>
                       <FaLock className="input-icon" />
                       <input
@@ -363,7 +377,7 @@ const Profile = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">Yeni Şifrə</label>
+                    <label className="form-label">{t('profile.newPass')}</label>
                     <div className={`input-wrapper ${errors.newPassword ? 'error' : ''}`}>
                       <FaLock className="input-icon" />
                       <input
@@ -381,7 +395,7 @@ const Profile = () => {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">Yeni Şifrə Təkrarı</label>
+                    <label className="form-label">{t('profile.confirmPass')}</label>
                     <div className={`input-wrapper ${errors.confirmPassword ? 'error' : ''}`}>
                       <FaLock className="input-icon" />
                       <input
@@ -399,7 +413,7 @@ const Profile = () => {
 
                 <div className="form-actions">
                   <button type="submit" className="btn-save">
-                    Şifrəni yenilə
+                    {t('profile.updatePass')}
                   </button>
                   <button 
                     type="button" 
@@ -414,7 +428,7 @@ const Profile = () => {
                       setErrors({});
                     }}
                   >
-                    Ləğv et
+                    {t('profile.cancel')}
                   </button>
                 </div>
               </form>
@@ -424,7 +438,7 @@ const Profile = () => {
                   <FaLock />
                 </div>
                 <div className="info-content">
-                  <span className="info-label">Şifrə</span>
+                  <span className="info-label">{t('profile.password')}</span>
                   <span className="info-value">••••••••</span>
                 </div>
               </div>

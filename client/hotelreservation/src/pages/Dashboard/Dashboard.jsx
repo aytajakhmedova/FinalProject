@@ -1,16 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaCheckCircle, FaHourglass, FaTimesCircle, FaClipboardList } from 'react-icons/fa';
-import { MOCK_RESERVATIONS, getDashboardStats } from '../../data/reservationsData';
+import { getAllBookings, getBookingStats, updateBooking } from '../../utils/bookingsStore';
+import { hasReviewForBooking } from '../../utils/reviewsStore';
+import { useLanguage } from '../../context/LanguageContext';
+import { getHotels } from '../../data/hotelsData';
 import './Dashboard.css';
 
+const hotelImageFor = (reservation) => {
+  const hotel = getHotels().find((item) => String(item.id) === String(reservation.hotelId));
+  return hotel?.mainImage || reservation.hotelImage;
+};
+
 const Dashboard = () => {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('all');
   const [user, setUser] = useState(null);
-  const [reservations, setReservations] = useState(MOCK_RESERVATIONS);
+  const [reservations, setReservations] = useState(getAllBookings());
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
-  const stats = getDashboardStats();
+  const stats = getBookingStats(reservations);
 
   useEffect(() => {
     // Get user data from localStorage
@@ -32,11 +41,10 @@ const Dashboard = () => {
 
   const getStatusBadge = (status) => {
     const badges = {
-      confirmed: { text: 'Təsdiqlənib', className: 'badge-confirmed', icon: <FaCheckCircle /> },
-      upcoming: { text: 'Gələcək', className: 'badge-upcoming', icon: <FaHourglass /> },
-      'checked-in': { text: 'Qeydiyyatdan keçib', className: 'badge-checked-in', icon: <FaCheckCircle /> },
-      completed: { text: 'Tamamlanıb', className: 'badge-completed', icon: <FaCheckCircle /> },
-      cancelled: { text: 'Ləğv edilib', className: 'badge-cancelled', icon: <FaTimesCircle /> },
+      confirmed: { text: t('status.confirmed'), className: 'badge-confirmed', icon: <FaCheckCircle /> },
+      'checked-in': { text: t('status.checkedIn'), className: 'badge-checked-in', icon: <FaHourglass /> },
+      'checked-out': { text: t('status.checkedOut'), className: 'badge-completed', icon: <FaCheckCircle /> },
+      cancelled: { text: t('status.cancelled'), className: 'badge-cancelled', icon: <FaTimesCircle /> },
     };
     return badges[status] || badges.confirmed;
   };
@@ -44,8 +52,8 @@ const Dashboard = () => {
   const filteredReservations = activeTab === 'all' 
     ? reservations 
     : reservations.filter(res => {
-        if (activeTab === 'upcoming') return res.status === 'confirmed' || res.status === 'upcoming';
-        if (activeTab === 'completed') return res.status === 'completed' || res.status === 'checked-in';
+        if (activeTab === 'upcoming') return res.status === 'confirmed' || res.status === 'checked-in';
+        if (activeTab === 'completed') return res.status === 'checked-out';
         if (activeTab === 'cancelled') return res.status === 'cancelled';
         return true;
       });
@@ -57,22 +65,19 @@ const Dashboard = () => {
 
   const confirmCancelReservation = () => {
     if (selectedReservation) {
-      setReservations(reservations.map(r => 
-        r.id === selectedReservation.id ? { ...r, status: 'cancelled' } : r
-      ));
+      updateBooking(selectedReservation.id, {
+        status: 'cancelled',
+        cancelledDate: new Date().toISOString(),
+      });
+      setReservations(getAllBookings());
       setShowCancelModal(false);
       setSelectedReservation(null);
-      alert('Rezervasiya uğurla ləğv edildi');
+      alert(t('dash.cancelledAlert'));
     }
   };
 
-  const canModifyReservation = (status) => {
-    return status === 'confirmed' || status === 'upcoming';
-  };
-
-  const canCancelReservation = (status) => {
-    return status === 'confirmed' || status === 'upcoming';
-  };
+  const canModifyReservation = (status) => status === 'confirmed';
+  const canCancelReservation = (status) => status === 'confirmed';
 
   return (
     <div className="dashboard-page">
@@ -81,16 +86,16 @@ const Dashboard = () => {
         <div className="dashboard-header">
           <div className="welcome-section">
             <h1 className="dashboard-title">
-              Xoş gəlmisiniz{user?.name ? `, ${user.name}` : ''}!
+              {t('dash.welcome')}{user?.name ? `, ${user.name}` : ''}!
             </h1>
-            <p className="dashboard-subtitle">Rezervasiyalarınızı idarə edin və səyahətlərinizi izləyin</p>
+            <p className="dashboard-subtitle">{t('dash.subtitle')}</p>
           </div>
           <div className="user-profile-summary">
             <div className="user-avatar">
               <span>{getUserInitials()}</span>
             </div>
             <div className="user-info">
-              <h3>{user?.name || 'İstifadəçi'}</h3>
+              <h3>{user?.name || t('dash.user')}</h3>
               <p>{user?.email || 'email@example.com'}</p>
             </div>
           </div>
@@ -104,7 +109,7 @@ const Dashboard = () => {
             </div>
             <div className="stat-content">
               <div className="stat-value">{stats.upcoming}</div>
-              <div className="stat-label">Gələcək Qalma</div>
+              <div className="stat-label">{t('dash.upcoming')}</div>
             </div>
           </div>
 
@@ -114,7 +119,7 @@ const Dashboard = () => {
             </div>
             <div className="stat-content">
               <div className="stat-value">{stats.completed}</div>
-              <div className="stat-label">Tamamlanmış Qalma</div>
+              <div className="stat-label">{t('dash.completed')}</div>
             </div>
           </div>
 
@@ -124,7 +129,7 @@ const Dashboard = () => {
             </div>
             <div className="stat-content">
               <div className="stat-value">{stats.total}</div>
-              <div className="stat-label">Cəmi Rezervasiya</div>
+              <div className="stat-label">{t('dash.total')}</div>
             </div>
           </div>
         </div>
@@ -135,35 +140,35 @@ const Dashboard = () => {
             className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
             onClick={() => setActiveTab('all')}
           >
-            Hamısı ({MOCK_RESERVATIONS.length})
+            {t('dash.all')} ({reservations.length})
           </button>
           <button 
             className={`tab-btn ${activeTab === 'upcoming' ? 'active' : ''}`}
             onClick={() => setActiveTab('upcoming')}
           >
-            Gələcək ({stats.upcoming})
+            {t('dash.future')} ({stats.upcoming})
           </button>
           <button 
             className={`tab-btn ${activeTab === 'completed' ? 'active' : ''}`}
             onClick={() => setActiveTab('completed')}
           >
-            Tamamlanmış ({stats.completed})
+            {t('dash.done')} ({stats.completed})
           </button>
           <button 
             className={`tab-btn ${activeTab === 'cancelled' ? 'active' : ''}`}
             onClick={() => setActiveTab('cancelled')}
           >
-            Ləğv edilmiş ({stats.cancelled})
+            {t('dash.cancelled')} ({stats.cancelled})
           </button>
         </div>
 
         {/* Reservations List */}
         <div className="reservations-section">
           <h2 className="section-title">
-            {activeTab === 'all' && 'Bütün Rezervasiyalar'}
-            {activeTab === 'upcoming' && 'Gələcək Rezervasiyalar'}
-            {activeTab === 'completed' && 'Tamamlanmış Rezervasiyalar'}
-            {activeTab === 'cancelled' && 'Ləğv Edilmiş Rezervasiyalar'}
+            {activeTab === 'all' && t('dash.allTitle')}
+            {activeTab === 'upcoming' && t('dash.futureTitle')}
+            {activeTab === 'completed' && t('dash.doneTitle')}
+            {activeTab === 'cancelled' && t('dash.cancelledTitle')}
           </h2>
 
           {filteredReservations.length > 0 ? (
@@ -173,7 +178,7 @@ const Dashboard = () => {
                 return (
                   <div key={reservation.id} className="reservation-card">
                     <div className="reservation-image">
-                      <img src={reservation.hotelImage} alt={reservation.hotelName} />
+                      <img src={hotelImageFor(reservation)} alt={reservation.hotelName} />
                       <div className={`reservation-status-badge ${badge.className}`}>
                         {badge.icon}
                         <span>{badge.text}</span>
@@ -183,7 +188,7 @@ const Dashboard = () => {
                     <div className="reservation-content">
                       <div className="reservation-header">
                         <h3 className="reservation-hotel-name">{reservation.hotelName}</h3>
-                        <div className="reservation-id">#{reservation.id}</div>
+                        <div className="reservation-id">#{reservation.confirmationNumber || reservation.id}</div>
                       </div>
 
                       <div className="reservation-location">
@@ -199,7 +204,7 @@ const Dashboard = () => {
                         <div className="detail-item">
                           <FaCalendarAlt className="detail-icon" />
                           <div className="detail-text">
-                            <span className="detail-label">Giriş</span>
+                            <span className="detail-label">{t('dash.checkIn')}</span>
                             <span className="detail-value">{reservation.checkIn}</span>
                           </div>
                         </div>
@@ -207,7 +212,7 @@ const Dashboard = () => {
                         <div className="detail-item">
                           <FaCalendarAlt className="detail-icon" />
                           <div className="detail-text">
-                            <span className="detail-label">Çıxış</span>
+                            <span className="detail-label">{t('dash.checkOut')}</span>
                             <span className="detail-value">{reservation.checkOut}</span>
                           </div>
                         </div>
@@ -215,15 +220,15 @@ const Dashboard = () => {
                         <div className="detail-item">
                           <FaUsers className="detail-icon" />
                           <div className="detail-text">
-                            <span className="detail-label">Qonaqlar</span>
-                            <span className="detail-value">{reservation.guests} nəfər</span>
+                            <span className="detail-label">{t('dash.guests')}</span>
+                            <span className="detail-value">{t('dash.people', { count: reservation.guests })}</span>
                           </div>
                         </div>
                       </div>
 
                       <div className="reservation-footer">
                         <div className="reservation-price">
-                          <span className="price-label">{reservation.nights} gecə</span>
+                          <span className="price-label">{t('dash.nights', { count: reservation.nights })}</span>
                           <span className="price-amount">₼{reservation.totalPrice}</span>
                         </div>
                         <div className="reservation-actions">
@@ -231,22 +236,30 @@ const Dashboard = () => {
                             to={`/reservations/${reservation.id}`} 
                             className="btn-view-reservation"
                           >
-                            Ətraflı bax
+                            {t('dash.details')}
                           </Link>
                           {canModifyReservation(reservation.status) && (
-                            <button 
+                            <Link
+                              to={`/reservations/${reservation.id}?edit=1`}
                               className="btn-modify-reservation"
-                              onClick={() => alert('Dəyişdirmə funksiyası tezliklə əlavə olunacaq')}
                             >
-                              Dəyişdir
-                            </button>
+                              {t('dash.modify')}
+                            </Link>
+                          )}
+                          {reservation.status === 'checked-out' && !hasReviewForBooking(reservation.id) && (
+                            <Link
+                              to={`/hotels/${reservation.hotelId}#reviews`}
+                              className="btn-modify-reservation"
+                            >
+                              {t('dash.review')}
+                            </Link>
                           )}
                           {canCancelReservation(reservation.status) && (
                             <button 
                               className="btn-cancel-reservation"
                               onClick={() => handleCancelReservation(reservation)}
                             >
-                              Ləğv et
+                              {t('dash.cancel')}
                             </button>
                           )}
                         </div>
@@ -259,10 +272,10 @@ const Dashboard = () => {
           ) : (
             <div className="no-reservations">
               <FaClipboardList />
-              <h3>Rezervasiya tapılmadı</h3>
-              <p>Bu kateqoriyada rezervasiyanız yoxdur</p>
+              <h3>{t('dash.emptyTitle')}</h3>
+              <p>{t('dash.emptyText')}</p>
               <Link to="/hotels" className="btn-browse-hotels">
-                Otelləri Kəşf Et
+                {t('dash.browse')}
               </Link>
             </div>
           )}
@@ -273,14 +286,14 @@ const Dashboard = () => {
       {showCancelModal && (
         <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Rezervasiyanı Ləğv Et</h3>
-            <p>Bu rezervasiyanı ləğv etmək istədiyinizə əminsiniz?</p>
+            <h3>{t('dash.cancelTitle')}</h3>
+            <p>{t('dash.cancelSure')}</p>
             {selectedReservation && (
               <div className="modal-reservation-info">
                 <p><strong>{selectedReservation.hotelName}</strong></p>
                 <p>{selectedReservation.checkIn} - {selectedReservation.checkOut}</p>
                 <p className="modal-warning">
-                  ⚠️ Ləğv etdikdən sonra bu əməliyyatı geri qaytara bilməzsiniz
+                  ⚠️ {t('dash.cancelWarn')}
                 </p>
               </div>
             )}
@@ -289,13 +302,13 @@ const Dashboard = () => {
                 className="btn-modal-cancel"
                 onClick={() => setShowCancelModal(false)}
               >
-                Xeyr, saxla
+                {t('dash.keep')}
               </button>
               <button 
                 className="btn-modal-confirm"
                 onClick={confirmCancelReservation}
               >
-                Bəli, ləğv et
+                {t('dash.confirmCancel')}
               </button>
             </div>
           </div>
