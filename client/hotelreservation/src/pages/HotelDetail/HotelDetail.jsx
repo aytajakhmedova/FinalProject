@@ -1,23 +1,46 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { FaMapMarkerAlt, FaStar, FaWifi, FaParking, FaSwimmingPool, FaDumbbell, FaUtensils, FaCocktail, FaCheck, FaArrowLeft, FaBed } from 'react-icons/fa';
 import RatingStars from '../../components/common/RatingStars/RatingStars';
 import RoomCard from '../../components/common/RoomCard/RoomCard';
 import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
 import ReviewsSection from '../../components/common/ReviewsSection/ReviewsSection';
-import { getHotelById } from '../../data/hotelsData';
-import { checkRoomAvailability } from '../../data/roomsData';
+import { getHotel } from '../../api/client';
 import './HotelDetail.css';
 
 const HotelDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const hotel = getHotelById(id);
   const checkIn = searchParams.get('checkIn') || '';
   const checkOut = searchParams.get('checkOut') || '';
   const guests = parseInt(searchParams.get('guests') || '0', 10);
   const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
+  const [hotel, setHotel] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    getHotel(id, { checkIn, checkOut, guests: guests || undefined })
+      .then((data) => {
+        if (!active) return;
+        const hotelId = Number(data.id);
+        setHotel({
+          ...data,
+          rooms: (data.rooms || []).filter((room) => Number(room.hotelId) === hotelId),
+        });
+      })
+      .catch(() => {
+        if (active) setHotel(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [id, checkIn, checkOut, guests]);
 
   const handleScrollToRooms = () => {
     const roomsSection = document.getElementById('rooms');
@@ -25,6 +48,14 @@ const HotelDetail = () => {
       roomsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="hotel-not-found">
+        <h2>Yüklənir...</h2>
+      </div>
+    );
+  }
 
   if (!hotel) {
     return (
@@ -34,6 +65,14 @@ const HotelDetail = () => {
       </div>
     );
   }
+
+  const hotelRooms = hotel.rooms || [];
+  const visibleRooms = hotelRooms.filter((room) => {
+    if (room.available === false) return false;
+    if (guests && room.capacity < guests) return false;
+    if (checkIn && checkOut && room.isAvailable === false) return false;
+    return true;
+  });
 
   const amenityIcons = {
     'Wi-Fi': <FaWifi />,
@@ -133,25 +172,19 @@ const HotelDetail = () => {
                   ? `${checkIn} — ${checkOut} tarixləri üçün boş otaqlar`
                   : 'Rezervasiya etmək üçün otaq seçin'}
               </p>
-              <div className="rooms-grid">
-                {hotel.rooms
-                  .filter((room) => {
-                    if (room.available === false) return false;
-                    if (guests && room.capacity < guests) return false;
-                    if (checkIn && checkOut && !checkRoomAvailability(room.id, checkIn, checkOut)) return false;
-                    return true;
-                  })
-                  .map(room => (
-                  <RoomCard key={room.id} room={room} hotelId={hotel.id} queryString={queryString} />
-                ))}
-              </div>
-              {hotel.rooms.filter((room) => {
-                if (room.available === false) return false;
-                if (guests && room.capacity < guests) return false;
-                if (checkIn && checkOut && !checkRoomAvailability(room.id, checkIn, checkOut)) return false;
-                return true;
-              }).length === 0 && (
-                <p className="section-subtitle">Bu tarix və qonaq sayı üçün boş otaq yoxdur.</p>
+              {hotelRooms.length === 0 ? (
+                <p className="section-subtitle">Bu oteldə hələ otaq yoxdur.</p>
+              ) : (
+                <>
+                  <div className="rooms-grid">
+                    {visibleRooms.map((room) => (
+                      <RoomCard key={room.id} room={room} hotelId={hotel.id} queryString={queryString} />
+                    ))}
+                  </div>
+                  {visibleRooms.length === 0 && (
+                    <p className="section-subtitle">Bu tarix və qonaq sayı üçün boş otaq yoxdur.</p>
+                  )}
+                </>
               )}
             </section>
 

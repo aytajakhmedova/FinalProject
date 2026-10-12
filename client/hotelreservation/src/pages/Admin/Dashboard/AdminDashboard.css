@@ -7,9 +7,10 @@
 .dashboard-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 2rem;
-  gap: 2rem;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .dashboard-title {
@@ -43,6 +44,9 @@
 .btn-primary {
   background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
   color: white;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
 
 .btn-primary:hover {
@@ -64,8 +68,8 @@
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
   margin-bottom: 2.5rem;
 }
 
@@ -175,13 +179,14 @@
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 16px;
-  overflow: hidden;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 .bookings-table {
   width: 100%;
+  min-width: 720px;
   border-collapse: collapse;
-  table-layout: fixed;
 }
 
 .bookings-table thead {
@@ -198,12 +203,6 @@
   letter-spacing: 0.5px;
 }
 
-.bookings-table th:nth-child(1) { width: 60px; }
-.bookings-table th:nth-child(2) { width: auto; }
-.bookings-table th:nth-child(3) { width: auto; }
-.bookings-table th:nth-child(4) { width: 140px; }
-.bookings-table th:nth-child(5) { width: 130px; }
-
 .bookings-table tbody tr {
   border-top: 1px solid var(--border-color);
   transition: background 0.2s ease;
@@ -214,21 +213,19 @@
 }
 
 .bookings-table td {
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.25rem;
   color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
 }
 
 .guest-cell {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  white-space: nowrap;
-  overflow: visible;
-  max-width: 250px;
+}
+
+.admin-dashboard .muted {
+  color: var(--text-muted);
+  font-size: 0.82rem;
 }
 
 .guest-avatar {

@@ -232,9 +232,8 @@ const FlightBooking = () => {
                           onChange={(e) => updatePassenger(passenger.id, 'title', e.target.value)}
                           required
                         >
-                          <option value="Mr">Cənab</option>
-                          <option value="Mrs">Xanım</option>
-                          <option value="Ms">Xanım</option>
+                          <option value="Mr">Kişi</option>
+                          <option value="Mrs">Qadın</option>
                         </select>
                       </div>
 

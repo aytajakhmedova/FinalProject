@@ -8,7 +8,7 @@ const AdminLayout = () => {
     <div className="admin-layout">
       <aside className="admin-sidebar">
         <div className="admin-logo">
-          <h2>OtelBurada Admin</h2>
+          <h2>AE Hotel Admin</h2>
         </div>
         <nav className="admin-nav">
           <Link to="/admin" className="admin-nav-link">

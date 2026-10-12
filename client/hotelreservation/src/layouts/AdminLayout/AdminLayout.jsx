@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   FaHome, 
   FaHotel, 
+  FaBed,
   FaCalendarCheck, 
   FaUsers, 
   FaCog, 
@@ -24,7 +25,8 @@ const AdminLayout = () => {
 
   const menuItems = [
     { path: '/admin', icon: <FaHome />, label: 'Dashboard', exact: true },
-    { path: '/admin/hotels', icon: <FaHotel />, label: t('admin.rooms') },
+    { path: '/admin/oteller', icon: <FaHotel />, label: t('admin.hotels') },
+    { path: '/admin/hotels', icon: <FaBed />, label: t('admin.rooms') },
     { path: '/admin/bookings', icon: <FaCalendarCheck />, label: t('admin.bookings') },
     { path: '/admin/occupancy', icon: <FaCalendarAlt />, label: t('admin.occupancy') },
     { path: '/admin/users', icon: <FaUsers />, label: t('admin.users') },

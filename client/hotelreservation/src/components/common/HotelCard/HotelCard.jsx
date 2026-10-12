@@ -4,7 +4,7 @@ import { FaMapMarkerAlt, FaStar, FaHeart } from 'react-icons/fa';
 import RatingStars from '../RatingStars/RatingStars';
 import './HotelCard.css';
 
-const HotelCard = ({ hotel, currency = 'AZN' }) => {
+const HotelCard = ({ hotel, currency = 'AZN', queryString = '' }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
 
@@ -78,10 +78,10 @@ const HotelCard = ({ hotel, currency = 'AZN' }) => {
               <span className="price-amount">{formatPrice(hotel.pricePerNight)}</span>
             </div>
             <div className="hotel-card-actions">
-              <Link to={`/hotels/${hotel.id}`} className="btn-detail">
+              <Link to={`/hotels/${hotel.id}${queryString}`} className="btn-detail">
                 Ətraflı bax
               </Link>
-              <Link to={`/hotels/${hotel.id}#rezervasiya`} className="btn-book">
+              <Link to={`/hotels/${hotel.id}${queryString}#rooms`} className="btn-book">
                 Rezervasiya et
               </Link>
             </div>

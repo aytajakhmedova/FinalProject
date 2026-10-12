@@ -3,7 +3,7 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { FaArrowLeft, FaCreditCard, FaHotel, FaInfoCircle, FaLock, FaUser } from 'react-icons/fa';
 import { MdEmail } from 'react-icons/md';
 import { formatDate } from '../../data/roomsData';
-import { addBooking, generateConfirmationNumber, normalizeBooking } from '../../utils/bookingsStore';
+import { createBooking } from '../../api/client';
 import roomPhoto from '../../assets/images/otaq2.jpg';
 import { useLanguage } from '../../context/LanguageContext';
 import './Booking.css';
@@ -26,6 +26,7 @@ const Booking = () => {
   const [cvv, setCvv] = useState('');
   const [country, setCountry] = useState('AZ');
   const [formError, setFormError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     // Load user data if authenticated
@@ -69,7 +70,7 @@ const Booking = () => {
     return `${digits.slice(0, 2)}/${digits.slice(2)}`;
   };
 
-  const handleSubmitBooking = (e) => {
+  const handleSubmitBooking = async (e) => {
     e.preventDefault();
     setFormError('');
 
@@ -98,52 +99,29 @@ const Booking = () => {
       }
     }
 
-    const confirmationNumber = generateConfirmationNumber();
-    const booking = normalizeBooking({
-      id: confirmationNumber,
-      confirmationNumber,
-      guestName,
-      guestEmail,
-      guestPhone,
-      hotelId: hotel.id,
-      hotelName: hotel.title,
-      hotelImage: hotel.mainImage || hotel.images?.[0],
-      location: `${hotel.city || ''}${hotel.country ? `, ${hotel.country}` : ''}`,
-      hotel: {
-        id: hotel.id,
-        name: hotel.title,
-        title: hotel.title,
-        location: hotel.location
-      },
-      room: {
-        id: room.id,
-        name: room.name,
-        pricePerNight: room.pricePerNight
-      },
-      roomId: room.id,
-      roomType: room.name,
-      pricePerNight: room.pricePerNight,
-      checkIn,
-      checkOut,
-      guests,
-      nights: priceBreakdown.nights,
-      totalPrice: priceBreakdown.total,
-      priceBreakdown,
-      specialRequests,
-      paymentMethod,
-      status: 'confirmed',
-      statusHistory: [
-        {
-          status: 'confirmed',
-          timestamp: new Date().toISOString(),
-          note: 'Rezervasiya yaradıldı'
-        }
-      ],
-      bookingDate: new Date().toISOString(),
-    });
-
-    addBooking(booking);
-    navigate('/booking-success', { state: { booking } });
+    try {
+      setSubmitting(true);
+      const booking = await createBooking({
+        bookingType: 'hotel',
+        hotelId: hotel.id,
+        roomId: room.id,
+        guestName,
+        guestEmail,
+        guestPhone,
+        checkIn,
+        checkOut,
+        guests,
+        specialRequests,
+        paymentMethod,
+        cardNumber,
+        cardHolder: cardName,
+      });
+      navigate('/booking-success', { state: { booking } });
+    } catch (error) {
+      setFormError(error.message);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const money = (value) => {
@@ -352,7 +330,7 @@ const Booking = () => {
 
             {formError && <p className="pay-error">{formError}</p>}
 
-            <button type="submit" className="pay-submit">
+            <button type="submit" className="pay-submit" disabled={submitting}>
               {paymentMethod === 'card'
                 ? t('pay.pay', { amount: `₼ ${money(priceBreakdown.total)}` })
                 : t('pay.confirm')}

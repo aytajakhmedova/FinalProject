@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import { FaUsers, FaBed, FaExpand } from 'react-icons/fa';
 import './RoomCard.css';
 
-const RoomCard = ({ room, hotelId }) => {
+const RoomCard = ({ room, hotelId, queryString = '' }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
 
   // Yalnız ilk 3 şəkili göstər
-  const displayImages = room.images.slice(0, 3);
+  const displayImages = (room.images || []).slice(0, 3);
 
   return (
     <>
@@ -23,11 +23,11 @@ const RoomCard = ({ room, hotelId }) => {
           }}
           style={{ cursor: 'pointer' }}
         >
-          <img src={room.images[0]} alt={room.name} />
-          {!room.available && (
+          <img src={displayImages[0]} alt={room.name} />
+          {room.available === false && (
             <div className="room-unavailable-badge">Mövcud deyil</div>
           )}
-          {room.images.length > 1 && (
+          {displayImages.length > 1 && (
             <div className="room-image-count">
               📷 {Math.min(room.images.length, 3)} şəkil
             </div>
@@ -71,14 +71,14 @@ const RoomCard = ({ room, hotelId }) => {
             </div>
             <div className="room-actions">
               <Link 
-                to={`/rooms/${room.id}?hotel=${hotelId}`} 
+                to={`/rooms/${room.id}?hotel=${hotelId}${queryString ? `&${queryString.replace(/^\?/, '')}` : ''}`} 
                 className="btn-room-detail"
               >
                 Ətraflı
               </Link>
-              {room.available ? (
+              {room.available !== false ? (
                 <Link 
-                  to={`/rooms/${room.id}?hotel=${hotelId}#book`} 
+                  to={`/rooms/${room.id}?hotel=${hotelId}${queryString ? `&${queryString.replace(/^\?/, '')}` : ''}#book`} 
                   className="btn-room-book"
                 >
                   Rezervasiya et

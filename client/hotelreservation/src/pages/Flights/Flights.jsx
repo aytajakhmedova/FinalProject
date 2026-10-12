@@ -12,7 +12,7 @@ const Flights = () => {
   const [formData, setFormData] = useState({
     from: '',
     to: '',
-    departure: '',
+    departure: '2026-11-20',
     returnDate: '',
     travelers: '1',
     flightClass: 'economy',

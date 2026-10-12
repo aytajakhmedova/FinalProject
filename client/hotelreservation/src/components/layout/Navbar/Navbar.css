@@ -24,14 +24,35 @@
   justify-content: space-between;
 }
 
+.navbar-logo {
+  transition: transform 0.3s ease;
+}
+
+.navbar-logo:hover {
+  animation: logoFloat 2s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
 .navbar-logo img {
-  height: 50px;
-  width: auto;
+  width: 60px;
+  height: auto;
   transition: all 0.3s;
 }
 
+.navbar-logo:hover {
+  transform: scale(1.05);
+}
+
 .navbar-scrolled .navbar-logo img {
-  height: 45px;
+  width: 55px;
 }
 
 .navbar-menu {

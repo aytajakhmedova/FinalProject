@@ -47,9 +47,20 @@
   gap: 1.25rem;
 }
 
+.footer-logo {
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s ease;
+}
+
+.footer-logo:hover {
+  transform: scale(1.05);
+}
+
 .footer-logo img {
-  height: 42px;
-  width: auto;
+  width: 55px;
+  height: auto;
+  transition: all 0.3s ease;
+}
   display: block;
 }
 

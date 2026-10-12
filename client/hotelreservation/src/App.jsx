@@ -21,11 +21,13 @@ import Flights from './pages/Flights/Flights';
 import FlightResults from './pages/FlightResults/FlightResults';
 import FlightBooking from './pages/FlightBooking/FlightBooking';
 import OccupancyCalendar from './pages/Admin/OccupancyCalendar/OccupancyCalendar';
+import AdminRooms from './pages/Admin/AdminRooms';
 import Booking from './pages/Booking/Booking';
 import BookingSuccess from './pages/Booking/BookingSuccess';
 import AdminLayout from './layouts/AdminLayout/AdminLayout';
 import AdminDashboard from './pages/Admin/Dashboard/AdminDashboard';
 import AdminHotels from './pages/Admin/Hotels/AdminHotels';
+import AdminHotelManager from './pages/Admin/Hotels/AdminHotelManager';
 import AdminBookings from './pages/Admin/Bookings/AdminBookings';
 import AdminUsers from './pages/Admin/Users/AdminUsers';
 import AdminAnalytics from './pages/Admin/Analytics/AdminAnalytics';
@@ -240,7 +242,9 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="oteller" element={<AdminHotelManager />} />
             <Route path="hotels" element={<AdminHotels />} />
+            <Route path="rooms" element={<AdminRooms />} />
             <Route path="bookings" element={<AdminBookings />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="analytics" element={<AdminAnalytics />} />

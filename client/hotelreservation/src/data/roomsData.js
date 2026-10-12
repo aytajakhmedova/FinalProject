@@ -1,9 +1,11 @@
 // Room availability and booking utilities
 
 // Mock unavailable dates for rooms
+import { hasActiveBookingOverlap } from '../utils/bookingsStore';
+
 export const UNAVAILABLE_DATES = {
-  101: ['2024-11-25', '2024-11-26', '2024-12-24', '2024-12-25', '2024-12-31', '2025-01-01'],
-  102: ['2024-12-01', '2024-12-02', '2024-12-15'],
+  101: ['2024-11-25', '2024-11-26', '2024-12-24', '2024-12-25', '2024-12-31', '2025-01-01', '2026-10-20', '2026-10-21'],
+  102: ['2024-12-01', '2024-12-02', '2024-12-15', '2026-10-12', '2026-10-13'],
   103: ['2024-11-20', '2024-11-21', '2024-12-10'],
   201: ['2024-12-20', '2024-12-21', '2024-12-22'],
   301: ['2024-11-28', '2024-11-29', '2024-11-30'],
@@ -18,7 +20,7 @@ export const UNAVAILABLE_DATES = {
  * @param {string} checkOut - Check-out date (YYYY-MM-DD)
  * @returns {boolean} - Is available
  */
-export const checkRoomAvailability = (roomId, checkIn, checkOut) => {
+export const checkRoomAvailability = (roomId, checkIn, checkOut, exceptBookingId) => {
   if (!checkIn || !checkOut) return true;
   
   const unavailableDates = UNAVAILABLE_DATES[roomId] || [];
@@ -34,8 +36,22 @@ export const checkRoomAvailability = (roomId, checkIn, checkOut) => {
     }
     currentDate.setDate(currentDate.getDate() + 1);
   }
+
+  if (hasActiveBookingOverlap(roomId, checkIn, checkOut, exceptBookingId)) {
+    return false;
+  }
   
   return true;
+};
+
+export const hotelHasAvailability = (hotel, checkIn, checkOut, guests = 1) => {
+  if (!hotel?.rooms?.length) return false;
+  return hotel.rooms.some((room) => {
+    if (room.available === false) return false;
+    if (guests && room.capacity < Number(guests)) return false;
+    if (checkIn && checkOut && !checkRoomAvailability(room.id, checkIn, checkOut)) return false;
+    return true;
+  });
 };
 
 /**

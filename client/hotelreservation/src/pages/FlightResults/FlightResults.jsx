@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaPlane, FaExchangeAlt, FaFilter, FaTimesCircle } from 'react-icons/fa';
+import { getFlights } from '../../api/client';
 import './FlightResults.css';
 
 const FlightResults = () => {
@@ -9,100 +10,39 @@ const FlightResults = () => {
   const searchParams = location.state || {
     from: 'Bakı (GYD)',
     to: 'İstanbul (IST)',
-    departure: '2026-01-25',
+    departure: '2026-11-20',
     travelers: '2',
     class: 'economy'
   };
 
-  const [priceRange, setPriceRange] = useState([70, 500]);
+  const [priceRange, setPriceRange] = useState([0, 2000]);
   const [selectedStops, setSelectedStops] = useState([]);
   const [selectedAirlines, setSelectedAirlines] = useState([]);
   const [selectedAirports, setSelectedAirports] = useState([]);
 
-  const flights = [
-    {
-      id: 1,
-      airline: 'AZAL',
-      flightNumber: 'J2-5620',
-      logo: '🛫',
-      departTime: '14:50',
-      departDate: 'Baz, 25 Yan 2026',
-      departLocation: 'GYD - Terminal 1',
-      departCity: 'Bakı, Azərbaycan',
-      arriveTime: '17:35',
-      arriveDate: 'Baz, 25 Yan 2026',
-      arriveLocation: 'IST - Terminal 1',
-      arriveCity: 'İstanbul, Türkiyə',
-      duration: '2s 45dəq',
-      stops: 'Birbaşa',
-      price: 180,
-      class: 'Ekonom',
-      seatsLeft: 15,
-      refundable: true
-    },
-    {
-      id: 2,
-      airline: 'Turkish Airlines',
-      flightNumber: 'TK-1254',
-      logo: '✈️',
-      departTime: '09:20',
-      departDate: 'Baz, 25 Yan 2026',
-      departLocation: 'GYD - Terminal 1',
-      departCity: 'Bakı, Azərbaycan',
-      arriveTime: '12:10',
-      arriveDate: 'Baz, 25 Yan 2026',
-      arriveLocation: 'IST - Terminal 2',
-      arriveCity: 'İstanbul, Türkiyə',
-      duration: '2s 50dəq',
-      stops: 'Birbaşa',
-      price: 220,
-      class: 'Ekonom',
-      seatsLeft: 8,
-      refundable: false
-    },
-    {
-      id: 3,
-      airline: 'Buta Airways',
-      flightNumber: 'J2-2158',
-      logo: '🛩️',
-      departTime: '18:30',
-      departDate: 'Baz, 25 Yan 2026',
-      departLocation: 'GYD - Terminal 1',
-      departCity: 'Bakı, Azərbaycan',
-      arriveTime: '21:15',
-      arriveDate: 'Baz, 25 Yan 2026',
-      arriveLocation: 'SAW - Terminal 1',
-      arriveCity: 'İstanbul, Türkiyə',
-      duration: '2s 45dəq',
-      stops: 'Birbaşa',
-      price: 150,
-      class: 'Ekonom',
-      seatsLeft: 22,
-      refundable: true
-    },
-    {
-      id: 4,
-      airline: 'Pegasus',
-      flightNumber: 'PC-1145',
-      logo: '🦄',
-      departTime: '06:40',
-      departDate: 'Baz, 25 Yan 2026',
-      departLocation: 'GYD - Terminal 1',
-      departCity: 'Bakı, Azərbaycan',
-      arriveTime: '09:25',
-      arriveDate: 'Baz, 25 Yan 2026',
-      arriveLocation: 'SAW - Terminal 2',
-      arriveCity: 'İstanbul, Türkiyə',
-      duration: '2s 45dəq',
-      stops: 'Birbaşa',
-      price: 165,
-      class: 'Ekonom',
-      seatsLeft: 5,
-      refundable: false
-    },
-  ];
+  const [flights, setFlights] = useState([]);
+  const [loadError, setLoadError] = useState("");
 
-  const airlines = ['AZAL', 'Turkish Airlines', 'Buta Airways', 'Pegasus'];
+  useEffect(() => {
+    let active = true;
+    getFlights({
+      origin: searchParams.from,
+      destination: searchParams.to,
+      date: searchParams.departure,
+      cabin: searchParams.class,
+    })
+      .then((data) => {
+        if (active) setFlights(data);
+      })
+      .catch((error) => {
+        if (active) setLoadError(error.message);
+      });
+    return () => {
+      active = false;
+    };
+  }, [searchParams.from, searchParams.to, searchParams.departure, searchParams.class]);
+
+  const airlines = [...new Set(flights.map((flight) => flight.airline))];
   const airports = [
     { code: 'GYD', name: 'Bakı', count: 4 },
     { code: 'IST', name: 'İstanbul', count: 2 },
@@ -128,7 +68,7 @@ const FlightResults = () => {
   };
 
   const clearFilters = () => {
-    setPriceRange([70, 500]);
+    setPriceRange([0, 2000]);
     setSelectedStops([]);
     setSelectedAirlines([]);
     setSelectedAirports([]);

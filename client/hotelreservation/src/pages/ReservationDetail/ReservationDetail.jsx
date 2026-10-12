@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { FaArrowLeft, FaCalendarAlt, FaUsers, FaHotel, FaBed, FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaExclamationTriangle } from 'react-icons/fa';
-import { formatDate, calculateNights, getMinCheckInDate, getMinCheckOutDate } from '../../data/roomsData';
+import { formatDate, calculateNights, getMinCheckInDate, getMinCheckOutDate, checkRoomAvailability, calculateRoomPrice } from '../../data/roomsData';
+import { getBookingById, updateBooking } from '../../utils/bookingsStore';
 import './ReservationDetail.css';
 
 const ReservationDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   const [reservation, setReservation] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(searchParams.get('edit') === '1');
   const [showCancelModal, setShowCancelModal] = useState(false);
   
   // Edit form state
@@ -18,10 +20,7 @@ const ReservationDetail = () => {
   const [editGuests, setEditGuests] = useState(2);
 
   useEffect(() => {
-    // Load reservation from localStorage
-    const bookings = JSON.parse(localStorage.getItem('userBookings') || '[]');
-    const found = bookings.find(b => b.id.toString() === id);
-    
+    const found = getBookingById(id);
     if (found) {
       setReservation(found);
       setEditCheckIn(found.checkIn);
@@ -50,39 +49,34 @@ const ReservationDetail = () => {
   const canCancel = reservation.status === 'confirmed';
 
   const handleSaveEdit = () => {
-    // Recalculate price
-    const nights = calculateNights(editCheckIn, editCheckOut);
-    const basePrice = reservation.room.pricePerNight || reservation.priceBreakdown.basePrice / reservation.nights;
-    const newBasePrice = basePrice * nights;
-    const extraGuests = Math.max(0, editGuests - 2);
-    const extraGuestFee = extraGuests * 50 * nights;
-    const subtotal = newBasePrice + extraGuestFee;
-    const tax = subtotal * 0.18;
-    const total = subtotal + tax;
+    if (!editCheckIn || !editCheckOut || editCheckOut <= editCheckIn) {
+      alert('Çıxış tarixi girişdən sonra olmalıdır');
+      return;
+    }
 
-    const updatedReservation = {
-      ...reservation,
+    const available = checkRoomAvailability(
+      reservation.roomId,
+      editCheckIn,
+      editCheckOut,
+      reservation.id
+    );
+    if (!available) {
+      alert('Bu tarixlər üçün otaq artıq doludur');
+      return;
+    }
+
+    const pricePerNight = reservation.room?.pricePerNight || reservation.pricePerNight || 0;
+    const priceBreakdown = calculateRoomPrice(pricePerNight, editCheckIn, editCheckOut, editGuests);
+    const updatedReservation = updateBooking(reservation.id, {
       checkIn: editCheckIn,
       checkOut: editCheckOut,
       guests: editGuests,
-      nights,
-      priceBreakdown: {
-        nights,
-        basePrice: newBasePrice,
-        extraGuestFee,
-        subtotal,
-        taxRate: 0.18,
-        tax: Math.round(tax * 100) / 100,
-        total: Math.round(total * 100) / 100
-      }
-    };
+      nights: priceBreakdown.nights,
+      totalPrice: priceBreakdown.total,
+      priceBreakdown,
+    });
 
-    // Update localStorage
-    const bookings = JSON.parse(localStorage.getItem('userBookings') || '[]');
-    const index = bookings.findIndex(b => b.id === reservation.id);
-    if (index !== -1) {
-      bookings[index] = updatedReservation;
-      localStorage.setItem('userBookings', JSON.stringify(bookings));
+    if (updatedReservation) {
       setReservation(updatedReservation);
       setIsEditing(false);
       alert('Rezervasiya uğurla yeniləndi!');
@@ -90,18 +84,11 @@ const ReservationDetail = () => {
   };
 
   const handleCancelBooking = () => {
-    const updatedReservation = {
-      ...reservation,
+    const updatedReservation = updateBooking(reservation.id, {
       status: 'cancelled',
-      cancelledAt: new Date().toISOString()
-    };
-
-    // Update localStorage
-    const bookings = JSON.parse(localStorage.getItem('userBookings') || '[]');
-    const index = bookings.findIndex(b => b.id === reservation.id);
-    if (index !== -1) {
-      bookings[index] = updatedReservation;
-      localStorage.setItem('userBookings', JSON.stringify(bookings));
+      cancelledAt: new Date().toISOString(),
+    });
+    if (updatedReservation) {
       setReservation(updatedReservation);
       setShowCancelModal(false);
       alert('Rezervasiya ləğv edildi');
@@ -143,7 +130,7 @@ const ReservationDetail = () => {
             <div className="info-card">
               <div className="card-header">
                 <h2>Rezervasiya Məlumatları</h2>
-                <div className="confirmation-number">#{reservation.id}</div>
+                <div className="confirmation-number">#{reservation.confirmationNumber || reservation.id}</div>
               </div>
 
               <div className="hotel-room-info">
@@ -151,7 +138,7 @@ const ReservationDetail = () => {
                   <FaHotel className="info-icon" />
                   <div>
                     <span className="info-label">Otel</span>
-                    <strong>{reservation.hotel.name}</strong>
+                    <strong>{reservation.hotel?.name || reservation.hotelName}</strong>
                   </div>
                 </div>
 
@@ -159,7 +146,7 @@ const ReservationDetail = () => {
                   <FaBed className="info-icon" />
                   <div>
                     <span className="info-label">Otaq</span>
-                    <strong>{reservation.room.name}</strong>
+                    <strong>{reservation.room?.name || reservation.roomType}</strong>
                   </div>
                 </div>
               </div>
@@ -304,10 +291,10 @@ const ReservationDetail = () => {
               <div className="summary-rows">
                 <div className="summary-row">
                   <span>{reservation.nights} gecə</span>
-                  <span>₼{reservation.priceBreakdown.basePrice}</span>
+                  <span>₼{reservation.priceBreakdown?.basePrice ?? reservation.totalPrice}</span>
                 </div>
 
-                {reservation.priceBreakdown.extraGuestFee > 0 && (
+                {reservation.priceBreakdown?.extraGuestFee > 0 && (
                   <div className="summary-row">
                     <span>Əlavə qonaq</span>
                     <span>₼{reservation.priceBreakdown.extraGuestFee}</span>
@@ -316,19 +303,19 @@ const ReservationDetail = () => {
 
                 <div className="summary-row">
                   <span>Ara cəm</span>
-                  <span>₼{reservation.priceBreakdown.subtotal}</span>
+                  <span>₼{reservation.priceBreakdown?.subtotal ?? reservation.totalPrice}</span>
                 </div>
 
                 <div className="summary-row">
                   <span>Vergi (18%)</span>
-                  <span>₼{reservation.priceBreakdown.tax}</span>
+                  <span>₼{reservation.priceBreakdown?.tax ?? 0}</span>
                 </div>
 
                 <div className="summary-divider"></div>
 
                 <div className="summary-row summary-total">
                   <span>Yekun</span>
-                  <strong>₼{reservation.priceBreakdown.total}</strong>
+                  <strong>₼{reservation.priceBreakdown?.total ?? reservation.totalPrice}</strong>
                 </div>
               </div>
             </div>

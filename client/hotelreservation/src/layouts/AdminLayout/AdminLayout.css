@@ -1,6 +1,9 @@
 .admin-layout {
   display: flex;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
   background: var(--bg-primary);
 }
 
@@ -154,13 +157,17 @@
 .admin-main {
   margin-left: 260px;
   width: calc(100% - 260px);
+  max-width: calc(100% - 260px);
+  min-width: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
 .admin-main.expanded {
   margin-left: 80px;
   width: calc(100% - 80px);
+  max-width: calc(100% - 80px);
 }
 
 /* Top Bar */
@@ -222,7 +229,10 @@
 /* Content Area */
 .admin-content {
   padding: 2rem;
+  min-width: 0;
+  max-width: 100%;
   min-height: calc(100vh - 73px);
+  box-sizing: border-box;
 }
 
 /* Responsive */
@@ -238,6 +248,7 @@
   .admin-main {
     margin-left: 0;
     width: 100%;
+    max-width: 100%;
   }
 
   .mobile-menu-toggle {

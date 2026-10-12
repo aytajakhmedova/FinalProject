@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { FaUsers, FaBed, FaExpand, FaCheck, FaArrowLeft, FaCalendarAlt, FaInfoCircle } from 'react-icons/fa';
-import { getHotelById, getRoomById } from '../../data/hotelsData';
-import { checkRoomAvailability, calculateRoomPrice, calculateNights, formatDate, getMinCheckInDate, getMinCheckOutDate } from '../../data/roomsData';
+import { getHotel, quoteRoom } from '../../api/client';
+import { calculateNights, formatDate, getMinCheckInDate, getMinCheckOutDate } from '../../data/roomsData';
 import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
 import './RoomDetail.css';
 
@@ -12,14 +12,42 @@ const RoomDetail = () => {
   const navigate = useNavigate();
   const hotelId = searchParams.get('hotel');
   
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
-  const [guests, setGuests] = useState(2);
+  const [checkIn, setCheckIn] = useState(searchParams.get('checkIn') || '');
+  const [checkOut, setCheckOut] = useState(searchParams.get('checkOut') || '');
+  const [guests, setGuests] = useState(parseInt(searchParams.get('guests') || '2', 10));
   const [isAvailable, setIsAvailable] = useState(true);
   const [priceBreakdown, setPriceBreakdown] = useState(null);
+  const [hotel, setHotel] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const hotel = getHotelById(hotelId);
+  useEffect(() => {
+    let active = true;
+    if (!hotelId) {
+      setLoading(false);
+      return undefined;
+    }
+    getHotel(hotelId)
+      .then((data) => {
+        if (active) setHotel(data);
+      })
+      .catch(() => {
+        if (active) setHotel(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [hotelId]);
+
   const room = hotel?.rooms.find(r => r.id === parseInt(id));
+
+  useEffect(() => {
+    if (room && guests > room.capacity) {
+      setGuests(room.capacity);
+    }
+  }, [room, guests]);
 
   const handleCheckInChange = (e) => {
     const newCheckIn = e.target.value;
@@ -32,18 +60,40 @@ const RoomDetail = () => {
   };
 
   useEffect(() => {
-    if (checkIn && checkOut && room) {
-      const available = checkRoomAvailability(room.id, checkIn, checkOut);
-      setIsAvailable(available);
-      
-      if (available) {
-        const breakdown = calculateRoomPrice(room.pricePerNight, checkIn, checkOut, guests);
-        setPriceBreakdown(breakdown);
-      } else {
-        setPriceBreakdown(null);
-      }
-    }
+    if (!checkIn || !checkOut || !room) return undefined;
+    let active = true;
+    quoteRoom(room.id, { checkIn, checkOut, guests })
+      .then((quote) => {
+        if (!active) return;
+        setIsAvailable(quote.available);
+        setPriceBreakdown(quote.available ? {
+          nights: quote.nights,
+          basePrice: quote.basePrice,
+          extraGuestFee: quote.extraGuestFee,
+          subtotal: quote.subtotal,
+          taxRate: quote.taxRate,
+          tax: quote.tax,
+          total: quote.total,
+        } : null);
+      })
+      .catch(() => {
+        if (active) {
+          setIsAvailable(false);
+          setPriceBreakdown(null);
+        }
+      });
+    return () => {
+      active = false;
+    };
   }, [checkIn, checkOut, guests, room]);
+
+  if (loading) {
+    return (
+      <div className="hotel-not-found">
+        <h2>Yüklənir...</h2>
+      </div>
+    );
+  }
 
   if (!hotel || !room) {
     return (
@@ -57,7 +107,7 @@ const RoomDetail = () => {
   const nights = calculateNights(checkIn, checkOut);
 
   const handleReserveNow = () => {
-    // Check authentication
+    if (!isAvailable || !priceBreakdown) return;
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     
     if (!isAuthenticated) {

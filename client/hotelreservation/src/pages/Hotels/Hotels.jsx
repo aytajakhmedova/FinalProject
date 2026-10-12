@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FaSearch, FaFilter, FaSort } from 'react-icons/fa';
 import HotelCard from '../../components/common/HotelCard/HotelCard';
-import { getHotels } from '../../data/hotelsData';
-import { hotelHasAvailability } from '../../data/roomsData';
+import { getHotels } from '../../api/client';
+import { getHotels as getLocalHotels } from '../../data/hotelsData';
 import { useLanguage } from '../../context/LanguageContext';
 import './Hotels.css';
 
@@ -22,8 +22,35 @@ const Hotels = () => {
   const [guests, setGuests] = useState(searchParams.get('guests') || '2');
   const [sortBy, setSortBy] = useState('recommended');
   const [showFilters, setShowFilters] = useState(false);
+  const [hotels, setHotels] = useState([]);
+  const [loadError, setLoadError] = useState('');
 
-  const hotels = getHotels();
+  useEffect(() => {
+    let active = true;
+    getHotels({ checkIn, checkOut, guests })
+      .then((data) => {
+        if (!active) return;
+        setLoadError('');
+        setHotels(data);
+      })
+      .catch(() => {
+        if (!active) return;
+        setLoadError('');
+        setHotels(
+          getLocalHotels().map((hotel) => ({
+            ...hotel,
+            rooms: (hotel.rooms || []).map((room) => ({
+              ...room,
+              isAvailable: room.isAvailable ?? room.available !== false,
+            })),
+          }))
+        );
+      });
+    return () => {
+      active = false;
+    };
+  }, [checkIn, checkOut, guests]);
+
   const guestCount = parseInt(guests, 10) || 1;
 
   const updateStayParams = (next) => {
@@ -47,7 +74,7 @@ const Hotels = () => {
     const matchesAmenities = filters.amenities.length === 0 || 
                             filters.amenities.every(a => hotel.amenities.includes(a));
     const matchesType = filters.hotelType.length === 0 || filters.hotelType.includes(hotel.hotelType);
-    const matchesStay = hotelHasAvailability(hotel, checkIn, checkOut, guestCount);
+    const matchesStay = !checkIn || !checkOut || hotel.rooms.some((room) => room.isAvailable);
     
     return matchesSearch && matchesPrice && matchesStars && matchesAmenities && matchesType && matchesStay;
   });
@@ -274,6 +301,8 @@ const Hotels = () => {
             </div>
 
             {/* Hotels Grid */}
+            {loadError && <div className="no-results"><h3>{loadError}</h3></div>}
+
             {sortedHotels.length > 0 ? (
               <div className="hotels-grid">
                 {sortedHotels.map(hotel => (

@@ -32,6 +32,15 @@
   margin-left: 3rem;
 }
 
+.occupancy-hotel-select {
+  margin: 1rem 0 0 3rem;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
 /* Statistics */
 .calendar-stats {
   display: grid;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaFacebook, FaInstagram, FaTwitter, FaLinkedin, FaPhone, FaEnvelope, FaMapMarkerAlt, FaArrowUp } from 'react-icons/fa';
-import logo from '../../../assets/images/logo.png';
+import logo from '../../../assets/images/AE_HOTEL_transparent_logo.png';
 import './Footer.css';
 
 const Footer = () => {
@@ -16,10 +16,10 @@ const Footer = () => {
           {/* Company Info */}
           <div className="footer-col">
             <div className="footer-logo">
-              <img src={logo} alt="OtelBurada" />
+              <img src={logo} alt="AE Hotel" />
             </div>
             <p className="footer-description">
-              OtelBurada - Azərbaycanda və dünyada ən yaxşı otel rezervasiya platforması. 
+              AE Hotel - Azərbaycanda və dünyada ən yaxşı otel rezervasiya platforması. 
               Lüks və rahatlığı bir arada yaşayın.
             </p>
             <div className="footer-social">
@@ -80,7 +80,7 @@ const Footer = () => {
               </li>
               <li>
                 <FaEnvelope className="contact-icon" />
-                <span>info@otelburada.az</span>
+                <span>info@aehotel.com</span>
               </li>
             </ul>
           </div>
@@ -88,7 +88,7 @@ const Footer = () => {
 
         {/* Footer Bottom */}
         <div className="footer-bottom">
-          <p>&copy; 2024 OtelBurada. Bütün hüquqlar qorunur.</p>
+          <p>&copy; 2026 AE Hotel. Bütün hüquqlar qorunur.</p>
           <div className="footer-bottom-links">
             <a href="#">Məxfilik Siyasəti</a>
             <a href="#">İstifadə Şərtləri</a>

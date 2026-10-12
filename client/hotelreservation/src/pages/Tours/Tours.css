@@ -105,7 +105,7 @@
   box-shadow: 0 0 0 4px rgba(139, 90, 60, 0.1);
 }
 
-.filter-group {
+.tours-page .filter-group {
   display: flex;
   gap: 1rem;
 }
@@ -415,7 +415,7 @@
     min-width: 100%;
   }
 
-  .filter-group {
+  .tours-page .filter-group {
     flex-direction: column;
   }
 

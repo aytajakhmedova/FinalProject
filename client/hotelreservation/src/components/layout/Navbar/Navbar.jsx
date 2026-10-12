@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { FaMoon, FaSun, FaBars, FaTimes, FaUser } from 'react-icons/fa';
 import { useTheme } from '../../../context/ThemeContext';
-import logo from '../../../assets/images/logo.png';
+import logo from '../../../assets/images/AE_HOTEL_transparent_logo.png';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -23,7 +23,7 @@ const Navbar = () => {
       <div className="navbar-container">
         {/* Logo */}
         <Link to="/" className="navbar-logo">
-          <img src={logo} alt="OtelBurada" />
+          <img src={logo} alt="AE Hotel" />
         </Link>
 
         {/* Desktop Menu */}
