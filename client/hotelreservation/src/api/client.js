@@ -1,4 +1,5 @@
 import { getAuthToken } from "./auth";
+import { uniqueHotelImage, uniqueListImages, uniqueTourImage } from "../data/localMedia";
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5080";
 
@@ -54,7 +55,7 @@ export function mapRoom(room) {
 }
 
 export function mapHotel(hotel) {
-  const image = resolveImage(hotel.imageFile);
+  const image = resolveImage(hotel.imageFile) || uniqueHotelImage(hotel.id);
   return {
     ...hotel,
     reviews: hotel.reviewCount,
@@ -68,7 +69,9 @@ export function mapHotel(hotel) {
 }
 
 export function mapTour(tour) {
-  const image = resolveImage(tour.imageFile);
+  const mapped = resolveImage(tour.imageFile);
+  const usesHotelStock = /hotelimg\d+\.(jfif|jpe?g|png)$/i.test(tour.imageFile || "");
+  const image = mapped && !usesHotelStock ? mapped : uniqueTourImage(tour.id);
   return {
     ...tour,
     reviews: tour.reviewCount,
@@ -154,7 +157,7 @@ export const listFlights = (params) => request(withQuery("/api/flights", params)
 export const createFlight = (flight) => request("/api/flights", { method: "POST", body: JSON.stringify(flight) });
 export const updateFlight = (id, flight) => request(`/api/flights/${id}`, { method: "PUT", body: JSON.stringify(flight) });
 export const deleteFlight = (id) => request(`/api/flights/${id}`, { method: "DELETE" });
-export const getTours = (params) => request(withQuery("/api/tours", params)).then((items) => items.map(mapTour));
+export const getTours = (params) => request(withQuery("/api/tours", params)).then((items) => uniqueListImages(items.map(mapTour)));
 export const getTour = (id) => request(`/api/tours/${id}`).then(mapTour);
 export const listTours = () => request("/api/tours");
 export const createTour = (tour) => request("/api/tours", { method: "POST", body: JSON.stringify(tour) });
@@ -168,8 +171,19 @@ export const getBooking = (id) => request(`/api/bookings/${id}`).then(mapBooking
 export const deleteBooking = (id) => request(`/api/bookings/${id}`, { method: "DELETE" });
 export const createBooking = (booking) => request("/api/bookings", { method: "POST", body: JSON.stringify(booking) }).then(mapBooking);
 export const getTripSuggestions = (params) => request(withQuery("/api/trip-suggestions", params));
+export const getActiveDiscounts = () => request("/api/discounts/active");
+export const getDiscounts = () => request("/api/discounts");
+export const createDiscount = (item) => request("/api/discounts", { method: "POST", body: JSON.stringify(item) });
+export const updateDiscount = (id, item) => request(`/api/discounts/${id}`, { method: "PUT", body: JSON.stringify(item) });
+export const deleteDiscount = (id) => request(`/api/discounts/${id}`, { method: "DELETE" });
+export const getUsers = () => request("/api/users");
+export const updateUserRole = (id, role, assignedHotelId) =>
+  request(`/api/users/${id}/role`, { method: "PUT", body: JSON.stringify({ role, assignedHotelId }) });
+export const getHotelReviews = (hotelId) => request(`/api/hotels/${hotelId}/reviews`);
+export const createReview = (review) => request("/api/reviews", { method: "POST", body: JSON.stringify(review) });
 export const updateBookingDetails = (id, booking) => request(`/api/bookings/${id}`, { method: "PUT", body: JSON.stringify(booking) }).then(mapBooking);
 export const updateBookingStatus = (id, status) => request(`/api/bookings/${id}/status`, { method: "PUT", body: JSON.stringify({ status }) }).then(mapBooking);
+export const emailBookingReceipt = (id) => request(`/api/bookings/${id}/email-receipt`, { method: "POST" }).then(mapBooking);
 
 export const getPayments = () => request("/api/payments");
 export const updatePaymentStatus = (id, status) => request(`/api/payments/${id}`, { method: "PUT", body: JSON.stringify({ status }) });
