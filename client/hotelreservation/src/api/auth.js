@@ -32,9 +32,16 @@ export function getAuthUser() {
   }
 }
 
+const STAFF_ROLES = ["SuperAdmin", "Admin", "HotelManager", "Receptionist"];
+
 export function isAdminSession() {
   const roles = getAuthUser()?.roles;
-  return Array.isArray(roles) && roles.some((role) => role === "Admin" || role === "SuperAdmin");
+  return Array.isArray(roles) && roles.some((role) => STAFF_ROLES.includes(role));
+}
+
+export function hasRole(...allowed) {
+  const roles = getAuthUser()?.roles;
+  return Array.isArray(roles) && roles.some((role) => allowed.includes(role));
 }
 
 export function getSafeAdminPath(next) {
@@ -71,6 +78,7 @@ export function saveAuthSession(auth, { rememberMe = false } = {}) {
       email: auth.email,
       name: auth.name,
       roles: Array.isArray(auth.roles) ? auth.roles : [],
+      assignedHotelId: auth.assignedHotelId || null,
     })
   );
 
