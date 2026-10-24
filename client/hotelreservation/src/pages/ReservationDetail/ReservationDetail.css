@@ -1,8 +1,8 @@
 .reservation-detail-page {
   min-height: 100vh;
-  padding-top: 80px;
+  padding: 1.75rem 0 4rem;
   background: var(--bg-primary);
-  padding-bottom: 4rem;
+  position: relative;
 }
 
 .reservation-container {
@@ -103,24 +103,35 @@
 }
 
 /* Content Layout */
-.reservation-content {
+.reservation-detail-page .reservation-content {
   display: grid;
-  grid-template-columns: 1fr 400px;
-  gap: 3rem;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 1.5rem;
+  align-items: start;
 }
 
 /* Info Cards */
 .reservation-info-section {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.25rem;
+  min-width: 0;
 }
 
-.info-card {
+.reservation-detail-page .info-card {
+  position: static;
+  inset: auto;
+  width: auto;
+  max-width: none;
+  z-index: auto;
+  animation: none;
+  transform: none;
+  backdrop-filter: none;
+  box-shadow: none;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 16px;
-  padding: 2rem;
+  padding: 1.5rem 1.75rem;
 }
 
 .card-header {
@@ -132,10 +143,15 @@
   border-bottom: 1px solid var(--border-color);
 }
 
-.card-header h2 {
-  font-size: 1.5rem;
+.card-header h2,
+.reservation-detail-page .info-card h3 {
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--text-primary);
+  margin: 0 0 1rem;
+}
+
+.card-header h2 {
   margin: 0;
 }
 
@@ -423,13 +439,14 @@
 }
 
 /* Price Summary Sidebar */
-.price-summary-sidebar {
+.reservation-detail-page .price-summary-sidebar {
   position: sticky;
-  top: 100px;
+  top: 88px;
   height: fit-content;
+  width: auto;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .summary-card {
@@ -605,11 +622,11 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .reservation-content {
+  .reservation-detail-page .reservation-content {
     grid-template-columns: 1fr;
   }
 
-  .price-summary-sidebar {
+  .reservation-detail-page .price-summary-sidebar {
     position: static;
   }
 
@@ -627,8 +644,8 @@
     font-size: 2rem;
   }
 
-  .info-card {
-    padding: 1.5rem;
+  .reservation-detail-page .info-card {
+    padding: 1.25rem;
   }
 
   .action-buttons {

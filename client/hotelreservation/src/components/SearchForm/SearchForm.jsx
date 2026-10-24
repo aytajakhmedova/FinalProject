@@ -7,11 +7,10 @@ import {
   FaPlane,
   FaHotel,
   FaRoute,
-  FaTaxi,
   FaMinus,
   FaPlus,
 } from 'react-icons/fa';
-import { CITIES } from '../../data/travelData';
+import { getSiteCities } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import './SearchForm.css';
 
@@ -30,6 +29,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
   const [showGuests, setShowGuests] = useState(false);
   const [showCities, setShowCities] = useState(false);
   const [error, setError] = useState('');
+  const [cities, setCities] = useState([]);
   const wrapRef = useRef(null);
   const { t } = useLanguage();
 
@@ -37,12 +37,17 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
     { id: 'hotel', label: t('search.hotel'), icon: <FaHotel /> },
     { id: 'flight', label: t('search.flight'), icon: <FaPlane /> },
     { id: 'tour', label: t('search.tour'), icon: <FaRoute /> },
-    { id: 'taxi', label: t('search.taxi'), icon: <FaTaxi /> },
   ];
 
-  const filteredCities = CITIES.filter((c) =>
+  const filteredCities = cities.filter((c) =>
     `${c.name} ${c.country}`.toLowerCase().includes(location.toLowerCase())
   );
+
+  useEffect(() => {
+    getSiteCities()
+      .then(setCities)
+      .catch(() => setCities([]));
+  }, []);
 
   useEffect(() => {
     const close = (e) => {
@@ -79,7 +84,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
       setError(t('search.needDates'));
       return;
     }
-    if (checkIn && checkOut && checkOut <= checkIn && serviceType !== 'taxi' && serviceType !== 'flight') {
+    if (checkIn && checkOut && checkOut <= checkIn && serviceType !== 'flight') {
       setError(t('search.dateOrder'));
       return;
     }
@@ -97,7 +102,6 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
     hotel: t('search.hotelTitle'),
     flight: t('search.flightTitle'),
     tour: t('search.tourTitle'),
-    taxi: t('search.taxiTitle'),
   };
 
   return (
@@ -162,7 +166,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
         <div className="form-field date-field">
           <FaCalendarAlt className="field-icon" />
           <div className="field-content">
-            <label>{serviceType === 'taxi' ? t('search.date') : t('search.checkIn')}</label>
+            <label>{t('search.checkIn')}</label>
             <input
               type="date"
               value={checkIn}
@@ -174,26 +178,22 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
           </div>
         </div>
 
-        {serviceType !== 'taxi' && (
-          <>
-            <div className="form-divider"></div>
-            <div className="form-field date-field">
-              <FaCalendarAlt className="field-icon" />
-              <div className="field-content">
-                <label>{serviceType === 'flight' ? t('search.return') : t('search.checkOut')}</label>
-                <input
-                  type="date"
-                  value={checkOut}
-                  min={checkIn ? new Date(new Date(checkIn).getTime() + 86400000).toISOString().split('T')[0] : new Date(Date.now() + 86400000).toISOString().split('T')[0]}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  placeholder="Çıxış tarixi seçin"
-                  disabled={!checkIn}
-                  required
-                />
-              </div>
-            </div>
-          </>
-        )}
+        <div className="form-divider"></div>
+        <div className="form-field date-field">
+          <FaCalendarAlt className="field-icon" />
+          <div className="field-content">
+            <label>{serviceType === 'flight' ? t('search.return') : t('search.checkOut')}</label>
+            <input
+              type="date"
+              value={checkOut}
+              min={checkIn ? new Date(new Date(checkIn).getTime() + 86400000).toISOString().split('T')[0] : new Date(Date.now() + 86400000).toISOString().split('T')[0]}
+              onChange={(e) => setCheckOut(e.target.value)}
+              placeholder="Çıxış tarixi seçin"
+              disabled={!checkIn}
+              required
+            />
+          </div>
+        </div>
 
         <div className="form-divider"></div>
 

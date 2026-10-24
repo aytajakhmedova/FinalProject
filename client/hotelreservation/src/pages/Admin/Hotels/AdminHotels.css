@@ -54,6 +54,7 @@
 }
 
 .inventory-toolbar select,
+.inventory-toolbar input,
 .admin-edit-card input,
 .admin-edit-card select,
 .admin-edit-card textarea {

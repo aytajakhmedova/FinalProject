@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaPhone, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useLanguage } from '../../context/LanguageContext';
 import LanguageSwitch from '../../components/LanguageSwitch/LanguageSwitch';
+import { registerRequest, saveAuthSession } from '../../api/auth';
 import './Auth.css';
 
 const Register = () => {
@@ -20,6 +21,7 @@ const Register = () => {
   });
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [legalOpen, setLegalOpen] = useState(null);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -80,26 +82,24 @@ const Register = () => {
     if (!validate()) return;
 
     setIsLoading(true);
+    setErrors({});
 
-    // Mock registration
-    setTimeout(() => {
-      // Create user object with registration data
-      const newUser = {
-        id: Date.now(),
-        name: formData.fullName,
+    const parts = formData.fullName.trim().split(/\s+/);
+    try {
+      const auth = await registerRequest({
         email: formData.email,
+        password: formData.password,
+        name: parts[0],
+        surname: parts.slice(1).join(' ') || parts[0],
         phone: formData.phone,
-      };
-
-      // Save to localStorage and authenticate immediately
-      localStorage.setItem('user', JSON.stringify(newUser));
-      localStorage.setItem('isAuthenticated', 'true');
-      
-      setIsLoading(false);
-      
-      // Redirect to dashboard
+      });
+      saveAuthSession(auth);
       navigate('/dashboard', { replace: true });
-    }, 1500);
+    } catch (error) {
+      setErrors({ form: error.message });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -240,12 +240,15 @@ const Register = () => {
                   className="checkbox-input"
                 />
                 <span>
-                  <Link to="/terms" className="terms-link">Şərtlər</Link> və{' '}
-                  <Link to="/privacy" className="terms-link">Məxfilik Siyasəti</Link>ni qəbul edirəm
+                  {t('legal.acceptPrefix')}<button type="button" className="terms-link" onClick={() => setLegalOpen('terms')}>{t('legal.termsTitle')}</button>
+                  {' '}{t('legal.and')}{' '}
+                  <button type="button" className="terms-link" onClick={() => setLegalOpen('privacy')}>{t('legal.privacyTitle')}</button>{t('legal.acceptSuffix')}
                 </span>
               </label>
               {errors.agreeToTerms && <span className="error-message">{errors.agreeToTerms}</span>}
             </div>
+
+            {errors.form && <span className="error-message">{errors.form}</span>}
 
             {/* Submit Button */}
             <button 
@@ -282,6 +285,48 @@ const Register = () => {
           <div className="decoration-circle circle-3"></div>
         </div>
       </div>
+
+      {legalOpen && (
+        <div className="legal-overlay" onClick={() => setLegalOpen(null)}>
+          <div
+            className="legal-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="legal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="legal-toolbar">
+              <button
+                type="button"
+                className={`legal-tab ${legalOpen === 'terms' ? 'active' : ''}`}
+                onClick={() => setLegalOpen('terms')}
+              >
+                {t('legal.termsTitle')}
+              </button>
+              <button
+                type="button"
+                className={`legal-tab ${legalOpen === 'privacy' ? 'active' : ''}`}
+                onClick={() => setLegalOpen('privacy')}
+              >
+                {t('legal.privacyTitle')}
+              </button>
+              <button type="button" className="legal-close" onClick={() => setLegalOpen(null)} aria-label={t('legal.close')}>
+                ×
+              </button>
+            </div>
+            <div className="legal-body">
+              <h2 id="legal-title">
+                {legalOpen === 'privacy' ? t('legal.privacyTitle') : t('legal.termsTitle')}
+              </h2>
+              {(legalOpen === 'privacy' ? t('legal.privacyBody') : t('legal.termsBody'))
+                .split('\n\n')
+                .map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

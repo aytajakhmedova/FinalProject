@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useLanguage } from '../../context/LanguageContext';
 import LanguageSwitch from '../../components/LanguageSwitch/LanguageSwitch';
+import { getSafeAdminPath, loginRequest, saveAuthSession } from '../../api/auth';
 import './Auth.css';
 
 const Login = () => {
@@ -55,49 +56,23 @@ const Login = () => {
     if (!validate()) return;
 
     setIsLoading(true);
+    setErrors({});
 
-    // Mock authentication
-    setTimeout(() => {
-      // Mock successful login - use actual entered email
-      const mockUser = {
-        id: Date.now(), // unique ID
-        name: formData.email.split('@')[0], // use email username as name temporarily
-        email: formData.email,
-        phone: '+994 50 123 45 67',
-      };
-
-      // Save to localStorage
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('isAuthenticated', 'true');
-      
-      if (formData.rememberMe) {
-        localStorage.setItem('rememberMe', 'true');
+    try {
+      const auth = await loginRequest(formData.email, formData.password);
+      saveAuthSession(auth, { rememberMe: formData.rememberMe });
+      const nextPath = getSafeAdminPath(new URLSearchParams(location.search).get('next'));
+      const roles = Array.isArray(auth.roles) ? auth.roles : [];
+      if (nextPath && !roles.some((role) => role === 'Admin' || role === 'SuperAdmin')) {
+        setErrors({ form: 'Rezervasiyalar və admin səhifələri üçün admin hesabı lazımdır.' });
+        return;
       }
-
+      navigate(nextPath || '/dashboard', { replace: true });
+    } catch (error) {
+      setErrors({ form: error.message });
+    } finally {
       setIsLoading(false);
-
-      const pendingRaw = localStorage.getItem('pendingBooking');
-      if (pendingRaw) {
-        try {
-          const pending = JSON.parse(pendingRaw);
-          localStorage.removeItem('pendingBooking');
-          const params = new URLSearchParams();
-          if (pending.hotelId) params.set('hotel', pending.hotelId);
-          if (pending.checkIn) params.set('checkIn', pending.checkIn);
-          if (pending.checkOut) params.set('checkOut', pending.checkOut);
-          if (pending.guests) params.set('guests', pending.guests);
-          if (pending.roomId) {
-            navigate(`/rooms/${pending.roomId}?${params.toString()}`, { replace: true });
-            return;
-          }
-        } catch {
-          localStorage.removeItem('pendingBooking');
-        }
-      }
-
-      const from = location.state?.from || '/dashboard';
-      navigate(from, { replace: true });
-    }, 1500);
+    }
   };
 
   return (
@@ -176,6 +151,8 @@ const Login = () => {
                 {t('auth.forgot')}
               </Link>
             </div>
+
+            {errors.form && <span className="error-message">{errors.form}</span>}
 
             {/* Submit Button */}
             <button 

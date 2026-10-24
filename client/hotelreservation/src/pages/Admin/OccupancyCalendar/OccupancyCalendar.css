@@ -32,13 +32,44 @@
   margin-left: 3rem;
 }
 
-.occupancy-hotel-select {
+.occupancy-hotel-select,
+.occupancy-month-input {
   margin: 1rem 0 0 3rem;
   padding: 0.6rem 0.9rem;
   border-radius: 10px;
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   color: var(--text-primary);
+  font: inherit;
+}
+
+.occupancy-month-input {
+  margin: 0;
+}
+
+.occupancy-message {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.occupancy-message h2 {
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.btn-occupancy-retry {
+  margin-top: 1rem;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #8B5A3C, #A0522D);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 /* Statistics */
@@ -105,8 +136,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 1.25rem;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 }
 
 .btn-month-nav {
@@ -165,9 +197,15 @@
   border-color: #10b981;
 }
 
-.legend-indicator.occupied {
+.legend-indicator.occupied,
+.legend-indicator.occupied.confirmed {
   background: rgba(239, 68, 68, 0.2);
   border-color: #ef4444;
+}
+
+.legend-indicator.occupied.checked-in {
+  background: rgba(139, 90, 60, 0.35);
+  border-color: #8B5A3C;
 }
 
 /* Calendar Grid */
@@ -208,6 +246,10 @@
   color: var(--text-primary);
   text-align: center;
   font-size: 0.9rem;
+}
+
+.day-header.today {
+  outline: 2px solid #8B5A3C;
 }
 
 .grid-row {
@@ -263,18 +305,36 @@
   transform: scale(1.05);
 }
 
-.day-cell.occupied {
+.day-cell.occupied,
+.day-cell.occupied.confirmed {
   background: rgba(239, 68, 68, 0.1);
 }
 
-.day-cell.occupied:hover {
+.day-cell.occupied:hover,
+.day-cell.occupied.confirmed:hover {
   background: rgba(239, 68, 68, 0.2);
   transform: scale(1.05);
+}
+
+.day-cell.occupied.checked-in {
+  background: rgba(139, 90, 60, 0.22);
+}
+
+.day-cell.occupied.checked-in:hover {
+  background: rgba(139, 90, 60, 0.32);
+}
+
+.day-cell.today {
+  box-shadow: inset 0 0 0 2px #8B5A3C;
 }
 
 .occupied-indicator {
   color: #ef4444;
   font-size: 1.5rem;
+}
+
+.day-cell.checked-in .occupied-indicator {
+  color: #8B5A3C;
 }
 
 /* Daily Occupancy Chart */

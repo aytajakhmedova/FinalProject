@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { createHotel, deleteHotel, getHotels, updateHotel } from '../../../api/client';
+import { createHotel, deleteHotel, getHotels, updateHotel, uploadMedia } from '../../../api/client';
 import './AdminHotels.css';
 
 const emptyHotel = () => ({
@@ -39,11 +39,13 @@ const AdminHotelManager = () => {
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
   const [loadError, setLoadError] = useState('');
   const [saveError, setSaveError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
-  const loadHotels = () => {
-    setLoading(true);
+  const loadHotels = (silent = false) => {
+    if (!silent) setLoading(true);
     return getHotels()
       .then((items) => {
         setHotels(items);
@@ -53,7 +55,9 @@ const AdminHotelManager = () => {
         setHotels([]);
         setLoadError(error.message || 'Otellər yüklənmədi.');
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!silent) setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -66,12 +70,14 @@ const AdminHotelManager = () => {
     const payload = toHotelRequest(editing);
     const isExisting = hotels.some((hotel) => hotel.id === editing.id);
     setSaving(true);
+    setSaveError('');
+    setSuccessMessage('');
     const action = isExisting ? updateHotel(editing.id, payload) : createHotel(payload);
     action
       .then(() => {
         setEditing(null);
-        setSaveError('');
-        return loadHotels();
+        setSuccessMessage(isExisting ? 'Otel yeniləndi.' : 'Otel əlavə olundu.');
+        return loadHotels(true);
       })
       .catch((error) => {
         setSaveError(error.message || 'Otel yadda saxlanılmadı.');
@@ -82,18 +88,22 @@ const AdminHotelManager = () => {
   const handleDelete = (hotel) => {
     const roomCount = hotel.rooms?.length || 0;
     const message = roomCount
-      ? `Bu otelin ${roomCount} otağı da silinəcək. Oteli silmək istəyirsiniz?`
-      : 'Oteli silmək istəyirsiniz?';
+      ? `Bu otelin ${roomCount} otağı var. Otaq, rezervasiya və ya booking bağlıdırsa silinməyəcək. Yenə də silmək istəyirsiniz?`
+      : 'Bu oteli silmək istəyirsiniz? Rezervasiya və ya booking varsa əməliyyat dayandırılacaq.';
     if (!window.confirm(message)) return;
+    setDeletingId(hotel.id);
+    setSaveError('');
+    setSuccessMessage('');
     deleteHotel(hotel.id)
       .then(() => {
-        setSaveError('');
         if (editing?.id === hotel.id) setEditing(null);
-        return loadHotels();
+        setSuccessMessage('Otel silindi.');
+        return loadHotels(true);
       })
       .catch((error) => {
         setSaveError(error.message || 'Otel silinmədi.');
-      });
+      })
+      .finally(() => setDeletingId(null));
   };
 
   return (
@@ -108,17 +118,23 @@ const AdminHotelManager = () => {
         <div className="coming-soon-card">
           <h2>Məlumat yüklənmədi</h2>
           <p>{loadError}</p>
+          <div className="admin-form-actions">
+            <button type="button" className="btn-admin-primary" onClick={() => loadHotels()}>
+              Yenidən yoxla
+            </button>
+          </div>
         </div>
       )}
 
       {!loading && !loadError && (
         <>
           <div className="inventory-toolbar">
-            <button className="btn-admin-primary" onClick={() => { setSaveError(''); setEditing(emptyHotel()); }}>
+            <button className="btn-admin-primary" onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing(emptyHotel()); }}>
               + Otel əlavə et
             </button>
           </div>
 
+          {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}
           {saveError && !editing && <p className="muted">{saveError}</p>}
 
           <div className="admin-table-wrap">
@@ -138,15 +154,18 @@ const AdminHotelManager = () => {
                     <td>
                       <strong>{hotel.title}</strong>
                       <div className="muted">{hotel.city}{hotel.country ? `, ${hotel.country}` : ''}</div>
+                      <div className="muted">{hotel.rooms?.length || 0} otaq</div>
                     </td>
                     <td>{hotel.address || hotel.location || '—'}</td>
                     <td>₼{hotel.pricePerNight}</td>
                     <td>{hotel.stars}</td>
                     <td className="table-actions">
-                      <button onClick={() => { setSaveError(''); setEditing({ ...hotel, amenities: hotel.amenities || [] }); }}>
+                      <button onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing({ ...hotel, amenities: hotel.amenities || [] }); }}>
                         Redaktə
                       </button>
-                      <button className="danger" onClick={() => handleDelete(hotel)}>Sil</button>
+                      <button className="danger" onClick={() => handleDelete(hotel)} disabled={deletingId === hotel.id}>
+                        {deletingId === hotel.id ? 'Silinir...' : 'Sil'}
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -269,8 +288,19 @@ const AdminHotelManager = () => {
               <input
                 value={editing.imageFile || ''}
                 onChange={(e) => setEditing({ ...editing, imageFile: e.target.value })}
-                maxLength={200}
+                maxLength={400}
                 placeholder="Fayl adı və ya şəkil ünvanı"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  uploadMedia(file)
+                    .then((data) => setEditing((prev) => ({ ...prev, imageFile: data.url })))
+                    .catch((err) => setSaveError(err.message || 'Şəkil yüklənmədi.'));
+                }}
               />
             </label>
             <label className="full">

@@ -67,11 +67,6 @@
   width: 65px;
   height: auto;
   object-fit: contain;
-  transition: transform 0.3s ease;
-}
-
-.logo:hover .logo-image {
-  transform: scale(1.05);
 }
 
 .header.scrolled .logo-image {

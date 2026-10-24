@@ -14,19 +14,25 @@ const Home = ({ currency, favorites, onToggleFavorite }) => {
 
   const handleSearch = (nextQuery) => {
     setServiceType(nextQuery.type);
+    const params = new URLSearchParams();
+    const guests = (nextQuery.guests?.adults || 0) + (nextQuery.guests?.children || 0);
     if (nextQuery.type === 'flight') {
-      navigate('/flights');
+      if (nextQuery.location) params.set('origin', nextQuery.location);
+      if (nextQuery.checkIn) params.set('date', nextQuery.checkIn);
+      if (guests) params.set('passengers', String(guests));
+      navigate(`/flight-results?${params.toString()}`);
       return;
     }
     if (nextQuery.type === 'tour') {
-      navigate('/tours');
+      if (nextQuery.location) params.set('destination', nextQuery.location);
+      if (nextQuery.checkIn) params.set('date', nextQuery.checkIn);
+      if (guests) params.set('guests', String(guests));
+      navigate(`/tours?${params.toString()}`);
       return;
     }
-    const params = new URLSearchParams();
     if (nextQuery.location) params.set('location', nextQuery.location);
     if (nextQuery.checkIn) params.set('checkIn', nextQuery.checkIn);
     if (nextQuery.checkOut) params.set('checkOut', nextQuery.checkOut);
-    const guests = (nextQuery.guests?.adults || 0) + (nextQuery.guests?.children || 0);
     if (guests) params.set('guests', String(guests));
     navigate(`/hotels?${params.toString()}`);
   };

@@ -1,20 +1,48 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { FaStar, FaClock, FaMapMarkerAlt, FaUsers, FaSearch, FaFilter } from 'react-icons/fa';
-import { TOURS_DATA, getTourCategories } from '../../data/toursData';
+import { getTours } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import './Tours.css';
 
 const Tours = () => {
   const { t } = useLanguage();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams] = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('destination') || '');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [sortBy, setSortBy] = useState('popular');
+  const [tours, setTours] = useState([]);
+  const [loadError, setLoadError] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const categories = getTourCategories();
+  useEffect(() => {
+    let active = true;
+    getTours({
+      destination: searchParams.get('destination') || undefined,
+      date: searchParams.get('date') || undefined,
+      guests: searchParams.get('guests') || undefined,
+    })
+      .then((items) => {
+        if (!active) return;
+        setTours(items);
+        setLoadError('');
+      })
+      .catch((error) => {
+        if (!active) return;
+        setTours([]);
+        setLoadError(error.message || 'Turlar yüklənmədi.');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [searchParams]);
 
-  // Filter tours
-  const filteredTours = TOURS_DATA.filter(tour => {
+  const categories = [...new Set(tours.map((tour) => tour.category).filter(Boolean))];
+
+  const filteredTours = tours.filter(tour => {
     const matchesSearch = tour.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          tour.destination.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !selectedCategory || tour.category === selectedCategory;
@@ -96,7 +124,7 @@ const Tours = () => {
           </div>
 
           <p className="results-count">
-            {sortedTours.length} tur tapıldı
+            {loading ? 'Yüklənir...' : loadError || `${sortedTours.length} tur tapıldı`}
           </p>
         </div>
       </section>
@@ -111,7 +139,7 @@ const Tours = () => {
                   <div className="tour-card-image">
                     <img src={tour.image} alt={tour.name} />
                     <div className="tour-category-badge">{tour.category}</div>
-                    <div className={`tour-difficulty-badge difficulty-${tour.difficulty.toLowerCase()}`}>
+                    <div className={`tour-difficulty-badge difficulty-${(tour.difficulty || '').toLowerCase()}`}>
                       {tour.difficulty}
                     </div>
                   </div>

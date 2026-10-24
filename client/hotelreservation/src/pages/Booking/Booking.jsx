@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { FaArrowLeft, FaCreditCard, FaHotel, FaInfoCircle, FaLock, FaUser } from 'react-icons/fa';
+import { FaArrowLeft, FaCheck, FaCreditCard, FaHotel, FaInfoCircle, FaLock, FaMapMarkedAlt, FaPlane, FaUser } from 'react-icons/fa';
 import { MdEmail } from 'react-icons/md';
 import { formatDate } from '../../data/roomsData';
-import { createBooking } from '../../api/client';
+import { createBooking, getTripSuggestions } from '../../api/client';
 import roomPhoto from '../../assets/images/otaq2.jpg';
 import { useLanguage } from '../../context/LanguageContext';
 import './Booking.css';
+
+const BUNDLE_RATE = 0.9;
+
+const money = (value) => {
+  const amount = Number(value) || 0;
+  return Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
+};
+
+const bundlePrice = (value, guests = 1) =>
+  Math.round(Number(value) * Number(guests) * BUNDLE_RATE * 100) / 100;
+
+const pickTourDate = (tour, checkIn, checkOut) => {
+  const dates = tour?.availableDates || [];
+  const inStay = dates.find((date) => date >= checkIn && (!checkOut || date < checkOut));
+  return inStay || dates[0] || checkIn;
+};
 
 const Booking = () => {
   const { t } = useLanguage();
@@ -27,6 +43,16 @@ const Booking = () => {
   const [country, setCountry] = useState('AZ');
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [suggestions, setSuggestions] = useState({ flights: [], tours: [], message: '' });
+  const [selectedFlightId, setSelectedFlightId] = useState(null);
+  const [selectedTourId, setSelectedTourId] = useState(null);
+
+  const hotel = bookingData?.hotel;
+  const room = bookingData?.room;
+  const checkIn = bookingData?.checkIn;
+  const checkOut = bookingData?.checkOut;
+  const guests = bookingData?.guests;
+  const priceBreakdown = bookingData?.priceBreakdown;
 
   useEffect(() => {
     // Load user data if authenticated
@@ -39,8 +65,33 @@ const Booking = () => {
     }
   }, []);
 
-  // If no booking data, redirect
-  if (!bookingData || !bookingData.hotel || !bookingData.room) {
+  useEffect(() => {
+    if (!hotel) return undefined;
+    let active = true;
+    getTripSuggestions({
+      city: hotel.city || hotel.location || '',
+      checkIn,
+      checkOut,
+      guests,
+    })
+      .then((data) => {
+        if (!active) return;
+        setSuggestions({
+          message: data.message || 'Səyahətini tamamla — uçuş və tur seçimlərinə də bax!',
+          flights: Array.isArray(data.flights) ? data.flights : [],
+          tours: Array.isArray(data.tours) ? data.tours : [],
+        });
+      })
+      .catch(() => {
+        if (!active) return;
+        setSuggestions({ flights: [], tours: [], message: '' });
+      });
+    return () => {
+      active = false;
+    };
+  }, [hotel, checkIn, checkOut, guests]);
+
+  if (!hotel || !room) {
     return (
       <div className="booking-page">
         <div className="booking-container">
@@ -57,7 +108,11 @@ const Booking = () => {
     );
   }
 
-  const { hotel, room, checkIn, checkOut, guests, priceBreakdown } = bookingData;
+  const selectedFlight = suggestions.flights.find((item) => item.id === selectedFlightId) || null;
+  const selectedTour = suggestions.tours.find((item) => item.id === selectedTourId) || null;
+  const flightTotal = selectedFlight ? bundlePrice(selectedFlight.price, guests) : 0;
+  const tourTotal = selectedTour ? bundlePrice(selectedTour.price, guests) : 0;
+  const grandTotal = Number(priceBreakdown?.total) + flightTotal + tourTotal;
 
   const formatCardNumber = (value) => {
     const digits = value.replace(/\D/g, '').slice(0, 16);
@@ -101,32 +156,57 @@ const Booking = () => {
 
     try {
       setSubmitting(true);
+      const guest = { guestName, guestEmail, guestPhone, guests, paymentMethod, cardNumber, cardHolder: cardName };
       const booking = await createBooking({
         bookingType: 'hotel',
         hotelId: hotel.id,
         roomId: room.id,
-        guestName,
-        guestEmail,
-        guestPhone,
         checkIn,
         checkOut,
-        guests,
         specialRequests,
-        paymentMethod,
-        cardNumber,
-        cardHolder: cardName,
+        ...guest,
       });
-      navigate('/booking-success', { state: { booking } });
+
+      const extras = [];
+      const extraErrors = [];
+      if (selectedFlight) {
+        try {
+          extras.push(await createBooking({
+            bookingType: 'flight',
+            flightId: selectedFlight.id,
+            bundleWithHotel: true,
+            ...guest,
+          }));
+        } catch (error) {
+          extraErrors.push(error.message || 'Uçuş əlavə olunmadı.');
+        }
+      }
+      if (selectedTour) {
+        try {
+          extras.push(await createBooking({
+            bookingType: 'tour',
+            tourId: selectedTour.id,
+            travelDate: pickTourDate(selectedTour, checkIn, checkOut),
+            bundleWithHotel: true,
+            ...guest,
+          }));
+        } catch (error) {
+          extraErrors.push(error.message || 'Tur əlavə olunmadı.');
+        }
+      }
+
+      navigate('/booking-success', {
+        state: {
+          booking,
+          extras,
+          extrasError: extraErrors.join(' '),
+        },
+      });
     } catch (error) {
       setFormError(error.message);
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const money = (value) => {
-    const amount = Number(value) || 0;
-    return Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
   };
 
   return (
@@ -190,6 +270,80 @@ const Booking = () => {
               </div>
             </label>
 
+            {(suggestions.flights.length > 0 || suggestions.tours.length > 0) && (
+              <section className="pay-addons">
+                <div className="pay-addons-head">
+                  <div>
+                    <h3>Səyahətini tamamla</h3>
+                    <p>İstəyə bağlıdır. Seçdiyin uçuş və ya tur paketdə 10% endirimli olur.</p>
+                  </div>
+                  <span className="pay-addon-badge">−10%</span>
+                </div>
+
+                {suggestions.flights.length > 0 && (
+                  <div className="pay-addon-group">
+                    <div className="pay-addon-label">
+                      <span>Uçuş seçimləri</span>
+                    </div>
+                    {suggestions.flights.map((flight) => {
+                      const active = selectedFlightId === flight.id;
+                      return (
+                        <button
+                          key={flight.id}
+                          type="button"
+                          className={`pay-choice pay-addon ${active ? 'active' : ''}`}
+                          aria-pressed={active}
+                          onClick={() => setSelectedFlightId(active ? null : flight.id)}
+                        >
+                          <span className="pay-choice-icon"><FaPlane /></span>
+                          <span className="pay-choice-body">
+                            <strong>{flight.airline} {flight.flightNumber}</strong>
+                            <span className="pay-choice-meta">{flight.originCity} → {flight.destinationCity}</span>
+                          </span>
+                          <span className="pay-choice-price">
+                            <span className="pay-choice-amount">₼ {money(bundlePrice(flight.price, guests))}</span>
+                            <s>₼ {money(Number(flight.price) * guests)}</s>
+                          </span>
+                          <span className="pay-tick" aria-hidden="true">{active && <FaCheck />}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {suggestions.tours.length > 0 && (
+                  <div className="pay-addon-group">
+                    <div className="pay-addon-label">
+                      <span>Tur seçimləri</span>
+                    </div>
+                    {suggestions.tours.map((tour) => {
+                      const active = selectedTourId === tour.id;
+                      return (
+                        <button
+                          key={tour.id}
+                          type="button"
+                          className={`pay-choice pay-addon ${active ? 'active' : ''}`}
+                          aria-pressed={active}
+                          onClick={() => setSelectedTourId(active ? null : tour.id)}
+                        >
+                          <span className="pay-choice-icon"><FaMapMarkedAlt /></span>
+                          <span className="pay-choice-body">
+                            <strong>{tour.name}</strong>
+                            <span className="pay-choice-meta">{String(tour.destination || '').split(',')[0]} · {tour.duration}</span>
+                          </span>
+                          <span className="pay-choice-price">
+                            <span className="pay-choice-amount">₼ {money(bundlePrice(tour.price, guests))}</span>
+                            <s>₼ {money(Number(tour.price) * guests)}</s>
+                          </span>
+                          <span className="pay-tick" aria-hidden="true">{active && <FaCheck />}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </section>
+            )}
+
             <div className="pay-choices">
               <button
                 type="button"
@@ -199,7 +353,7 @@ const Booking = () => {
                 <span className="pay-choice-icon"><FaCreditCard /></span>
                 <span className="pay-choice-body">
                   <strong>{t('pay.cardNow')}</strong>
-                  <span className="pay-choice-amount">₼ {money(priceBreakdown.total)}</span>
+                  <span className="pay-choice-amount">₼ {money(grandTotal)}</span>
                   <span className="pay-choice-note">Müştəri rezervasiya zamanı ödəniş edir. Real kart ödənişi üçün ödəniş provayderi lazımdır.</span>
                 </span>
               </button>
@@ -288,7 +442,7 @@ const Booking = () => {
                 <span className="pay-choice-icon"><FaHotel /></span>
                 <span className="pay-choice-body">
                   <strong>{t('pay.atHotel')}</strong>
-                  <span className="pay-choice-amount">₼ {money(priceBreakdown.total)}</span>
+                  <span className="pay-choice-amount">₼ {money(grandTotal)}</span>
                   <span className="pay-choice-note">Müştəri otağı indi rezervasiya edir, pulu isə otelə çatanda ödəyir.</span>
                 </span>
               </button>
@@ -315,16 +469,24 @@ const Booking = () => {
 
             <div className="pay-totals">
               <div>
-                <span>Ara cəm</span>
-                <strong>₼ {money(priceBreakdown.subtotal)}</strong>
+                <span>Otel</span>
+                <strong>₼ {money(priceBreakdown.total)}</strong>
               </div>
-              <div>
-                <span>ƏDV (18%)</span>
-                <strong>₼ {money(priceBreakdown.tax)}</strong>
-              </div>
+              {selectedFlight && (
+                <div>
+                  <span>Uçuş (paket −10%)</span>
+                  <strong>₼ {money(flightTotal)}</strong>
+                </div>
+              )}
+              {selectedTour && (
+                <div>
+                  <span>Tur (paket −10%)</span>
+                  <strong>₼ {money(tourTotal)}</strong>
+                </div>
+              )}
               <div className="pay-total">
                 <span>Yekun məbləğ</span>
-                <strong>₼ {money(priceBreakdown.total)}</strong>
+                <strong>₼ {money(grandTotal)}</strong>
               </div>
             </div>
 
@@ -332,7 +494,7 @@ const Booking = () => {
 
             <button type="submit" className="pay-submit" disabled={submitting}>
               {paymentMethod === 'card'
-                ? t('pay.pay', { amount: `₼ ${money(priceBreakdown.total)}` })
+                ? t('pay.pay', { amount: `₼ ${money(grandTotal)}` })
                 : t('pay.confirm')}
             </button>
             <p className="pay-secure"><FaLock /> Kart məlumatı saxlanılmır və şifrələnmiş formada yoxlanılır</p>

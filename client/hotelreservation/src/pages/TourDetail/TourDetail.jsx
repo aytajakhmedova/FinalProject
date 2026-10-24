@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   FaStar, 
@@ -10,21 +10,44 @@ import {
   FaTimesCircle,
   FaCalendarAlt
 } from 'react-icons/fa';
-import { getTourById } from '../../data/toursData';
+import { createBooking, getTour } from '../../api/client';
+import { getAuthToken } from '../../api/auth';
 import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
 import './TourDetail.css';
 
 const TourDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const tour = getTourById(id);
+  const [tour, setTour] = useState(null);
+  const [loadError, setLoadError] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [guestCount, setGuestCount] = useState(2);
+  const [bookingError, setBookingError] = useState('');
+  const [booking, setBooking] = useState(false);
 
-  if (!tour) {
+  useEffect(() => {
+    let active = true;
+    getTour(id)
+      .then((data) => {
+        if (!active) return;
+        setTour(data);
+        setGuestCount(data.minGuests || 1);
+        setLoadError('');
+      })
+      .catch((error) => {
+        if (!active) return;
+        setTour(null);
+        setLoadError(error.message || 'Tur tapılmadı');
+      });
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  if (loadError || !tour) {
     return (
       <div className="tour-not-found">
-        <h2>Tur tapılmadı</h2>
+        <h2>{loadError || 'Yüklənir...'}</h2>
         <Link to="/tours" className="back-link">Turlara qayıt</Link>
       </div>
     );
@@ -32,17 +55,31 @@ const TourDetail = () => {
 
   const totalPrice = tour.price * guestCount;
 
-  const handleBooking = () => {
-    // Check authentication
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-    
-    if (!isAuthenticated) {
-      // Redirect to login
+  const handleBooking = (event) => {
+    event.preventDefault();
+    if (!getAuthToken()) {
       navigate('/login', { state: { from: `/tours/${id}` } });
-    } else {
-      // TODO: Navigate to booking page
-      alert('Rezervasiya funksiyası backend hazır olduqda əlavə ediləcək');
+      return;
     }
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    setBooking(true);
+    setBookingError('');
+    createBooking({
+      bookingType: 'tour',
+      tourId: tour.id,
+      travelDate: selectedDate,
+      guests: guestCount,
+      guestName: user.name || user.email || 'Qonaq',
+      guestEmail: user.email,
+      paymentMethod: 'card',
+    })
+      .then((created) => {
+        navigate('/booking-success', { state: { booking: created } });
+      })
+      .catch((error) => {
+        setBookingError(error.message || 'Rezervasiya alınmadı.');
+      })
+      .finally(() => setBooking(false));
   };
 
   return (
@@ -69,7 +106,7 @@ const TourDetail = () => {
             <div className="tour-detail-header">
               <div className="tour-badges">
                 <span className="category-badge">{tour.category}</span>
-                <span className={`difficulty-badge difficulty-${tour.difficulty.toLowerCase()}`}>
+                <span className={`difficulty-badge difficulty-${(tour.difficulty || '').toLowerCase()}`}>
                   {tour.difficulty}
                 </span>
               </div>
@@ -188,7 +225,7 @@ const TourDetail = () => {
                 <span className="price-unit">/ nəfər</span>
               </div>
 
-              <form className="booking-form" onSubmit={(e) => { e.preventDefault(); handleBooking(); }}>
+              <form className="booking-form" onSubmit={handleBooking}>
                 {/* Date Selection */}
                 <div className="form-group">
                   <label className="form-label">
@@ -246,8 +283,9 @@ const TourDetail = () => {
                   </div>
                 </div>
 
-                <button type="submit" className="btn-book-tour">
-                  Rezervasiya et
+                {bookingError && <p className="booking-note">{bookingError}</p>}
+                <button type="submit" className="btn-book-tour" disabled={booking}>
+                  {booking ? 'Göndərilir...' : 'Rezervasiya et'}
                 </button>
               </form>
 

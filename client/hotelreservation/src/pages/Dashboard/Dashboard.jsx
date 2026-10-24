@@ -1,33 +1,102 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, Navigate } from 'react-router-dom';
 import { FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaCheckCircle, FaHourglass, FaTimesCircle, FaClipboardList } from 'react-icons/fa';
-import { getAllBookings, getBookingStats, updateBooking } from '../../utils/bookingsStore';
 import { hasReviewForBooking } from '../../utils/reviewsStore';
 import { useLanguage } from '../../context/LanguageContext';
-import { getHotels } from '../../data/hotelsData';
+import { getAuthToken } from '../../api/auth';
+import { deleteBooking, getHotels, getMyBookings } from '../../api/client';
 import './Dashboard.css';
 
-const hotelImageFor = (reservation) => {
-  const hotel = getHotels().find((item) => String(item.id) === String(reservation.hotelId));
-  return hotel?.mainImage || reservation.hotelImage;
+const bookingTypeOf = (reservation) => (reservation.bookingType || 'hotel').toLowerCase();
+
+const bookingTitle = (reservation) => {
+  const type = bookingTypeOf(reservation);
+  if (type === 'flight') return reservation.itemName || reservation.flightNumber || reservation.hotelName;
+  if (type === 'tour') return reservation.tourName || reservation.itemName || reservation.hotelName;
+  return reservation.hotelName || reservation.itemName;
 };
+
+const bookingSubtitle = (reservation) => {
+  const type = bookingTypeOf(reservation);
+  if (type === 'flight') return reservation.flightNumber || reservation.itemName;
+  if (type === 'tour') return reservation.tourName || reservation.itemName;
+  return reservation.roomType || reservation.roomName || reservation.itemName;
+};
+
+const typeLabel = (reservation, t) => {
+  const type = bookingTypeOf(reservation);
+  if (type === 'flight') return t('nav.flight');
+  if (type === 'tour') return t('nav.tour');
+  return t('nav.hotel');
+};
+
+const statsFrom = (bookings) => ({
+  upcoming: bookings.filter((b) => b.status === 'confirmed' || b.status === 'checked-in').length,
+  completed: bookings.filter((b) => b.status === 'checked-out').length,
+  cancelled: bookings.filter((b) => b.status === 'cancelled').length,
+  total: bookings.length,
+});
 
 const Dashboard = () => {
   const { t } = useLanguage();
+  const token = getAuthToken();
   const [activeTab, setActiveTab] = useState('all');
   const [user, setUser] = useState(null);
-  const [reservations, setReservations] = useState(getAllBookings());
+  const [reservations, setReservations] = useState([]);
+  const [hotelImages, setHotelImages] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState(null);
-  const stats = getBookingStats(reservations);
+  const [cancelError, setCancelError] = useState('');
+  const [cancelling, setCancelling] = useState(false);
+  const stats = statsFrom(reservations);
+
+  const loadReservations = useCallback(async () => {
+    if (!getAuthToken()) {
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    try {
+      const bookings = await getMyBookings();
+      setReservations(Array.isArray(bookings) ? bookings : []);
+      try {
+        const hotels = await getHotels();
+        const images = {};
+        (hotels || []).forEach((hotel) => {
+          if (hotel?.id != null && hotel.mainImage) images[String(hotel.id)] = hotel.mainImage;
+        });
+        setHotelImages(images);
+      } catch {
+        setHotelImages({});
+      }
+    } catch (err) {
+      setReservations([]);
+      setError(err.message || t('dash.loadError'));
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
 
   useEffect(() => {
-    // Get user data from localStorage
     const userData = localStorage.getItem('user');
     if (userData) {
       setUser(JSON.parse(userData));
     }
   }, []);
+
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    loadReservations();
+  }, [token, loadReservations]);
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
 
   const getUserInitials = () => {
     if (!user || !user.name) return 'A';
@@ -60,23 +129,27 @@ const Dashboard = () => {
 
   const handleCancelReservation = (reservation) => {
     setSelectedReservation(reservation);
+    setCancelError('');
     setShowCancelModal(true);
   };
 
-  const confirmCancelReservation = () => {
-    if (selectedReservation) {
-      updateBooking(selectedReservation.id, {
-        status: 'cancelled',
-        cancelledDate: new Date().toISOString(),
-      });
-      setReservations(getAllBookings());
+  const confirmCancelReservation = async () => {
+    if (!selectedReservation) return;
+
+    setCancelling(true);
+    setCancelError('');
+    try {
+      await deleteBooking(selectedReservation.id);
+      await loadReservations();
       setShowCancelModal(false);
       setSelectedReservation(null);
-      alert(t('dash.cancelledAlert'));
+    } catch (err) {
+      setCancelError(err.message || t('dash.cancelError'));
+    } finally {
+      setCancelling(false);
     }
   };
 
-  const canModifyReservation = (status) => status === 'confirmed';
   const canCancelReservation = (status) => status === 'confirmed';
 
   return (
@@ -171,14 +244,34 @@ const Dashboard = () => {
             {activeTab === 'cancelled' && t('dash.cancelledTitle')}
           </h2>
 
-          {filteredReservations.length > 0 ? (
+          {loading ? (
+            <div className="no-reservations">
+              <FaClipboardList />
+              <h3>{t('dash.loading')}</h3>
+            </div>
+          ) : error ? (
+            <div className="no-reservations">
+              <FaClipboardList />
+              <h3>{t('dash.loadError')}</h3>
+              <p>{error}</p>
+              <button type="button" className="btn-browse-hotels" onClick={loadReservations}>
+                {t('dash.retry')}
+              </button>
+            </div>
+          ) : filteredReservations.length > 0 ? (
             <div className="reservations-grid">
               {filteredReservations.map(reservation => {
                 const badge = getStatusBadge(reservation.status);
+                const type = bookingTypeOf(reservation);
+                const title = bookingTitle(reservation);
+                const image = type === 'hotel' ? hotelImages[String(reservation.hotelId)] : '';
+                const firstDateLabel = type === 'hotel' ? t('dash.checkIn') : t('dash.travelDate');
+                const firstDate = reservation.checkIn || '—';
+                const secondDate = reservation.checkOut || '—';
                 return (
                   <div key={reservation.id} className="reservation-card">
-                    <div className="reservation-image">
-                      <img src={hotelImageFor(reservation)} alt={reservation.hotelName} />
+                    <div className={`reservation-image${image ? '' : ' is-empty'}`}>
+                      {image ? <img src={image} alt={title} /> : null}
                       <div className={`reservation-status-badge ${badge.className}`}>
                         {badge.icon}
                         <span>{badge.text}</span>
@@ -187,8 +280,8 @@ const Dashboard = () => {
 
                     <div className="reservation-content">
                       <div className="reservation-header">
-                        <h3 className="reservation-hotel-name">{reservation.hotelName}</h3>
-                        <div className="reservation-id">#{reservation.confirmationNumber || reservation.id}</div>
+                        <h3 className="reservation-hotel-name">{title}</h3>
+                        <div className="reservation-id">#{reservation.confirmationNumber || reservation.code || reservation.id}</div>
                       </div>
 
                       <div className="reservation-location">
@@ -197,15 +290,15 @@ const Dashboard = () => {
                       </div>
 
                       <div className="reservation-room-type">
-                        {reservation.roomType}
+                        {typeLabel(reservation, t)} · {bookingSubtitle(reservation)}
                       </div>
 
                       <div className="reservation-details">
                         <div className="detail-item">
                           <FaCalendarAlt className="detail-icon" />
                           <div className="detail-text">
-                            <span className="detail-label">{t('dash.checkIn')}</span>
-                            <span className="detail-value">{reservation.checkIn}</span>
+                            <span className="detail-label">{firstDateLabel}</span>
+                            <span className="detail-value">{firstDate}</span>
                           </div>
                         </div>
 
@@ -213,7 +306,7 @@ const Dashboard = () => {
                           <FaCalendarAlt className="detail-icon" />
                           <div className="detail-text">
                             <span className="detail-label">{t('dash.checkOut')}</span>
-                            <span className="detail-value">{reservation.checkOut}</span>
+                            <span className="detail-value">{secondDate}</span>
                           </div>
                         </div>
 
@@ -228,7 +321,11 @@ const Dashboard = () => {
 
                       <div className="reservation-footer">
                         <div className="reservation-price">
-                          <span className="price-label">{t('dash.nights', { count: reservation.nights })}</span>
+                          <span className="price-label">
+                            {reservation.nights > 0
+                              ? t('dash.nights', { count: reservation.nights })
+                              : typeLabel(reservation, t)}
+                          </span>
                           <span className="price-amount">₼{reservation.totalPrice}</span>
                         </div>
                         <div className="reservation-actions">
@@ -238,15 +335,7 @@ const Dashboard = () => {
                           >
                             {t('dash.details')}
                           </Link>
-                          {canModifyReservation(reservation.status) && (
-                            <Link
-                              to={`/reservations/${reservation.id}?edit=1`}
-                              className="btn-modify-reservation"
-                            >
-                              {t('dash.modify')}
-                            </Link>
-                          )}
-                          {reservation.status === 'checked-out' && !hasReviewForBooking(reservation.id) && (
+                          {reservation.status === 'checked-out' && type === 'hotel' && !hasReviewForBooking(reservation.id) && (
                             <Link
                               to={`/hotels/${reservation.hotelId}#reviews`}
                               className="btn-modify-reservation"
@@ -284,31 +373,34 @@ const Dashboard = () => {
 
       {/* Cancel Confirmation Modal */}
       {showCancelModal && (
-        <div className="modal-overlay" onClick={() => setShowCancelModal(false)}>
+        <div className="modal-overlay" onClick={() => !cancelling && setShowCancelModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h3>{t('dash.cancelTitle')}</h3>
             <p>{t('dash.cancelSure')}</p>
             {selectedReservation && (
               <div className="modal-reservation-info">
-                <p><strong>{selectedReservation.hotelName}</strong></p>
-                <p>{selectedReservation.checkIn} - {selectedReservation.checkOut}</p>
+                <p><strong>{bookingTitle(selectedReservation)}</strong></p>
+                <p>{selectedReservation.checkIn} - {selectedReservation.checkOut || selectedReservation.checkIn}</p>
                 <p className="modal-warning">
                   ⚠️ {t('dash.cancelWarn')}
                 </p>
+                {cancelError && <p className="modal-warning">{cancelError}</p>}
               </div>
             )}
             <div className="modal-actions">
               <button 
                 className="btn-modal-cancel"
+                disabled={cancelling}
                 onClick={() => setShowCancelModal(false)}
               >
                 {t('dash.keep')}
               </button>
               <button 
                 className="btn-modal-confirm"
+                disabled={cancelling}
                 onClick={confirmCancelReservation}
               >
-                {t('dash.confirmCancel')}
+                {cancelling ? t('dash.loading') : t('dash.confirmCancel')}
               </button>
             </div>
           </div>

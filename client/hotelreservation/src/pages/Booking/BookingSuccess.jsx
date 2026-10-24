@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link, useLocation, Navigate } from 'react-router-dom';
-import { FaCheckCircle, FaHotel, FaCalendarAlt, FaUsers } from 'react-icons/fa';
+import { FaCheckCircle, FaHotel, FaCalendarAlt, FaUsers, FaPlane, FaMapMarkedAlt } from 'react-icons/fa';
 import { formatDate } from '../../data/roomsData';
 import './BookingSuccess.css';
 
 const BookingSuccess = () => {
   const location = useLocation();
   const booking = location.state?.booking;
+  const extras = Array.isArray(location.state?.extras) ? location.state.extras : [];
+  const extrasError = location.state?.extrasError || '';
 
   if (!booking) {
     return <Navigate to="/dashboard" replace />;
@@ -42,7 +44,21 @@ const BookingSuccess = () => {
             <FaUsers />
             <span>{booking.guests} nəfər · {booking.nights} gecə · ₼{total}</span>
           </div>
+          {extras.map((extra) => (
+            <div key={extra.id}>
+              {extra.bookingType === 'flight' ? <FaPlane /> : <FaMapMarkedAlt />}
+              <span>
+                {extra.bookingType === 'flight' ? extra.flightNumber || extra.itemName : extra.tourName || extra.itemName}
+                {' · '}
+                {extra.confirmationNumber || extra.code}
+                {' · ₼'}
+                {extra.totalPrice}
+              </span>
+            </div>
+          ))}
         </div>
+
+        {extrasError && <p className="success-extra-error">{extrasError} Otel rezervasiyan yadda qaldı.</p>}
 
         <div className="success-actions">
           <Link to={`/reservations/${booking.id}`} className="btn-success-primary">

@@ -49,17 +49,11 @@
 
 .footer-logo {
   margin-bottom: 1.5rem;
-  transition: transform 0.3s ease;
-}
-
-.footer-logo:hover {
-  transform: scale(1.05);
 }
 
 .footer-logo img {
   width: 55px;
   height: auto;
-  transition: all 0.3s ease;
 }
   display: block;
 }

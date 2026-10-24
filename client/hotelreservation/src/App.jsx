@@ -14,6 +14,7 @@ import Dashboard from './pages/Dashboard/Dashboard';
 import ReservationDetail from './pages/ReservationDetail/ReservationDetail';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import ForgotPassword from './pages/Auth/ForgotPassword';
 import Profile from './pages/Profile/Profile';
 import Tours from './pages/Tours/Tours';
 import TourDetail from './pages/TourDetail/TourDetail';
@@ -32,6 +33,8 @@ import AdminBookings from './pages/Admin/Bookings/AdminBookings';
 import AdminUsers from './pages/Admin/Users/AdminUsers';
 import AdminAnalytics from './pages/Admin/Analytics/AdminAnalytics';
 import AdminSettings from './pages/Admin/Settings/AdminSettings';
+import AdminFlights from './pages/Admin/Flights/AdminFlights';
+import AdminTours from './pages/Admin/Tours/AdminTours';
 import './App.css';
 
 function App() {
@@ -238,6 +241,8 @@ function App() {
           {/* Auth Routes without Header & Footer */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ForgotPassword />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
@@ -246,9 +251,15 @@ function App() {
             <Route path="hotels" element={<AdminHotels />} />
             <Route path="rooms" element={<AdminRooms />} />
             <Route path="bookings" element={<AdminBookings />} />
+            <Route path="rezervasiyalar" element={<AdminBookings />} />
             <Route path="users" element={<AdminUsers />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="occupancy" element={<OccupancyCalendar />} />
+            <Route path="teqvim" element={<OccupancyCalendar />} />
+            <Route path="ucuslar" element={<AdminFlights />} />
+            <Route path="flights" element={<AdminFlights />} />
+            <Route path="turlar" element={<AdminTours />} />
+            <Route path="tours" element={<AdminTours />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>

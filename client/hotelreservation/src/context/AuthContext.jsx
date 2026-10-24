@@ -1,6 +1,15 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useMemo, useState } from 'react';
+import { clearAuthSession, getAuthToken, saveAuthSession } from '../api/auth';
 
 const AuthContext = createContext();
+
+function readStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem('user') || 'null');
+  } catch {
+    return null;
+  }
+}
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -11,29 +20,37 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const token = getAuthToken();
+  const [user, setUser] = useState(() => (token ? readStoredUser() : null));
 
-  const login = (userData) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(userData));
+  const applySession = (auth, options) => {
+    saveAuthSession(auth, options);
+    setUser(readStoredUser());
+    return auth;
   };
+
+  const login = (auth, options) => applySession(auth, options);
 
   const logout = () => {
+    clearAuthSession();
     setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('user');
   };
 
-  const register = (userData) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(userData));
-  };
+  const register = (auth, options) => applySession(auth, options);
+
+  const value = useMemo(
+    () => ({
+      user,
+      isAuthenticated: Boolean(getAuthToken()),
+      login,
+      logout,
+      register,
+    }),
+    [user]
+  );
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, register }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,22 +1,49 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaChevronLeft, FaChevronRight, FaHeart, FaPlay, FaRegHeart, FaStar } from 'react-icons/fa';
-import { HOTELS, formatPrice } from '../../data/travelData';
+import { formatPrice } from '../../data/travelData';
+import { getHotels } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
+import { useSiteContent } from '../../context/SiteContentContext';
 import './FeaturedHotels.css';
 
 const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onPlayVideo }) => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { content } = useSiteContent();
   const [activeIndex, setActiveIndex] = useState(0);
-  const featured = HOTELS.slice(0, 5);
+  const [featured, setFeatured] = useState([]);
+  const [loadError, setLoadError] = useState('');
+  const [loading, setLoading] = useState(true);
   const hotel = featured[activeIndex];
 
   useEffect(() => {
-    const t = setInterval(() => {
+    let active = true;
+    getHotels()
+      .then((items) => {
+        if (!active) return;
+        setFeatured(items.slice(0, 5));
+        setLoadError('');
+      })
+      .catch((error) => {
+        if (!active) return;
+        setFeatured([]);
+        setLoadError(error.message || 'Otellər yüklənmədi.');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (featured.length < 2) return undefined;
+    const timer = setInterval(() => {
       setActiveIndex((prev) => (prev === featured.length - 1 ? 0 : prev + 1));
     }, 6500);
-    return () => clearInterval(t);
+    return () => clearInterval(timer);
   }, [featured.length]);
 
   const handlePrev = () => {
@@ -30,12 +57,11 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
   const mid = Math.floor(featured.length / 2);
 
   const handleHotelClick = (hotelId) => {
-    // Navigate to hotel detail page
     navigate(`/hotels/${hotelId}`);
   };
 
   const handleDiscoverClick = (e) => {
-    e.stopPropagation(); // Prevent card click
+    e.stopPropagation();
     if (onDiscover) {
       onDiscover(hotel);
     } else {
@@ -43,11 +69,33 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
     }
   };
 
+  if (loading) {
+    return (
+      <section className="featured-hotels-section" id="featured">
+        <div className="featured-hotels-container">
+          <p className="eyebrow center">{content?.settings?.featuredEyebrow}</p>
+          <h2 className="section-title">Yüklənir...</h2>
+        </div>
+      </section>
+    );
+  }
+
+  if (loadError || featured.length === 0) {
+    return (
+      <section className="featured-hotels-section" id="featured">
+        <div className="featured-hotels-container">
+          <p className="eyebrow center">{content?.settings?.featuredEyebrow}</p>
+          <h2 className="section-title">{loadError || 'Otel tapılmadı'}</h2>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="featured-hotels-section" id="featured">
       <div className="featured-hotels-container">
-        <p className="eyebrow center">{t('feat.eyebrow')}</p>
-        <h2 className="section-title">{t('feat.title')}</h2>
+        <p className="eyebrow center">{content?.settings?.featuredEyebrow || t('feat.eyebrow')}</p>
+        <h2 className="section-title">{content?.settings?.featuredTitle || t('feat.title')}</h2>
 
         <div className="hotels-slider-wrapper">
           <button className="nav-btn nav-prev" onClick={handlePrev} aria-label={t('feat.prev')}>
@@ -62,23 +110,23 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
                 onClick={() => setActiveIndex(index)}
                 onMouseEnter={() => setActiveIndex(index)}
               >
-                <img src={item.image} alt={item.title} />
+                <img src={item.mainImage} alt={item.title} />
               </button>
             ))}
           </div>
 
           <div className="main-display">
-            <div 
-              className="main-image" 
+            <div
+              className="main-image"
               onClick={() => handleHotelClick(hotel.id)}
               style={{ cursor: 'pointer' }}
             >
-              <img key={hotel.id} src={hotel.image} alt={hotel.title} />
+              <img key={hotel.id} src={hotel.mainImage} alt={hotel.title} />
               {hotel.video && (
                 <button
                   className="featured-play"
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent card click
+                    e.stopPropagation();
                     onPlayVideo(hotel);
                   }}
                   aria-label={t('feat.video')}
@@ -89,11 +137,11 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
               )}
               <div className="info-card" key={`info-${hotel.id}`}>
                 <div className="info-top">
-                  <span className="year-badge">{hotel.year}</span>
+                  <span className="year-badge">{hotel.hotelType}</span>
                   <button
                     className={`inline-fav ${favorites.includes(hotel.id) ? 'on' : ''}`}
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent card click
+                      e.stopPropagation();
                       onToggleFavorite(hotel.id);
                     }}
                   >
@@ -104,10 +152,10 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
                 <p className="hotel-description">{hotel.description}</p>
                 <div className="info-meta">
                   <span><FaStar /> {hotel.rating}</span>
-                  <strong>{formatPrice(hotel.price, currency)} {t('feat.perNight')}</strong>
+                  <strong>{formatPrice(hotel.pricePerNight, currency)} {t('feat.perNight')}</strong>
                 </div>
-                <button 
-                  className="discover-btn" 
+                <button
+                  className="discover-btn"
                   onClick={handleDiscoverClick}
                 >
                   {t('feat.discover')}
@@ -126,7 +174,7 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
                   onClick={() => setActiveIndex(actualIndex)}
                   onMouseEnter={() => setActiveIndex(actualIndex)}
                 >
-                  <img src={item.image} alt={item.title} />
+                  <img src={item.mainImage} alt={item.title} />
                 </button>
               );
             })}
