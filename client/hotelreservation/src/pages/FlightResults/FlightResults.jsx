@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FaPlane, FaExchangeAlt, FaFilter, FaTimesCircle } from 'react-icons/fa';
 import { getFlights } from '../../api/client';
 import './FlightResults.css';
 
 const FlightResults = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const searchParams = location.state || {
-    from: 'Bakı (GYD)',
-    to: 'İstanbul (IST)',
-    departure: '2026-11-20',
-    travelers: '2',
-    class: 'economy'
+  const [query] = useSearchParams();
+  const searchParams = {
+    from: query.get('origin') || query.get('from') || '',
+    to: query.get('destination') || query.get('to') || '',
+    departure: query.get('date') || query.get('departure') || '',
+    travelers: query.get('passengers') || query.get('travelers') || '1',
+    class: query.get('cabin') || query.get('class') || '',
   };
 
   const [priceRange, setPriceRange] = useState([0, 2000]);
@@ -29,7 +29,9 @@ const FlightResults = () => {
       origin: searchParams.from,
       destination: searchParams.to,
       date: searchParams.departure,
+      passengers: searchParams.travelers,
       cabin: searchParams.class,
+      sort: 'price',
     })
       .then((data) => {
         if (active) setFlights(data);

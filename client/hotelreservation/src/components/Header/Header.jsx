@@ -1,12 +1,20 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHotel, FaPlane, FaCar, FaTaxi, FaBars, FaTimes, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaHotel, FaPlane, FaCar, FaBars, FaTimes, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { IoNotifications } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdDarkMode, MdLightMode } from 'react-icons/md';
-import logo from '../../assets/images/AE_HOTEL_transparent_logo.png';
 import LanguageSwitch from '../LanguageSwitch/LanguageSwitch';
 import { useLanguage } from '../../context/LanguageContext';
+import { useSiteContent } from '../../context/SiteContentContext';
+import { clearAuthSession, getAuthToken } from '../../api/auth';
+import { resolveImage } from '../../api/client';
 import './Header.css';
+
+const QUICK_ICONS = {
+  hotel: <FaHotel />,
+  plane: <FaPlane />,
+  car: <FaCar />,
+};
 
 const Header = ({
   darkMode,
@@ -18,6 +26,10 @@ const Header = ({
 }) => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { content } = useSiteContent();
+  const settings = content?.settings;
+  const logo = resolveImage(settings?.logoUrl);
+  const siteName = settings?.siteName || 'AEHotel';
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -30,9 +42,9 @@ const Header = ({
 
   useEffect(() => {
     const syncUser = () => {
-      const authStatus = localStorage.getItem('isAuthenticated');
-      const userData = localStorage.getItem('user');
-      if (authStatus === 'true' && userData) {
+      const token = getAuthToken();
+      const userData = token ? localStorage.getItem('user') : null;
+      if (token && userData) {
         setIsAuthenticated(true);
         setUser(JSON.parse(userData));
       } else {
@@ -78,29 +90,30 @@ const Header = ({
     {
       id: 'discover',
       name: t('nav.discover'),
-      items: [
-        { label: t('nav.hotels'), href: '/hotels', isRoute: true },
-        { label: t('nav.destinations'), href: '/destinations', isRoute: true },
-        { label: t('nav.tours'), href: '/tours', isRoute: true },
-      ],
+      items: (content?.menus?.discover || []).filter((item) => item.url !== '/taxis').map((item) => ({
+        label: item.label,
+        href: item.url,
+        isRoute: item.isRoute,
+      })),
     },
     {
       id: 'pages',
       name: t('nav.pages'),
-      items: [
-        { label: t('nav.about'), href: '/about', isRoute: true },
-        { label: t('nav.reviews'), href: '/reviews', isRoute: true },
-        { label: t('nav.gallery'), href: '/gallery', isRoute: true },
-      ],
+      items: (content?.menus?.pages || []).map((item) => ({
+        label: item.label,
+        href: item.url,
+        isRoute: item.isRoute,
+      })),
     },
-  ];
+  ].filter((menu) => menu.items.length > 0);
 
-  const navItems = [
-    { icon: <FaHotel />, text: t('nav.hotel'), type: 'hotel', route: '/hotels' },
-    { icon: <FaPlane />, text: t('nav.flight'), type: 'flight', route: '/flights' },
-    { icon: <FaCar />, text: t('nav.tour'), type: 'tour', route: '/tours' },
-    { icon: <FaTaxi />, text: t('nav.taxi'), type: 'taxi', route: '#' },
-  ];
+  const navItems = (content?.menus?.quick || []).filter((item) => item.url !== '/taxis' && item.iconKey !== 'taxi').map((item) => ({
+    icon: QUICK_ICONS[item.iconKey] || <FaHotel />,
+    text: item.label,
+    type: item.iconKey || item.label,
+    route: item.url,
+    isRoute: item.isRoute,
+  }));
 
   const go = (href, isRoute = false) => {
     setMobileOpen(false);
@@ -115,9 +128,7 @@ const Header = ({
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
-    localStorage.removeItem('rememberMe');
+    clearAuthSession();
     setIsAuthenticated(false);
     setUser(null);
     setUserMenuOpen(false);
@@ -140,7 +151,11 @@ const Header = ({
       <div className="header-container">
         <div className="header-left">
           <Link className="logo" to="/">
-            <img src={logo} alt="AE Hotel" className="logo-image" />
+            {logo ? (
+              <img src={logo} alt={siteName} className="logo-image" />
+            ) : (
+              <span className="logo-text">{siteName}</span>
+            )}
           </Link>
 
           <nav className="main-nav">
@@ -179,7 +194,12 @@ const Header = ({
                 key={item.type}
                 className="quick-nav-btn"
                 onClick={() => {
-                  if (item.route && item.route !== '#') {
+                  if (item.isRoute && item.route && item.route !== '#') {
+                    navigate(item.route);
+                  } else if (item.route && item.route.startsWith('#')) {
+                    onServiceChange(item.type);
+                    go(item.route);
+                  } else if (item.route) {
                     navigate(item.route);
                   } else {
                     onServiceChange(item.type);
@@ -217,9 +237,9 @@ const Header = ({
               </button>
               {notesOpen && (
                 <div className="notes-panel">
-                  <p>{t('note.summer')}</p>
+                  {settings?.noticeSummer && <p>{settings.noticeSummer}</p>}
                   <p>{t('note.favorites', { count: favoriteCount })}</p>
-                  <p>{t('note.support')}</p>
+                  {settings?.noticeSupport && <p>{settings.noticeSupport}</p>}
                 </div>
               )}
             </div>

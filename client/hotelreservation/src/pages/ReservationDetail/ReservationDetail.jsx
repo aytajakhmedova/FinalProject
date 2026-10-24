@@ -1,9 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate, Link, useSearchParams, Navigate } from 'react-router-dom';
 import { FaArrowLeft, FaCalendarAlt, FaUsers, FaHotel, FaBed, FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaExclamationTriangle } from 'react-icons/fa';
-import { formatDate, calculateNights, getMinCheckInDate, getMinCheckOutDate, checkRoomAvailability, calculateRoomPrice } from '../../data/roomsData';
-import { getBookingById, updateBooking } from '../../utils/bookingsStore';
+import { getAuthToken } from '../../api/auth';
+import { deleteBooking, getBooking, updateBookingDetails } from '../../api/client';
 import './ReservationDetail.css';
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(String(dateString).slice(0, 10));
+  if (Number.isNaN(date.getTime())) return String(dateString);
+  const months = [
+    'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'İyun',
+    'İyul', 'Avqust', 'Sentyabr', 'Oktyabr', 'Noyabr', 'Dekabr',
+  ];
+  return `${date.getUTCDate()} ${months[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+};
+
+const dateInputValue = (value) => (value ? String(value).slice(0, 10) : '');
 
 const ReservationDetail = () => {
   const { id } = useParams();
@@ -11,6 +24,10 @@ const ReservationDetail = () => {
   const [searchParams] = useSearchParams();
   
   const [reservation, setReservation] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [actionError, setActionError] = useState('');
+  const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(searchParams.get('edit') === '1');
   const [showCancelModal, setShowCancelModal] = useState(false);
   
@@ -20,14 +37,47 @@ const ReservationDetail = () => {
   const [editGuests, setEditGuests] = useState(2);
 
   useEffect(() => {
-    const found = getBookingById(id);
-    if (found) {
-      setReservation(found);
-      setEditCheckIn(found.checkIn);
-      setEditCheckOut(found.checkOut);
-      setEditGuests(found.guests);
-    }
+    if (!getAuthToken()) return undefined;
+    let cancelled = false;
+    setLoading(true);
+    setLoadError('');
+    getBooking(id)
+      .then((found) => {
+        if (cancelled) return;
+        setReservation(found);
+        setEditCheckIn(dateInputValue(found.checkIn));
+        setEditCheckOut(dateInputValue(found.checkOut));
+        setEditGuests(found.guests || 1);
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          setReservation(null);
+          setLoadError(error.message || 'Rezervasiya yüklənmədi');
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
+
+  if (!getAuthToken()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (loading) {
+    return (
+      <div className="reservation-detail-page">
+        <div className="reservation-container">
+          <div className="no-reservation">
+            <h2>Rezervasiya yüklənir...</h2>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!reservation) {
     return (
@@ -35,7 +85,7 @@ const ReservationDetail = () => {
         <div className="reservation-container">
           <div className="no-reservation">
             <FaExclamationTriangle />
-            <h2>Rezervasiya tapılmadı</h2>
+            <h2>{loadError || 'Rezervasiya tapılmadı'}</h2>
             <Link to="/dashboard" className="btn-back-dashboard">
               Dashboard-a qayıt
             </Link>
@@ -45,53 +95,48 @@ const ReservationDetail = () => {
     );
   }
 
-  const canEdit = reservation.status === 'confirmed';
+  const bookingType = (reservation.bookingType || 'hotel').toLowerCase();
+  const canEdit = bookingType === 'hotel' && reservation.status === 'confirmed';
   const canCancel = reservation.status === 'confirmed';
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editCheckIn || !editCheckOut || editCheckOut <= editCheckIn) {
-      alert('Çıxış tarixi girişdən sonra olmalıdır');
+      setActionError('Çıxış tarixi girişdən sonra olmalıdır');
       return;
     }
 
-    const available = checkRoomAvailability(
-      reservation.roomId,
-      editCheckIn,
-      editCheckOut,
-      reservation.id
-    );
-    if (!available) {
-      alert('Bu tarixlər üçün otaq artıq doludur');
-      return;
-    }
-
-    const pricePerNight = reservation.room?.pricePerNight || reservation.pricePerNight || 0;
-    const priceBreakdown = calculateRoomPrice(pricePerNight, editCheckIn, editCheckOut, editGuests);
-    const updatedReservation = updateBooking(reservation.id, {
-      checkIn: editCheckIn,
-      checkOut: editCheckOut,
-      guests: editGuests,
-      nights: priceBreakdown.nights,
-      totalPrice: priceBreakdown.total,
-      priceBreakdown,
-    });
-
-    if (updatedReservation) {
+    setSaving(true);
+    setActionError('');
+    try {
+      const updatedReservation = await updateBookingDetails(reservation.id, {
+        checkIn: editCheckIn,
+        checkOut: editCheckOut,
+        guests: editGuests,
+        specialRequests: reservation.specialRequests || '',
+      });
       setReservation(updatedReservation);
+      setEditCheckIn(dateInputValue(updatedReservation.checkIn));
+      setEditCheckOut(dateInputValue(updatedReservation.checkOut));
+      setEditGuests(updatedReservation.guests || 1);
       setIsEditing(false);
-      alert('Rezervasiya uğurla yeniləndi!');
+    } catch (error) {
+      setActionError(error.message || 'Rezervasiya yenilənmədi');
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleCancelBooking = () => {
-    const updatedReservation = updateBooking(reservation.id, {
-      status: 'cancelled',
-      cancelledAt: new Date().toISOString(),
-    });
-    if (updatedReservation) {
-      setReservation(updatedReservation);
+  const handleCancelBooking = async () => {
+    setSaving(true);
+    setActionError('');
+    try {
+      await deleteBooking(reservation.id);
+      setReservation({ ...reservation, status: 'cancelled' });
       setShowCancelModal(false);
-      alert('Rezervasiya ləğv edildi');
+    } catch (error) {
+      setActionError(error.message || 'Rezervasiya ləğv edilmədi');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -162,7 +207,6 @@ const ReservationDetail = () => {
                         <input
                           type="date"
                           value={editCheckIn}
-                          min={getMinCheckInDate()}
                           onChange={(e) => setEditCheckIn(e.target.value)}
                           className="edit-input"
                         />
@@ -173,7 +217,6 @@ const ReservationDetail = () => {
                         <input
                           type="date"
                           value={editCheckOut}
-                          min={getMinCheckOutDate(editCheckIn)}
                           onChange={(e) => setEditCheckOut(e.target.value)}
                           className="edit-input"
                         />
@@ -195,9 +238,10 @@ const ReservationDetail = () => {
                       </div>
                     </div>
 
+                    {actionError && <p className="warning-text">{actionError}</p>}
                     <div className="edit-actions">
-                      <button onClick={handleSaveEdit} className="btn-save">
-                        <FaCheckCircle /> Yadda saxla
+                      <button onClick={handleSaveEdit} className="btn-save" disabled={saving}>
+                        <FaCheckCircle /> {saving ? 'Yenilənir...' : 'Yadda saxla'}
                       </button>
                       <button onClick={() => setIsEditing(false)} className="btn-cancel-edit">
                         Ləğv et
@@ -290,39 +334,22 @@ const ReservationDetail = () => {
 
               <div className="summary-rows">
                 <div className="summary-row">
-                  <span>{reservation.nights} gecə</span>
-                  <span>₼{reservation.priceBreakdown?.basePrice ?? reservation.totalPrice}</span>
-                </div>
-
-                {reservation.priceBreakdown?.extraGuestFee > 0 && (
-                  <div className="summary-row">
-                    <span>Əlavə qonaq</span>
-                    <span>₼{reservation.priceBreakdown.extraGuestFee}</span>
-                  </div>
-                )}
-
-                <div className="summary-row">
-                  <span>Ara cəm</span>
-                  <span>₼{reservation.priceBreakdown?.subtotal ?? reservation.totalPrice}</span>
-                </div>
-
-                <div className="summary-row">
-                  <span>Vergi (18%)</span>
-                  <span>₼{reservation.priceBreakdown?.tax ?? 0}</span>
+                  <span>{reservation.nights > 0 ? `${reservation.nights} gecə` : 'Məbləğ'}</span>
+                  <span>₼{reservation.totalPrice}</span>
                 </div>
 
                 <div className="summary-divider"></div>
 
                 <div className="summary-row summary-total">
                   <span>Yekun</span>
-                  <strong>₼{reservation.priceBreakdown?.total ?? reservation.totalPrice}</strong>
+                  <strong>₼{reservation.totalPrice}</strong>
                 </div>
               </div>
             </div>
 
             <div className="booking-info-card">
               <h4>Rezervasiya Tarixi</h4>
-              <p>{new Date(reservation.bookingDate).toLocaleDateString('az-AZ')}</p>
+              <p>{reservation.createdAt ? new Date(reservation.createdAt).toLocaleDateString('az-AZ') : '—'}</p>
             </div>
           </aside>
         </div>
@@ -339,10 +366,11 @@ const ReservationDetail = () => {
             <div className="modal-body">
               <p>Bu rezervasiyanı ləğv etmək istədiyinizdən əminsiniz?</p>
               <p className="warning-text">Bu əməliyyat geri qaytarıla bilməz.</p>
+              {actionError && <p className="warning-text">{actionError}</p>}
             </div>
             <div className="modal-actions">
-              <button onClick={handleCancelBooking} className="btn-confirm-cancel">
-                Bəli, ləğv et
+              <button onClick={handleCancelBooking} className="btn-confirm-cancel" disabled={saving}>
+                {saving ? 'Ləğv edilir...' : 'Bəli, ləğv et'}
               </button>
               <button onClick={() => setShowCancelModal(false)} className="btn-keep">
                 Xeyr, saxla

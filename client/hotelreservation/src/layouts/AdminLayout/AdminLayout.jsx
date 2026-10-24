@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   FaHome, 
@@ -11,10 +11,13 @@ import {
   FaTimes,
   FaSignOutAlt,
   FaChartBar,
-  FaCalendarAlt
+  FaCalendarAlt,
+  FaPlane,
+  FaMapMarkedAlt
 } from 'react-icons/fa';
 import './AdminLayout.css';
 import { useLanguage } from '../../context/LanguageContext';
+import { clearAuthSession, isAdminSession } from '../../api/auth';
 
 const AdminLayout = () => {
   const { t } = useLanguage();
@@ -22,13 +25,22 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isAdmin = isAdminSession();
+
+  useEffect(() => {
+    if (isAdmin) return;
+    const next = `${location.pathname}${location.search}`;
+    navigate(`/login?next=${encodeURIComponent(next)}`, { replace: true });
+  }, [isAdmin, location.pathname, location.search, navigate]);
 
   const menuItems = [
     { path: '/admin', icon: <FaHome />, label: 'Dashboard', exact: true },
     { path: '/admin/oteller', icon: <FaHotel />, label: t('admin.hotels') },
     { path: '/admin/hotels', icon: <FaBed />, label: t('admin.rooms') },
-    { path: '/admin/bookings', icon: <FaCalendarCheck />, label: t('admin.bookings') },
-    { path: '/admin/occupancy', icon: <FaCalendarAlt />, label: t('admin.occupancy') },
+    { path: '/admin/rezervasiyalar', icon: <FaCalendarCheck />, label: t('admin.bookings') },
+    { path: '/admin/teqvim', icon: <FaCalendarAlt />, label: t('admin.occupancy') },
+    { path: '/admin/ucuslar', icon: <FaPlane />, label: 'Uçuşlar' },
+    { path: '/admin/turlar', icon: <FaMapMarkedAlt />, label: 'Turlar' },
     { path: '/admin/users', icon: <FaUsers />, label: t('admin.users') },
     { path: '/admin/analytics', icon: <FaChartBar />, label: t('admin.analytics') },
     { path: '/admin/settings', icon: <FaCog />, label: t('admin.settings') },
@@ -42,10 +54,13 @@ const AdminLayout = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('user');
+    clearAuthSession();
     navigate('/login');
   };
+
+  if (!isAdmin) {
+    return null;
+  }
 
   return (
     <div className="admin-layout">

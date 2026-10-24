@@ -186,6 +186,7 @@ const AdminHotels = () => {
                 onChange={(e) => setEditing({ ...editing, hotelId: Number(e.target.value) })}
                 required
               >
+                <option value="" disabled>Otel seçin</option>
                 {hotels.map((item) => (
                   <option key={item.id} value={item.id}>{item.title}</option>
                 ))}

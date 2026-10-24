@@ -97,3 +97,9 @@
   border: 1px solid var(--border-color);
   color: var(--text-primary);
 }
+
+.success-extra-error {
+  color: #b45309;
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}

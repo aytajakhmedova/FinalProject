@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { FaSearch, FaFilter, FaSort } from 'react-icons/fa';
 import HotelCard from '../../components/common/HotelCard/HotelCard';
 import { getHotels } from '../../api/client';
-import { getHotels as getLocalHotels } from '../../data/hotelsData';
 import { useLanguage } from '../../context/LanguageContext';
 import './Hotels.css';
 
@@ -27,29 +26,21 @@ const Hotels = () => {
 
   useEffect(() => {
     let active = true;
-    getHotels({ checkIn, checkOut, guests })
+    getHotels({ city: searchParams.get('location'), checkIn, checkOut, guests })
       .then((data) => {
         if (!active) return;
         setLoadError('');
         setHotels(data);
       })
-      .catch(() => {
+      .catch((error) => {
         if (!active) return;
-        setLoadError('');
-        setHotels(
-          getLocalHotels().map((hotel) => ({
-            ...hotel,
-            rooms: (hotel.rooms || []).map((room) => ({
-              ...room,
-              isAvailable: room.isAvailable ?? room.available !== false,
-            })),
-          }))
-        );
+        setHotels([]);
+        setLoadError(error.message || 'Otellər yüklənmədi.');
       });
     return () => {
       active = false;
     };
-  }, [checkIn, checkOut, guests]);
+  }, [checkIn, checkOut, guests, searchParams]);
 
   const guestCount = parseInt(guests, 10) || 1;
 
@@ -104,7 +95,7 @@ const Hotels = () => {
         <div className="hotels-container">
           <h1 className="hotels-page-title">{t('hotels.title')}</h1>
           <p className="hotels-page-subtitle">
-            {t('hotels.found', { count: sortedHotels.length })}
+            {loadError || t('hotels.found', { count: sortedHotels.length })}
           </p>
 
           <div className="hotels-search-bar">

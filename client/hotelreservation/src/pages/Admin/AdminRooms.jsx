@@ -131,7 +131,7 @@ const AdminRooms = () => {
                       <strong>{room.name}</strong>
                       <div className="muted">{room.size} · {room.bedType}</div>
                     </td>
-                    <td>{hotelName(room.hotelId)}</td>
+                    <td>{room.hotelName || hotelName(room.hotelId)}</td>
                     <td>{room.capacity} nəfər</td>
                     <td>₼{room.pricePerNight}</td>
                     <td>{room.available === false ? 'Bağlı' : 'Açıq'}</td>
@@ -164,6 +164,7 @@ const AdminRooms = () => {
                 onChange={(e) => setEditing({ ...editing, hotelId: Number(e.target.value) })}
                 required
               >
+                <option value="" disabled>Otel seçin</option>
                 {hotels.map((hotel) => (
                   <option key={hotel.id} value={hotel.id}>{hotel.title}</option>
                 ))}
