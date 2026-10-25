@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation, Navigate } from 'react-router-dom';
 import { FaCheckCircle, FaHotel, FaCalendarAlt, FaUsers, FaPlane, FaMapMarkedAlt } from 'react-icons/fa';
 import { formatDate } from '../../data/roomsData';
+import { printBookingReceipt } from '../../utils/printReceipt';
 import './BookingSuccess.css';
 
 const BookingSuccess = () => {
@@ -14,7 +15,7 @@ const BookingSuccess = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const confirmation = booking.confirmationNumber || booking.id;
+  const confirmation = booking.code || booking.confirmationNumber || booking.id;
   const hotelName = booking.hotelName || booking.hotel?.name || booking.hotel?.title;
   const roomName = booking.roomType || booking.room?.name;
   const total = booking.totalPrice ?? booking.priceBreakdown?.total ?? 0;
@@ -59,8 +60,17 @@ const BookingSuccess = () => {
         </div>
 
         {extrasError && <p className="success-extra-error">{extrasError} Otel rezervasiyan yadda qaldı.</p>}
+        <p className="success-lead">
+          {booking.emailSent
+            ? `PDF sənəd ${booking.guestEmail || 'email'} ünvanına göndərildi.`
+            : 'PDF emailə göndərilmədi. SMTP (Gmail) qoşulmayıb və ya qonaq email real deyil.'}
+          {' '}Kart ödənişi demo rejimindədir.
+        </p>
 
         <div className="success-actions">
+          <button type="button" className="btn-success-secondary" onClick={() => printBookingReceipt(booking)}>
+            PDF / sənəd
+          </button>
           <Link to={`/reservations/${booking.id}`} className="btn-success-primary">
             Rezervasiyaya bax
           </Link>
