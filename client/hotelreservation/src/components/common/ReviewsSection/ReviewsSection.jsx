@@ -4,16 +4,17 @@ import { FaStar, FaEdit } from 'react-icons/fa';
 import RatingStars from '../RatingStars/RatingStars';
 import ReviewCard from '../ReviewCard/ReviewCard';
 import ReviewForm from '../ReviewForm/ReviewForm';
-import { addStayReview, getReviewableStays, getReviewsForHotel } from '../../../utils/reviewsStore';
+import { addStayReview, getReviewsForHotel } from '../../../utils/reviewsStore';
+import { createReview, getHotelReviews, getMyBookings } from '../../../api/client';
+import { getAuthToken } from '../../../api/auth';
 import './ReviewsSection.css';
 
-const currentUser = () => {
-  try {
-    return JSON.parse(localStorage.getItem('user') || 'null');
-  } catch {
-    return null;
-  }
-};
+const normalizeReview = (item) => ({
+  ...item,
+  userName: item.userName || item.guestName || 'Qonaq',
+  date: item.date || item.createdAt,
+  verified: item.verified !== false,
+});
 
 const ReviewsSection = ({ hotelId }) => {
   const navigate = useNavigate();
@@ -22,12 +23,34 @@ const ReviewsSection = ({ hotelId }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [stays, setStays] = useState([]);
 
-  const refresh = () => {
-    const loggedIn = localStorage.getItem('isAuthenticated') === 'true';
-    const email = currentUser()?.email || '';
+  const refresh = async () => {
+    const loggedIn = Boolean(getAuthToken());
     setIsAuthenticated(loggedIn);
-    setReviewsList(getReviewsForHotel(hotelId));
-    setStays(loggedIn ? getReviewableStays(hotelId, email) : []);
+    let apiReviews = [];
+    try {
+      apiReviews = await getHotelReviews(hotelId);
+    } catch {
+      apiReviews = [];
+    }
+    const local = getReviewsForHotel(hotelId);
+    const merged = [...(Array.isArray(apiReviews) ? apiReviews : []).map(normalizeReview), ...local.map(normalizeReview)]
+      .filter((item, index, list) => list.findIndex((row) => String(row.id) === String(item.id) && String(row.bookingId || '') === String(item.bookingId || '')) === index);
+    setReviewsList(merged);
+    if (!loggedIn) {
+      setStays([]);
+      return;
+    }
+    try {
+      const mine = await getMyBookings();
+      const reviewed = new Set(merged.map((item) => String(item.bookingId || '')).filter(Boolean));
+      setStays((Array.isArray(mine) ? mine : []).filter((booking) =>
+        String(booking.hotelId) === String(hotelId) &&
+        booking.status === 'checked-out' &&
+        !reviewed.has(String(booking.id))
+      ));
+    } catch {
+      setStays([]);
+    }
   };
 
   useEffect(() => {
@@ -55,20 +78,28 @@ const ReviewsSection = ({ hotelId }) => {
     return total > 0 ? (count / total) * 100 : 0;
   };
 
-  const handleSubmitReview = (newReview) => {
-    // Double-check authentication before processing
-    const authStatus = localStorage.getItem('isAuthenticated');
-    if (authStatus !== 'true') {
+  const handleSubmitReview = async (newReview) => {
+    if (!getAuthToken()) {
       alert('Rəy yazmaq üçün daxil olmalısınız');
       navigate('/login', { state: { from: window.location.pathname } });
       return;
     }
     
     try {
-      addStayReview({ ...newReview, hotelId });
+      await createReview({
+        hotelId,
+        bookingId: newReview.bookingId,
+        rating: newReview.rating,
+        title: newReview.title,
+        comment: newReview.comment,
+      });
     } catch (error) {
-      alert(error.message);
-      return;
+      try {
+        addStayReview({ ...newReview, hotelId });
+      } catch (localError) {
+        alert(error.message || localError.message);
+        return;
+      }
     }
     setShowReviewForm(false);
     refresh();
@@ -76,8 +107,7 @@ const ReviewsSection = ({ hotelId }) => {
   };
 
   const handleWriteReviewClick = () => {
-    const authStatus = localStorage.getItem('isAuthenticated');
-    if (authStatus !== 'true') {
+    if (!getAuthToken()) {
       if (window.confirm('Rəy yazmaq üçün daxil olmalısınız. Login səhifəsinə keçmək istəyirsiniz?')) {
         navigate('/login', { state: { from: window.location.pathname } });
       }

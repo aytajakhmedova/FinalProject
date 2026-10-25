@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RatingStars from '../RatingStars/RatingStars';
+import { getAuthToken } from '../../../api/auth';
 import './ReviewForm.css';
 
 const ReviewForm = ({ onSubmit, onCancel, stays = [] }) => {
@@ -17,8 +18,7 @@ const ReviewForm = ({ onSubmit, onCancel, stays = [] }) => {
 
   // Check authentication on mount
   useEffect(() => {
-    const authStatus = localStorage.getItem('isAuthenticated');
-    if (authStatus !== 'true') {
+    if (!getAuthToken()) {
       alert('Rəy yazmaq üçün daxil olmalısınız');
       navigate('/login', { state: { from: window.location.pathname } });
     }
@@ -69,8 +69,7 @@ const ReviewForm = ({ onSubmit, onCancel, stays = [] }) => {
     e.stopPropagation();
 
     // Critical authentication check - must be first
-    const authStatus = localStorage.getItem('isAuthenticated');
-    if (authStatus !== 'true') {
+    if (!getAuthToken()) {
       alert('Rəy yazmaq üçün daxil olmalısınız');
       navigate('/login', { state: { from: window.location.pathname } });
       return;
@@ -129,7 +128,7 @@ const ReviewForm = ({ onSubmit, onCancel, stays = [] }) => {
           >
             {stays.map((stay) => (
               <option key={stay.id} value={stay.id}>
-                {stay.confirmationNumber || stay.id} · {stay.roomType || stay.room?.name || 'Otaq'} · {stay.checkIn} — {stay.checkOut}
+                {stay.code || stay.confirmationNumber || stay.id} · {stay.roomName || stay.roomType || stay.room?.name || 'Otaq'} · {stay.checkIn} — {stay.checkOut}
               </option>
             ))}
           </select>
