@@ -161,7 +161,19 @@ const HotelDetail = () => {
                   <span className="info-label">Ünvan:</span>
                   <span className="info-value">{hotel.address}</span>
                 </div>
+                <div className="info-item">
+                  <span className="info-label">Ləğv qaydası:</span>
+                  <span className="info-value">{hotel.cancellationPolicy || 'Check-in tarixindən əvvəl ləğv etmək olar.'}</span>
+                </div>
               </div>
+              {(hotel.address || hotel.location || hotel.city) && (
+                <iframe
+                  title="Otel xəritəsi"
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(`${hotel.address || hotel.location || ''}, ${hotel.city || ''}, ${hotel.country || ''}`)}&z=14&output=embed`}
+                  style={{ width: '100%', height: 240, border: 0, borderRadius: 12, marginTop: 16 }}
+                  loading="lazy"
+                />
+              )}
             </section>
 
             {/* Available Rooms */}
