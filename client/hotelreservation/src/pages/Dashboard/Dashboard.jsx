@@ -5,6 +5,7 @@ import { hasReviewForBooking } from '../../utils/reviewsStore';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAuthToken } from '../../api/auth';
 import { deleteBooking, getHotels, getMyBookings } from '../../api/client';
+import { printBookingReceipt } from '../../utils/printReceipt';
 import './Dashboard.css';
 
 const bookingTypeOf = (reservation) => (reservation.bookingType || 'hotel').toLowerCase();
@@ -335,6 +336,13 @@ const Dashboard = () => {
                           >
                             {t('dash.details')}
                           </Link>
+                          <button
+                            type="button"
+                            className="btn-modify-reservation"
+                            onClick={() => printBookingReceipt(reservation)}
+                          >
+                            PDF
+                          </button>
                           {reservation.status === 'checked-out' && type === 'hotel' && !hasReviewForBooking(reservation.id) && (
                             <Link
                               to={`/hotels/${reservation.hotelId}#reviews`}
@@ -382,7 +390,7 @@ const Dashboard = () => {
                 <p><strong>{bookingTitle(selectedReservation)}</strong></p>
                 <p>{selectedReservation.checkIn} - {selectedReservation.checkOut || selectedReservation.checkIn}</p>
                 <p className="modal-warning">
-                  ⚠️ {t('dash.cancelWarn')}
+                  ⚠️ {t('dash.cancelWarn')} Yalnız check-in tarixindən əvvəl.
                 </p>
                 {cancelError && <p className="modal-warning">{cancelError}</p>}
               </div>

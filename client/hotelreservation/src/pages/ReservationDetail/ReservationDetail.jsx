@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, useSearchParams, Navigate } from 'react-router-dom';
 import { FaArrowLeft, FaCalendarAlt, FaUsers, FaHotel, FaBed, FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { getAuthToken } from '../../api/auth';
-import { deleteBooking, getBooking, updateBookingDetails } from '../../api/client';
+import { deleteBooking, emailBookingReceipt, getBooking, updateBookingDetails } from '../../api/client';
+import { printBookingReceipt } from '../../utils/printReceipt';
 import './ReservationDetail.css';
 
 const formatDate = (dateString) => {
@@ -28,6 +29,8 @@ const ReservationDetail = () => {
   const [loadError, setLoadError] = useState('');
   const [actionError, setActionError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [emailing, setEmailing] = useState(false);
+  const [emailMessage, setEmailMessage] = useState('');
   const [isEditing, setIsEditing] = useState(searchParams.get('edit') === '1');
   const [showCancelModal, setShowCancelModal] = useState(false);
   
@@ -126,6 +129,21 @@ const ReservationDetail = () => {
     }
   };
 
+  const handleEmailReceipt = async () => {
+    setEmailing(true);
+    setActionError('');
+    setEmailMessage('');
+    try {
+      const updated = await emailBookingReceipt(reservation.id);
+      setReservation(updated);
+      setEmailMessage(`PDF ${updated.guestEmail} ünvanına göndərildi.`);
+    } catch (error) {
+      setActionError(error.message || 'PDF emailə göndərilmədi');
+    } finally {
+      setEmailing(false);
+    }
+  };
+
   const handleCancelBooking = async () => {
     setSaving(true);
     setActionError('');
@@ -175,7 +193,7 @@ const ReservationDetail = () => {
             <div className="info-card">
               <div className="card-header">
                 <h2>Rezervasiya Məlumatları</h2>
-                <div className="confirmation-number">#{reservation.confirmationNumber || reservation.id}</div>
+                <div className="confirmation-number">#{reservation.code || reservation.confirmationNumber || reservation.id}</div>
               </div>
 
               <div className="hotel-room-info">
@@ -191,7 +209,7 @@ const ReservationDetail = () => {
                   <FaBed className="info-icon" />
                   <div>
                     <span className="info-label">Otaq</span>
-                    <strong>{reservation.room?.name || reservation.roomType}</strong>
+                    <strong>{reservation.room?.name || reservation.roomName || reservation.roomType}</strong>
                   </div>
                 </div>
               </div>
@@ -313,6 +331,14 @@ const ReservationDetail = () => {
             {/* Action Buttons */}
             {!isEditing && (
               <div className="action-buttons">
+                <button type="button" className="btn-edit" onClick={() => printBookingReceipt(reservation)}>
+                  PDF / sənəd
+                </button>
+                <button type="button" className="btn-edit" onClick={handleEmailReceipt} disabled={emailing}>
+                  {emailing ? 'Göndərilir...' : 'PDF-i emailə göndər'}
+                </button>
+                {emailMessage && <p className="warning-text">{emailMessage}</p>}
+                {actionError && <p className="warning-text">{actionError}</p>}
                 {canEdit && (
                   <button onClick={() => setIsEditing(true)} className="btn-edit">
                     <FaEdit /> Redaktə Et
@@ -340,6 +366,10 @@ const ReservationDetail = () => {
 
                 <div className="summary-divider"></div>
 
+                <div className="summary-row">
+                  <span>Ödəniş</span>
+                  <span>{reservation.paymentMethod || '—'} · {reservation.paymentStatus || '—'}</span>
+                </div>
                 <div className="summary-row summary-total">
                   <span>Yekun</span>
                   <strong>₼{reservation.totalPrice}</strong>
@@ -365,7 +395,7 @@ const ReservationDetail = () => {
             </div>
             <div className="modal-body">
               <p>Bu rezervasiyanı ləğv etmək istədiyinizdən əminsiniz?</p>
-              <p className="warning-text">Bu əməliyyat geri qaytarıla bilməz.</p>
+              <p className="warning-text">Yalnız check-in tarixindən əvvəl ləğv etmək olar. Bu əməliyyat geri qaytarıla bilməz.</p>
               {actionError && <p className="warning-text">{actionError}</p>}
             </div>
             <div className="modal-actions">
