@@ -13,6 +13,7 @@ import theme5 from '../assets/images/hotelimg1.jfif';
 import theme6 from '../assets/images/hotelimg6.jfif';
 import theme9 from '../assets/images/hotelimg7.jfif';
 import theme10 from '../assets/images/hotelimg2.jfif';
+import { MEDIA } from './localMedia';
 import cityTowerVideo from '../assets/videos/aehotel-promo.mp4';
 import seaPoolVideo from '../assets/videos/videi2.mp4';
 import mountainVideo from '../assets/videos/video1.mp4';
@@ -190,7 +191,7 @@ export const DESTINATIONS = [
   },
   {
     country: 'Türkiyə',
-    image: theme4,
+    image: MEDIA.tourCastleDay,
     description: 'Qiymətlər 2 yetişkin üçün gecəlik orta göstəricidir.',
     months: [
       { name: 'Fevral', priceRange: '₺2.380 – ₺11.300' },
@@ -203,7 +204,7 @@ export const DESTINATIONS = [
   },
   {
     country: 'İtaliya',
-    image: theme9,
+    image: MEDIA.tourGondolas,
     description: 'Qiymətlər 2 yetişkin üçün gecəlik orta göstəricidir.',
     months: [
       { name: 'Fevral', priceRange: '€180 – €850' },
@@ -216,7 +217,7 @@ export const DESTINATIONS = [
   },
   {
     country: 'İspaniya',
-    image: theme5,
+    image: MEDIA.tourCastleNight,
     description: 'Qiymətlər 2 yetişkin üçün gecəlik orta göstəricidir.',
     months: [
       { name: 'Fevral', priceRange: '€170 – €820' },
@@ -229,7 +230,7 @@ export const DESTINATIONS = [
   },
   {
     country: 'Yunanıstan',
-    image: theme10,
+    image: MEDIA.tourBoats,
     description: 'Qiymətlər 2 yetişkin üçün gecəlik orta göstəricidir.',
     months: [
       { name: 'Fevral', priceRange: '€160 – €780' },

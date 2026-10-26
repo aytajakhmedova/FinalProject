@@ -2,9 +2,29 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaMapMarkerAlt, FaStar, FaHeart } from 'react-icons/fa';
 import RatingStars from '../RatingStars/RatingStars';
+import { useLanguage } from '../../../context/LanguageContext';
 import './HotelCard.css';
 
+const AMENITY_KEYS = {
+  Spa: 'hotels.amSpa',
+  Hovuz: 'hotels.amPool',
+  'Wi-Fi': 'hotels.amWifi',
+  Restoran: 'hotels.amRest',
+  Fitness: 'hotels.amFit',
+  Plaj: 'hotels.amBeach',
+  Parking: 'hotels.amPark',
+  Bar: 'hotels.amBar',
+};
+
+const TYPE_KEYS = {
+  Lüks: 'hotels.typeLuxury',
+  Wellness: 'hotels.typeWellness',
+  'Ailə': 'hotels.typeFamily',
+  'Şəhər': 'hotels.typeCity',
+};
+
 const HotelCard = ({ hotel, currency = 'AZN', queryString = '' }) => {
+  const { t } = useLanguage();
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
 
@@ -36,11 +56,11 @@ const HotelCard = ({ hotel, currency = 'AZN', queryString = '' }) => {
               <FaHeart />
             </button>
             {hotel.hotelType && (
-              <span className="hotel-card-badge">{hotel.hotelType}</span>
+              <span className="hotel-card-badge">{TYPE_KEYS[hotel.hotelType] ? t(TYPE_KEYS[hotel.hotelType]) : hotel.hotelType}</span>
             )}
             {displayImages.length > 1 && (
               <div className="hotel-image-count">
-                📷 {displayImages.length} şəkil
+                📷 {t('hotels.photos', { count: displayImages.length })}
               </div>
             )}
           </div>
@@ -63,26 +83,26 @@ const HotelCard = ({ hotel, currency = 'AZN', queryString = '' }) => {
 
           <div className="hotel-card-rating">
             <RatingStars rating={hotel.rating} size="0.9rem" />
-            <span className="review-count">({hotel.reviews} rəy)</span>
+            <span className="review-count">{t('hotels.reviews', { count: hotel.reviews })}</span>
           </div>
 
           <div className="hotel-card-amenities">
             {hotel.amenities.slice(0, 4).map((amenity, idx) => (
-              <span key={idx} className="amenity-tag">{amenity}</span>
+              <span key={idx} className="amenity-tag">{AMENITY_KEYS[amenity] ? t(AMENITY_KEYS[amenity]) : amenity}</span>
             ))}
           </div>
 
           <div className="hotel-card-footer">
             <div className="hotel-card-price">
-              <span className="price-label">Gecəlik</span>
+              <span className="price-label">{t('hotels.nightly')}</span>
               <span className="price-amount">{formatPrice(hotel.pricePerNight)}</span>
             </div>
             <div className="hotel-card-actions">
               <Link to={`/hotels/${hotel.id}${queryString}`} className="btn-detail">
-                Ətraflı bax
+                {t('hotels.details')}
               </Link>
               <Link to={`/hotels/${hotel.id}${queryString}#rooms`} className="btn-book">
-                Rezervasiya et
+                {t('hotels.book')}
               </Link>
             </div>
           </div>

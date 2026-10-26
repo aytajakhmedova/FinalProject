@@ -1,22 +1,20 @@
 import HolidaySection from '../../components/HolidaySection/HolidaySection';
-import imgStay from '../../assets/images/hotelimg3.jfif';
-import imgPool from '../../assets/images/hotelimg6.jfif';
-import imgSuite from '../../assets/images/hotelimg7.jfif';
+import { MEDIA } from '../../data/localMedia';
 import '../contentPages.css';
 
 const stories = [
   {
-    image: imgStay,
+    image: MEDIA.aeHotel,
     title: 'Otel, uçuş və tur bir yerdə',
     text: 'Qalmağı, uçuşu və transferi ayrı-ayrı axtarmağa ehtiyac qalmır. Hamısı bir bronun içindədir.',
   },
   {
-    image: imgPool,
+    image: MEDIA.hotelDining,
     title: 'Şəhər və dəniz mənzərəsi',
     text: 'Bakıdan Dubaya qədər hovuz, suit və gecə işıqları olan otelləri bir kolleksiyada toplayırıq.',
   },
   {
-    image: imgSuite,
+    image: MEDIA.tourBalloons,
     title: 'Səyahət boyu dəstək',
     text: 'Girişdən çıxışa qədər Azərbaycan dilində yazın. Sualınız gecə də cavabsız qalmır.',
   },

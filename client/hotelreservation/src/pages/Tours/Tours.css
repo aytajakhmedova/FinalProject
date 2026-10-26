@@ -5,7 +5,9 @@
 
 /* Hero Section */
 .tours-hero {
-  background: linear-gradient(135deg, #1a1410 0%, #3a2118 100%);
+  background:
+    linear-gradient(180deg, rgba(26, 20, 16, 0.55) 0%, rgba(26, 20, 16, 0.78) 100%),
+    var(--tours-hero-image, linear-gradient(135deg, #1a1410 0%, #3a2118 100%)) center/cover no-repeat;
   padding: 6rem 2rem 4rem;
   text-align: center;
   border-bottom: 1px solid var(--border-color);
@@ -77,15 +79,15 @@
   position: relative;
 }
 
-.search-icon {
-  position: absolute !important;
-  left: 1rem !important;
-  top: 50% !important;
-  transform: translateY(-50%) !important;
-  color: var(--text-secondary) !important;
-  font-size: 1.1rem !important;
-  pointer-events: none !important;
-  z-index: 1 !important;
+.tours-page .search-box .search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .search-input {
@@ -190,15 +192,20 @@
 .tour-card-image {
   position: relative;
   width: 100%;
-  height: 210px;
+  height: 250px;
   overflow: hidden;
   flex-shrink: 0;
+  background: #1a1410;
 }
 
 .tour-card-image img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  display: block;
   transition: transform 0.5s ease;
 }
 
@@ -432,7 +439,7 @@
   }
 
   .tour-card-image {
-    height: 190px;
+    height: 230px;
   }
 
   .tour-card-footer {
@@ -463,7 +470,7 @@
   }
 
   .tour-card-image {
-    height: 175px;
+    height: 220px;
   }
 
   .tour-card-info {

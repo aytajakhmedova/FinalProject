@@ -46,7 +46,7 @@ const Destinations = ({ onPickCity }) => {
                 <span className="arrow">›</span>
               </button>
             ))}
-            <p className="price-note">{activeDestination.description}</p>
+            <p className="price-note">{t('dest.note')}</p>
           </div>
         </div>
       </div>

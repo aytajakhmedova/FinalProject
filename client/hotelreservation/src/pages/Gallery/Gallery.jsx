@@ -1,29 +1,35 @@
 import { Link } from 'react-router-dom';
 import ImageGallery from '../../components/ImageGallery/ImageGallery';
+import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { resolveImage } from '../../api/client';
+import { GALLERY_EXTRAS } from '../../data/localMedia';
 import '../contentPages.css';
 
 const Gallery = () => {
+  const { t } = useLanguage();
   const { content, loading, error } = useSiteContent();
-  const photos = (content?.slides || []).map((slide) => ({
+  const seen = new Set();
+  const photos = [...(content?.slides || []).map((slide) => ({
     src: resolveImage(slide.imageUrl),
     caption: slide.title || slide.description,
-  })).filter((photo) => photo.src);
+  })), ...GALLERY_EXTRAS.map((item) => ({ src: item.src, caption: item.alt }))].filter((photo) => {
+    if (!photo.src || seen.has(photo.src)) return false;
+    seen.add(photo.src);
+    return true;
+  });
 
   return (
     <>
       <ImageGallery />
       <section className="fill-wrap">
-        <p className="fill-kicker">Kolleksiya</p>
-        <h2 className="fill-title">{content?.settings?.galleryTitle || 'Otel kadrları'}</h2>
-        {loading && <p className="fill-lead">Yüklənir...</p>}
+        <p className="fill-kicker">{t('gallery.kicker')}</p>
+        <h2 className="fill-title">{t('gallery.title')}</h2>
+        {loading && <p className="fill-lead">{t('common.loading')}</p>}
         {error && photos.length === 0 && <p className="fill-lead">{error}</p>}
         {photos.length > 0 && (
           <>
-            <p className="fill-lead">
-              Lobbidən hovuza, gecə işıqlarından suitə qədər. Şəklə baxıb bəyəndiyiniz oteli siyahıdan seçə bilərsiniz.
-            </p>
+            <p className="fill-lead">{t('gallery.lead')}</p>
             <div className="gallery-grid">
               {photos.map((photo) => (
                 <figure key={photo.caption + photo.src}>
@@ -35,7 +41,7 @@ const Gallery = () => {
           </>
         )}
         <p className="gallery-note">
-          <Link to="/hotels">Otellərə keç →</Link>
+          <Link to="/hotels">{t('footer.hotels')} →</Link>
         </p>
       </section>
     </>

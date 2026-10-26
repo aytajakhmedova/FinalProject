@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { FaStar, FaClock, FaMapMarkerAlt, FaUsers, FaSearch, FaFilter } from 'react-icons/fa';
 import { getTours } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
+import { MEDIA } from '../../data/localMedia';
 import './Tours.css';
 
 const Tours = () => {
@@ -68,11 +69,11 @@ const Tours = () => {
   return (
     <div className="tours-page">
       {/* Hero Section */}
-      <section className="tours-hero">
+      <section className="tours-hero" style={{ '--tours-hero-image': `url(${MEDIA.tourGondolas})` }}>
         <div className="tours-hero-content">
           <h1 className="tours-hero-title">{t('tours.title')}</h1>
           <p className="tours-hero-subtitle">
-            Azərbaycanın gözəl yerlərini kəşf edin
+            {t('tours.subtitle')}
           </p>
         </div>
       </section>
@@ -85,7 +86,7 @@ const Tours = () => {
               <FaSearch className="search-icon" />
               <input
                 type="text"
-                placeholder="Tur və ya təyinat axtar..."
+                placeholder={t('tours.searchPh')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
@@ -100,7 +101,7 @@ const Tours = () => {
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="filter-select"
                 >
-                  <option value="">Bütün Kateqoriyalar</option>
+                  <option value="">{t('tours.allCats')}</option>
                   {categories.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
@@ -113,18 +114,18 @@ const Tours = () => {
                   onChange={(e) => setSortBy(e.target.value)}
                   className="filter-select"
                 >
-                  <option value="popular">Populyar</option>
-                  <option value="price-low">Qiymət (Aşağıdan)</option>
-                  <option value="price-high">Qiymət (Yuxarıdan)</option>
-                  <option value="rating">Reytinq</option>
-                  <option value="duration">Müddət</option>
+                  <option value="popular">{t('tours.popular')}</option>
+                  <option value="price-low">{t('tours.priceLow')}</option>
+                  <option value="price-high">{t('tours.priceHigh')}</option>
+                  <option value="rating">{t('tours.rating')}</option>
+                  <option value="duration">{t('tours.duration')}</option>
                 </select>
               </div>
             </div>
           </div>
 
           <p className="results-count">
-            {loading ? 'Yüklənir...' : loadError || `${sortedTours.length} tur tapıldı`}
+            {loading ? t('common.loading') : loadError || t('tours.found', { count: sortedTours.length })}
           </p>
         </div>
       </section>
@@ -166,17 +167,17 @@ const Tours = () => {
                       </div>
                       <div className="tour-guests">
                         <FaUsers />
-                        <span>{tour.minGuests}-{tour.maxGuests} nəfər</span>
+                        <span>{t('tours.people', { min: tour.minGuests, max: tour.maxGuests })}</span>
                       </div>
                     </div>
 
                     <div className="tour-card-footer">
                       <div className="tour-price">
-                        <span className="price-label">Başlanğıc qiymət</span>
+                        <span className="price-label">{t('tours.fromPrice')}</span>
                         <span className="price-amount">₼{tour.price}</span>
                       </div>
                       <button className="btn-tour-view">
-                        Ətraflı bax
+                        {t('tours.details')}
                       </button>
                     </div>
                   </div>
@@ -185,11 +186,11 @@ const Tours = () => {
             ))}
           </div>
 
-          {sortedTours.length === 0 && (
+          {!loading && sortedTours.length === 0 && (
             <div className="no-results">
               <div className="no-results-icon">🔍</div>
-              <h3>Tur tapılmadı</h3>
-              <p>Axtarış və ya filter parametrlərini dəyişin</p>
+              <h3>{t('tours.empty')}</h3>
+              <p>{t('tours.emptyHint')}</p>
             </div>
           )}
         </div>
