@@ -14,6 +14,7 @@ const emptyHotel = () => ({
   hotelType: '',
   checkInTime: '14:00',
   checkOutTime: '12:00',
+  cancellationPolicy: 'Check-in tarixindən əvvəl ləğv etmək olar.',
   imageFile: '',
   amenities: [],
 });
@@ -30,6 +31,7 @@ const toHotelRequest = (hotel) => ({
   hotelType: hotel.hotelType || '',
   checkInTime: hotel.checkInTime || '14:00',
   checkOutTime: hotel.checkOutTime || '12:00',
+  cancellationPolicy: hotel.cancellationPolicy || 'Check-in tarixindən əvvəl ləğv etmək olar.',
   imageFile: hotel.imageFile || '',
   amenities: hotel.amenities || [],
 });
@@ -272,6 +274,15 @@ const AdminHotelManager = () => {
                 value={editing.checkOutTime}
                 onChange={(e) => setEditing({ ...editing, checkOutTime: e.target.value })}
                 maxLength={10}
+              />
+            </label>
+            <label className="full">
+              Ləğv qaydası
+              <textarea
+                value={editing.cancellationPolicy || ''}
+                onChange={(e) => setEditing({ ...editing, cancellationPolicy: e.target.value })}
+                maxLength={1000}
+                rows={2}
               />
             </label>
             <label className="full">
