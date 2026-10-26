@@ -35,6 +35,7 @@ import AdminAnalytics from './pages/Admin/Analytics/AdminAnalytics';
 import AdminSettings from './pages/Admin/Settings/AdminSettings';
 import AdminFlights from './pages/Admin/Flights/AdminFlights';
 import AdminTours from './pages/Admin/Tours/AdminTours';
+import AdminDiscounts from './pages/Admin/Discounts/AdminDiscounts';
 import './App.css';
 
 function App() {
@@ -260,6 +261,7 @@ function App() {
             <Route path="flights" element={<AdminFlights />} />
             <Route path="turlar" element={<AdminTours />} />
             <Route path="tours" element={<AdminTours />} />
+            <Route path="paketler" element={<AdminDiscounts />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>
