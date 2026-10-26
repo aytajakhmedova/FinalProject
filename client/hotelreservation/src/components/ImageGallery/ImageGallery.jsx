@@ -1,15 +1,23 @@
 import React from 'react';
+import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { resolveImage } from '../../api/client';
+import { GALLERY_EXTRAS } from '../../data/localMedia';
 import './ImageGallery.css';
 
 const ImageGallery = () => {
+  const { t } = useLanguage();
   const { content, loading, error } = useSiteContent();
-  const title = content?.settings?.galleryTitle;
-  const images = (content?.slides || []).map((slide) => ({
+  const title = t('gallery.title');
+  const seen = new Set();
+  const images = [...(content?.slides || []).map((slide) => ({
     src: resolveImage(slide.imageUrl),
     alt: slide.title || slide.description,
-  })).filter((item) => item.src);
+  })), ...GALLERY_EXTRAS].filter((item) => {
+    if (!item.src || seen.has(item.src)) return false;
+    seen.add(item.src);
+    return true;
+  });
 
   if (error && images.length === 0) {
     return (
@@ -22,7 +30,7 @@ const ImageGallery = () => {
   if (loading && images.length === 0) {
     return (
       <section className="image-gallery-section" id="gallery">
-        <h2 className="gallery-title">Yüklənir...</h2>
+        <h2 className="gallery-title">{t('common.loading')}</h2>
       </section>
     );
   }

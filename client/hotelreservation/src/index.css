@@ -28,9 +28,9 @@ body {
   --bg-primary: #1a1410;
   --bg-secondary: #2a1f1a;
   --bg-card: #2a1f1a;
-  --text-primary: #f5e6d3;
-  --text-secondary: rgba(245, 230, 211, 0.85);
-  --text-muted: rgba(245, 230, 211, 0.6);
+  --text-primary: #e8c9a0;
+  --text-secondary: #d4b08c;
+  --text-muted: #c4a484;
   --border-color: rgba(139, 90, 60, 0.2);
   --hero-bg: radial-gradient(1200px 600px at 10% -10%, rgba(139, 90, 60, 0.25), transparent 50%),
     linear-gradient(160deg, #1a1410 0%, #2a1f1a 55%, #1a0f0a 100%);
