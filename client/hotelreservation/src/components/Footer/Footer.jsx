@@ -2,10 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaLinkedin, FaTwitter, FaInstagram, FaFacebook, FaMapMarkerAlt, FaEnvelope, FaPhone, FaArrowUp } from 'react-icons/fa';
 import { useSiteContent } from '../../context/SiteContentContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { resolveImage } from '../../api/client';
+import { menuLabel } from '../../i18n/menuLabel';
 import './Footer.css';
 
 const Footer = () => {
+  const { t } = useLanguage();
   const { content, loading, error } = useSiteContent();
   const settings = content?.settings;
   const logo = resolveImage(settings?.logoUrl);
@@ -19,14 +22,14 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-container">
         {error && !content && <p className="footer-description">{error}</p>}
-        {loading && !content && <p className="footer-description">Yüklənir...</p>}
+        {loading && !content && <p className="footer-description">{t('common.loading')}</p>}
         {settings && (
         <div className="footer-grid">
           <div className="footer-col">
             <div className="footer-logo">
               {logo ? <img src={logo} alt={settings.siteName} /> : <span>{settings.siteName}</span>}
             </div>
-            <p className="footer-description">{settings.footerDescription}</p>
+            <p className="footer-description">{t('footer.desc')}</p>
             <div className="footer-social">
               {settings.linkedInUrl && <a href={settings.linkedInUrl} className="social-icon" target="_blank" rel="noreferrer"><FaLinkedin /></a>}
               {settings.twitterUrl && <a href={settings.twitterUrl} className="social-icon" target="_blank" rel="noreferrer"><FaTwitter /></a>}
@@ -36,14 +39,14 @@ const Footer = () => {
           </div>
 
           <div className="footer-col">
-            <h3 className="footer-heading">{settings.footerLinksTitle}</h3>
+            <h3 className="footer-heading">{t('footer.links')}</h3>
             <ul className="footer-links">
               {links.map((item) => (
                 <li key={item.id}>
                   {item.isRoute ? (
-                    <Link to={item.url}>{item.label}</Link>
+                    <Link to={item.url}>{menuLabel(item, t)}</Link>
                   ) : (
-                    <a href={item.url}>{item.label}</a>
+                    <a href={item.url}>{menuLabel(item, t)}</a>
                   )}
                 </li>
               ))}
@@ -51,25 +54,25 @@ const Footer = () => {
           </div>
 
           <div className="footer-col">
-            <h3 className="footer-heading">{settings.footerHoursTitle}</h3>
+            <h3 className="footer-heading">{t('footer.hours')}</h3>
             <ul className="footer-hours">
               <li>
-                <span>{settings.hoursWeekdays}</span>
-                <span>{settings.hoursValue}</span>
+                <span>{t('footer.monFri')}</span>
+                <span>{t('footer.allDay')}</span>
               </li>
               <li>
-                <span>{settings.hoursSaturday}</span>
-                <span>{settings.hoursValue}</span>
+                <span>{t('footer.sat')}</span>
+                <span>{t('footer.allDay')}</span>
               </li>
               <li>
-                <span>{settings.hoursSunday}</span>
-                <span>{settings.hoursValue}</span>
+                <span>{t('footer.sun')}</span>
+                <span>{t('footer.allDay')}</span>
               </li>
             </ul>
           </div>
 
           <div className="footer-col">
-            <h3 className="footer-heading">{settings.footerContactTitle}</h3>
+            <h3 className="footer-heading">{t('footer.contact')}</h3>
             <ul className="footer-contact">
               {settings.contactAddress && (
                 <li>
@@ -97,8 +100,8 @@ const Footer = () => {
         <div className="footer-bottom">
           <p>{settings?.copyrightText}</p>
           <div className="footer-bottom-links">
-            {settings?.privacyUrl && <a href={settings.privacyUrl}>Məxfilik</a>}
-            {settings?.termsUrl && <a href={settings.termsUrl}>Şərtlər</a>}
+            {settings?.privacyUrl && <a href={settings.privacyUrl}>{t('footer.privacy')}</a>}
+            {settings?.termsUrl && <a href={settings.termsUrl}>{t('footer.terms')}</a>}
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { clearAuthSession, getAuthToken } from '../../api/auth';
 import { resolveImage } from '../../api/client';
+import { menuLabel } from '../../i18n/menuLabel';
 import './Header.css';
 
 const QUICK_ICONS = {
@@ -91,7 +92,7 @@ const Header = ({
       id: 'discover',
       name: t('nav.discover'),
       items: (content?.menus?.discover || []).filter((item) => item.url !== '/taxis').map((item) => ({
-        label: item.label,
+        label: menuLabel(item, t),
         href: item.url,
         isRoute: item.isRoute,
       })),
@@ -100,7 +101,7 @@ const Header = ({
       id: 'pages',
       name: t('nav.pages'),
       items: (content?.menus?.pages || []).map((item) => ({
-        label: item.label,
+        label: menuLabel(item, t),
         href: item.url,
         isRoute: item.isRoute,
       })),
@@ -109,7 +110,7 @@ const Header = ({
 
   const navItems = (content?.menus?.quick || []).filter((item) => item.url !== '/taxis' && item.iconKey !== 'taxi').map((item) => ({
     icon: QUICK_ICONS[item.iconKey] || <FaHotel />,
-    text: item.label,
+    text: menuLabel(item, t, { short: true }),
     type: item.iconKey || item.label,
     route: item.url,
     isRoute: item.isRoute,
@@ -237,9 +238,9 @@ const Header = ({
               </button>
               {notesOpen && (
                 <div className="notes-panel">
-                  {settings?.noticeSummer && <p>{settings.noticeSummer}</p>}
+                  <p>{t('note.summer')}</p>
                   <p>{t('note.favorites', { count: favoriteCount })}</p>
-                  {settings?.noticeSupport && <p>{settings.noticeSupport}</p>}
+                  <p>{t('note.support')}</p>
                 </div>
               )}
             </div>

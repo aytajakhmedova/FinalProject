@@ -31,3 +31,20 @@
   justify-content: flex-end;
   margin-bottom: 0.75rem;
 }
+
+.auth-lang .language-select {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.auth-lang .language-select option {
+  color: #1a1410;
+  background: #f5ebe0;
+}
+
+.light-mode .auth-lang .language-select {
+  color: #1a1410;
+  background: rgba(139, 90, 60, 0.08);
+  border-color: rgba(139, 90, 60, 0.28);
+}
