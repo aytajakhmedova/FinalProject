@@ -94,7 +94,7 @@ const OccupancyCalendar = () => {
 
   const loadData = () => {
     setLoading(true);
-    return Promise.all([getHotels(), getBookings(), getReservations()])
+    return Promise.all([getHotels(), getBookings(), getReservations().catch(() => [])])
       .then(([hotelItems, bookingItems, reservationItems]) => {
         setHotels(hotelItems);
         setBookings(bookingItems);
@@ -230,7 +230,10 @@ const OccupancyCalendar = () => {
               <div className="stat-icon available"><FaBed /></div>
               <div className="stat-content">
                 <div className="stat-value">
-                  {Math.max(0, rooms.length - (todayIndex >= 0 ? occupiedRoomsPerDay[todayIndex] || 0 : 0))}
+                  {Math.max(0, rooms.filter((room) => {
+                    const occupied = todayIndex >= 0 && Boolean(stayFor(room.id, today.getDate()));
+                    return !occupied && room.housekeepingStatus !== 'cleaning';
+                  }).length)}
                 </div>
                 <div className="stat-label">Bu gün Boş</div>
               </div>
@@ -267,6 +270,10 @@ const OccupancyCalendar = () => {
               <span className="legend-indicator occupied checked-in"></span>
               <span>Giriş edilib</span>
             </div>
+            <div className="legend-item">
+              <span className="legend-indicator cleaning"></span>
+              <span>Təmizlik</span>
+            </div>
           </div>
 
           {rooms.length === 0 ? (
@@ -292,18 +299,22 @@ const OccupancyCalendar = () => {
                     <div className="room-info">
                       <div className="room-number">#{room.id}</div>
                       <div className="room-type">{room.name}</div>
-                      <div className="room-capacity">{hotel?.title}</div>
+                      <div className="room-capacity">
+                        {hotel?.title}
+                        {room.housekeepingStatus === 'cleaning' ? ' · Təmizlik' : ''}
+                      </div>
                     </div>
                     {days.map((day) => {
                       const stay = stayFor(room.id, day);
                       const iso = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                      const cleaning = !stay && room.housekeepingStatus === 'cleaning' && isCurrentMonth && day === today.getDate();
                       const title = stay
                         ? `${stay.hotelName || hotel?.title || ''} · ${stay.roomName || room.name} · ${STATUS_LABELS[stay.status] || stay.status}${stay.code ? ` · ${stay.code}` : ''} · ${stay.guestName}`
-                        : `${hotel?.title || ''} · ${room.name} · ${iso} · Boş`;
+                        : `${hotel?.title || ''} · ${room.name} · ${iso} · ${cleaning ? 'Təmizlik' : 'Boş'}`;
                       return (
                         <div
                           key={day}
-                          className={`day-cell ${stay ? `occupied ${stay.status}` : 'available'}${isCurrentMonth && day === today.getDate() ? ' today' : ''}`}
+                          className={`day-cell ${stay ? `occupied ${stay.status}` : cleaning ? 'cleaning' : 'available'}${isCurrentMonth && day === today.getDate() ? ' today' : ''}`}
                           title={title.trim()}
                         >
                           {stay && <span className="occupied-indicator">●</span>}

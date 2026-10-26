@@ -13,6 +13,7 @@ const emptyRoom = (hotelId) => ({
   imageFile: '',
   pricePerNight: 200,
   available: true,
+  housekeepingStatus: 'ready',
   hotelId,
 });
 
@@ -25,6 +26,7 @@ const toRoomRequest = (room) => ({
   size: room.size || '',
   pricePerNight: Number(room.pricePerNight) || 0,
   available: room.available !== false,
+  housekeepingStatus: room.housekeepingStatus === 'cleaning' ? 'cleaning' : 'ready',
   imageFile: room.imageFile || room.images?.[0] || '',
   amenities: room.amenities || [],
 });
@@ -134,7 +136,10 @@ const AdminRooms = () => {
                     <td>{room.hotelName || hotelName(room.hotelId)}</td>
                     <td>{room.capacity} nəfər</td>
                     <td>₼{room.pricePerNight}</td>
-                    <td>{room.available === false ? 'Bağlı' : 'Açıq'}</td>
+                    <td>
+                      {room.available === false ? 'Bağlı' : 'Açıq'}
+                      {room.housekeepingStatus === 'cleaning' ? ' · Təmizlik' : ''}
+                    </td>
                     <td className="table-actions">
                       <button onClick={() => setEditing({ ...room })}>Redaktə</button>
                       <button className="danger" onClick={() => handleDelete(room.id)}>Sil</button>
@@ -196,6 +201,16 @@ const AdminRooms = () => {
                 value={editing.capacity}
                 onChange={(e) => setEditing({ ...editing, capacity: Number(e.target.value) })}
               />
+            </label>
+            <label>
+              Təmizlik
+              <select
+                value={editing.housekeepingStatus === 'cleaning' ? 'cleaning' : 'ready'}
+                onChange={(e) => setEditing({ ...editing, housekeepingStatus: e.target.value })}
+              >
+                <option value="ready">Hazır</option>
+                <option value="cleaning">Təmizlikdə</option>
+              </select>
             </label>
             <label className="checkbox-row">
               <input

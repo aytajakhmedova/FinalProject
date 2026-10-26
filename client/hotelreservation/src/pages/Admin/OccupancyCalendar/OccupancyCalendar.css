@@ -208,6 +208,11 @@
   border-color: #8B5A3C;
 }
 
+.legend-indicator.cleaning {
+  background: rgba(245, 158, 11, 0.28);
+  border-color: #d97706;
+}
+
 /* Calendar Grid */
 .calendar-grid-container {
   overflow-x: auto;
@@ -322,6 +327,14 @@
 
 .day-cell.occupied.checked-in:hover {
   background: rgba(139, 90, 60, 0.32);
+}
+
+.day-cell.cleaning {
+  background: rgba(245, 158, 11, 0.18);
+}
+
+.day-cell.cleaning:hover {
+  background: rgba(245, 158, 11, 0.28);
 }
 
 .day-cell.today {
