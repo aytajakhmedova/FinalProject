@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  FaMapMarkerAlt,
   FaCalendarAlt,
   FaUsers,
   FaSearch,
@@ -13,6 +12,12 @@ import {
 import { getSiteCities } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import './SearchForm.css';
+
+const LocationPin = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+    <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7z" />
+  </svg>
+);
 
 const todayISO = () => new Date().toISOString().split('T')[0];
 const plusDaysISO = (days) => {
@@ -125,7 +130,9 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
 
       <form className="search-form" onSubmit={handleSubmit}>
         <div className="form-field location-field">
-          <FaMapMarkerAlt className="field-icon" />
+          <span className="field-icon" aria-hidden="true">
+            <LocationPin />
+          </span>
           <div className="field-content">
             <label>{serviceType === 'flight' ? t('search.fromTo') : t('search.place')}</label>
             <input
@@ -150,7 +157,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
                     setShowCities(false);
                   }}
                 >
-                  <FaMapMarkerAlt />
+                  <LocationPin />
                   <span>
                     {city.name}
                     <small>{city.country}</small>
@@ -164,7 +171,9 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
         <div className="form-divider"></div>
 
         <div className="form-field date-field">
-          <FaCalendarAlt className="field-icon" />
+          <span className="field-icon" aria-hidden="true">
+            <FaCalendarAlt />
+          </span>
           <div className="field-content">
             <label>{t('search.checkIn')}</label>
             <input
@@ -172,7 +181,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
               value={checkIn}
               min={todayISO()}
               onChange={handleCheckInChange}
-              placeholder="Giriş tarixi seçin"
+              placeholder={t('search.checkIn')}
               required
             />
           </div>
@@ -180,7 +189,9 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
 
         <div className="form-divider"></div>
         <div className="form-field date-field">
-          <FaCalendarAlt className="field-icon" />
+          <span className="field-icon" aria-hidden="true">
+            <FaCalendarAlt />
+          </span>
           <div className="field-content">
             <label>{serviceType === 'flight' ? t('search.return') : t('search.checkOut')}</label>
             <input
@@ -188,7 +199,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
               value={checkOut}
               min={checkIn ? new Date(new Date(checkIn).getTime() + 86400000).toISOString().split('T')[0] : new Date(Date.now() + 86400000).toISOString().split('T')[0]}
               onChange={(e) => setCheckOut(e.target.value)}
-              placeholder="Çıxış tarixi seçin"
+              placeholder={t('search.checkOut')}
               disabled={!checkIn}
               required
             />
@@ -198,7 +209,9 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
         <div className="form-divider"></div>
 
         <div className="form-field guests-field">
-          <FaUsers className="field-icon" />
+          <span className="field-icon" aria-hidden="true">
+            <FaUsers />
+          </span>
           <div className="field-content">
             <label>{t('search.guests')}</label>
             <button
@@ -234,7 +247,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
         </div>
 
         <button className="search-button" type="submit" aria-label={t('search.search')}>
-          <FaSearch className="search-icon" />
+          <FaSearch className="search-btn-icon" />
           <span className="search-btn-text">{t('search.search')}</span>
         </button>
       </form>

@@ -4,13 +4,11 @@ import { FaChevronLeft, FaChevronRight, FaHeart, FaPlay, FaRegHeart, FaStar } fr
 import { formatPrice } from '../../data/travelData';
 import { getHotels } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
-import { useSiteContent } from '../../context/SiteContentContext';
 import './FeaturedHotels.css';
 
 const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onPlayVideo }) => {
   const navigate = useNavigate();
   const { t } = useLanguage();
-  const { content } = useSiteContent();
   const [activeIndex, setActiveIndex] = useState(0);
   const [featured, setFeatured] = useState([]);
   const [loadError, setLoadError] = useState('');
@@ -22,13 +20,13 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
     getHotels()
       .then((items) => {
         if (!active) return;
-        setFeatured(items.slice(0, 5));
+        setFeatured(items.filter((item) => item.imageFile).slice(0, 5));
         setLoadError('');
       })
       .catch((error) => {
         if (!active) return;
         setFeatured([]);
-        setLoadError(error.message || 'Otellər yüklənmədi.');
+        setLoadError(error.message || t('hotels.loadError'));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -73,8 +71,8 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
     return (
       <section className="featured-hotels-section" id="featured">
         <div className="featured-hotels-container">
-          <p className="eyebrow center">{content?.settings?.featuredEyebrow}</p>
-          <h2 className="section-title">Yüklənir...</h2>
+          <p className="eyebrow center">{t('feat.eyebrow')}</p>
+          <h2 className="section-title">{t('common.loading')}</h2>
         </div>
       </section>
     );
@@ -84,8 +82,8 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
     return (
       <section className="featured-hotels-section" id="featured">
         <div className="featured-hotels-container">
-          <p className="eyebrow center">{content?.settings?.featuredEyebrow}</p>
-          <h2 className="section-title">{loadError || 'Otel tapılmadı'}</h2>
+          <p className="eyebrow center">{t('feat.eyebrow')}</p>
+          <h2 className="section-title">{loadError || t('hotels.empty')}</h2>
         </div>
       </section>
     );
@@ -94,8 +92,8 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
   return (
     <section className="featured-hotels-section" id="featured">
       <div className="featured-hotels-container">
-        <p className="eyebrow center">{content?.settings?.featuredEyebrow || t('feat.eyebrow')}</p>
-        <h2 className="section-title">{content?.settings?.featuredTitle || t('feat.title')}</h2>
+        <p className="eyebrow center">{t('feat.eyebrow')}</p>
+        <h2 className="section-title">{t('feat.title')}</h2>
 
         <div className="hotels-slider-wrapper">
           <button className="nav-btn nav-prev" onClick={handlePrev} aria-label={t('feat.prev')}>

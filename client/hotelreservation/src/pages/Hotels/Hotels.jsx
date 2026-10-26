@@ -35,7 +35,7 @@ const Hotels = () => {
       .catch((error) => {
         if (!active) return;
         setHotels([]);
-        setLoadError(error.message || 'Otellər yüklənmədi.');
+        setLoadError(error.message || t('hotels.loadError'));
       });
     return () => {
       active = false;
@@ -53,8 +53,22 @@ const Hotels = () => {
     setSearchParams(params);
   };
 
-  const allAmenities = ['Spa', 'Hovuz', 'Wi-Fi', 'Restoran', 'Fitness', 'Plaj', 'Parking', 'Bar'];
-  const hotelTypes = ['Lüks', 'Wellness', 'Ailə', 'Şəhər'];
+  const allAmenities = [
+    { value: 'Spa', key: 'hotels.amSpa' },
+    { value: 'Hovuz', key: 'hotels.amPool' },
+    { value: 'Wi-Fi', key: 'hotels.amWifi' },
+    { value: 'Restoran', key: 'hotels.amRest' },
+    { value: 'Fitness', key: 'hotels.amFit' },
+    { value: 'Plaj', key: 'hotels.amBeach' },
+    { value: 'Parking', key: 'hotels.amPark' },
+    { value: 'Bar', key: 'hotels.amBar' },
+  ];
+  const hotelTypes = [
+    { value: 'Lüks', key: 'hotels.typeLuxury' },
+    { value: 'Wellness', key: 'hotels.typeWellness' },
+    { value: 'Ailə', key: 'hotels.typeFamily' },
+    { value: 'Şəhər', key: 'hotels.typeCity' },
+  ];
 
   const filteredHotels = hotels.filter(hotel => {
     const matchesSearch = hotel.title.toLowerCase().includes(filters.search.toLowerCase()) ||
@@ -137,7 +151,7 @@ const Hotels = () => {
               }}
             >
               {[1, 2, 3, 4, 5, 6].map((n) => (
-                <option key={n} value={n}>{n} qonaq</option>
+                <option key={n} value={n}>{t('hotels.guestsN', { n })}</option>
               ))}
             </select>
             <button 
@@ -145,7 +159,7 @@ const Hotels = () => {
               onClick={() => setShowFilters(!showFilters)}
             >
               <FaFilter />
-              <span>Filtrlər</span>
+              <span>{t('hotels.filters')}</span>
             </button>
           </div>
         </div>
@@ -156,7 +170,7 @@ const Hotels = () => {
           {/* Filter Sidebar */}
           <aside className={`hotels-filters ${showFilters ? 'show-mobile' : ''}`}>
             <div className="filter-header">
-              <h3>Filtrlər</h3>
+              <h3>{t('hotels.filters')}</h3>
               <button 
                 className="close-filters"
                 onClick={() => setShowFilters(false)}
@@ -167,7 +181,7 @@ const Hotels = () => {
 
             {/* Price Range */}
             <div className="filter-group">
-              <h4>Qiymət aralığı</h4>
+              <h4>{t('hotels.priceRange')}</h4>
               <div className="price-inputs">
                 <label className="price-field">
                   <span className="price-field-label">Min</span>
@@ -209,7 +223,7 @@ const Hotels = () => {
 
             {/* Star Rating */}
             <div className="filter-group">
-              <h4>Ulduz reytinqi</h4>
+              <h4>{t('hotels.starsLabel')}</h4>
               <div className="checkbox-group">
                 {[5, 4, 3].map(star => (
                   <label key={star} className="checkbox-label">
@@ -218,7 +232,7 @@ const Hotels = () => {
                       checked={filters.stars.includes(star)}
                       onChange={() => toggleFilter('stars', star)}
                     />
-                    <span>{star} ulduz</span>
+                    <span>{t('hotels.starN', { n: star })}</span>
                   </label>
                 ))}
               </div>
@@ -226,16 +240,16 @@ const Hotels = () => {
 
             {/* Hotel Type */}
             <div className="filter-group">
-              <h4>Otel tipi</h4>
+              <h4>{t('hotels.type')}</h4>
               <div className="checkbox-group">
                 {hotelTypes.map(type => (
-                  <label key={type} className="checkbox-label">
+                  <label key={type.value} className="checkbox-label">
                     <input
                       type="checkbox"
-                      checked={filters.hotelType.includes(type)}
-                      onChange={() => toggleFilter('hotelType', type)}
+                      checked={filters.hotelType.includes(type.value)}
+                      onChange={() => toggleFilter('hotelType', type.value)}
                     />
-                    <span>{type}</span>
+                    <span>{t(type.key)}</span>
                   </label>
                 ))}
               </div>
@@ -243,16 +257,16 @@ const Hotels = () => {
 
             {/* Amenities */}
             <div className="filter-group">
-              <h4>İmkanlar</h4>
+              <h4>{t('hotels.amenities')}</h4>
               <div className="checkbox-group">
                 {allAmenities.map(amenity => (
-                  <label key={amenity} className="checkbox-label">
+                  <label key={amenity.value} className="checkbox-label">
                     <input
                       type="checkbox"
-                      checked={filters.amenities.includes(amenity)}
-                      onChange={() => toggleFilter('amenities', amenity)}
+                      checked={filters.amenities.includes(amenity.value)}
+                      onChange={() => toggleFilter('amenities', amenity.value)}
                     />
-                    <span>{amenity}</span>
+                    <span>{t(amenity.key)}</span>
                   </label>
                 ))}
               </div>
@@ -268,7 +282,7 @@ const Hotels = () => {
                 hotelType: []
               })}
             >
-              Filtrləri sıfırla
+              {t('hotels.reset')}
             </button>
           </aside>
 
@@ -307,8 +321,8 @@ const Hotels = () => {
               </div>
             ) : (
               <div className="no-results">
-                <h3>Nəticə tapılmadı</h3>
-                <p>Axtarış və ya filtr parametrlərini dəyişdirməyə cəhd edin</p>
+                <h3>{t('hotels.noResults')}</h3>
+                <p>{t('hotels.noResultsHint')}</p>
               </div>
             )}
           </div>

@@ -54,7 +54,7 @@
   position: relative;
 }
 
-.search-icon {
+.hotels-page .search-input-wrapper .search-icon {
   position: absolute;
   left: 1.25rem;
   top: 50%;
