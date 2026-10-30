@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
 import Home from './pages/Home';
@@ -36,22 +36,31 @@ import AdminSettings from './pages/Admin/Settings/AdminSettings';
 import AdminFlights from './pages/Admin/Flights/AdminFlights';
 import AdminTours from './pages/Admin/Tours/AdminTours';
 import AdminDiscounts from './pages/Admin/Discounts/AdminDiscounts';
+import ReceptionDesk from './pages/Reception/ReceptionDesk';
+import AdminReviews from './pages/Admin/Reviews/AdminReviews';
+import { hasRole } from './api/auth';
 import './App.css';
+
+function AdminHome() {
+  if (hasRole('Receptionist') && !hasRole('SuperAdmin', 'Admin', 'HotelManager')) {
+    return <Navigate to="/admin/resepsiyon" replace />;
+  }
+  return <AdminDashboard />;
+}
 
 function App() {
   const [darkMode, setDarkMode] = useState(true);
-  const [currency, setCurrency] = useState('AZN');
+  const currency = 'AZN';
   const [serviceType, setServiceType] = useState('hotel');
   const [favorites, setFavorites] = useState([]);
   const [toast, setToast] = useState('');
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    const savedCurrency = localStorage.getItem('currency');
     const savedFavs = localStorage.getItem('favorites');
     if (savedTheme) setDarkMode(savedTheme === 'dark');
-    if (savedCurrency) setCurrency(savedCurrency);
     if (savedFavs) setFavorites(JSON.parse(savedFavs));
+    localStorage.removeItem('currency');
   }, []);
 
   useEffect(() => {
@@ -64,11 +73,6 @@ function App() {
     const newMode = !darkMode;
     setDarkMode(newMode);
     localStorage.setItem('theme', newMode ? 'dark' : 'light');
-  };
-
-  const changeCurrency = (value) => {
-    setCurrency(value);
-    localStorage.setItem('currency', value);
   };
 
   const toggleFavorite = (id) => {
@@ -89,8 +93,6 @@ function App() {
               <Header
                 darkMode={darkMode}
                 toggleDarkMode={toggleDarkMode}
-                currency={currency}
-                onCurrencyChange={changeCurrency}
                 onServiceChange={(type) => setServiceType(type)}
                 favoriteCount={favorites.length}
               />
@@ -105,7 +107,7 @@ function App() {
           
           <Route path="/hotels" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <Hotels />
               <Footer />
             </>
@@ -113,7 +115,7 @@ function App() {
           
           <Route path="/destinations" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <main className="section-page"><DestinationsPage /></main>
               <Footer />
             </>
@@ -121,7 +123,7 @@ function App() {
 
           <Route path="/about" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <main className="section-page"><About /></main>
               <Footer />
             </>
@@ -129,7 +131,7 @@ function App() {
 
           <Route path="/reviews" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <main className="section-page"><ReviewsPage /></main>
               <Footer />
             </>
@@ -137,7 +139,7 @@ function App() {
 
           <Route path="/gallery" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <main className="section-page"><Gallery /></main>
               <Footer />
             </>
@@ -145,7 +147,7 @@ function App() {
 
           <Route path="/tours" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <Tours />
               <Footer />
             </>
@@ -153,7 +155,7 @@ function App() {
           
           <Route path="/tours/:id" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <TourDetail />
               <Footer />
             </>
@@ -161,7 +163,7 @@ function App() {
           
           <Route path="/flights" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <Flights />
               <Footer />
             </>
@@ -169,7 +171,7 @@ function App() {
           
           <Route path="/flight-results" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <FlightResults />
               <Footer />
             </>
@@ -177,7 +179,7 @@ function App() {
           
           <Route path="/flight-booking" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <FlightBooking />
               <Footer />
             </>
@@ -185,7 +187,7 @@ function App() {
           
           <Route path="/hotels/:id" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <HotelDetail />
               <Footer />
             </>
@@ -193,7 +195,7 @@ function App() {
           
           <Route path="/rooms/:id" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <RoomDetail />
               <Footer />
             </>
@@ -201,7 +203,7 @@ function App() {
 
           <Route path="/booking" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <Booking />
               <Footer />
             </>
@@ -209,7 +211,7 @@ function App() {
 
           <Route path="/booking-success" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <BookingSuccess />
               <Footer />
             </>
@@ -217,7 +219,7 @@ function App() {
           
           <Route path="/dashboard" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <Dashboard />
               <Footer />
             </>
@@ -225,7 +227,7 @@ function App() {
           
           <Route path="/reservations/:id" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <ReservationDetail />
               <Footer />
             </>
@@ -233,7 +235,7 @@ function App() {
           
           <Route path="/profile" element={
             <>
-              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} currency={currency} onCurrencyChange={changeCurrency} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <Profile />
               <Footer />
             </>
@@ -247,7 +249,8 @@ function App() {
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
+            <Route index element={<AdminHome />} />
+            <Route path="resepsiyon" element={<ReceptionDesk />} />
             <Route path="oteller" element={<AdminHotelManager />} />
             <Route path="hotels" element={<AdminHotels />} />
             <Route path="rooms" element={<AdminRooms />} />
@@ -262,6 +265,7 @@ function App() {
             <Route path="turlar" element={<AdminTours />} />
             <Route path="tours" element={<AdminTours />} />
             <Route path="paketler" element={<AdminDiscounts />} />
+            <Route path="reyler" element={<AdminReviews />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaCheckCircle, FaHourglass, FaTimesCircle, FaClipboardList } from 'react-icons/fa';
-import { hasReviewForBooking } from '../../utils/reviewsStore';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAuthToken } from '../../api/auth';
-import { deleteBooking, getHotels, getMyBookings } from '../../api/client';
+import { deleteBooking, getHotels, getMyBookings, getMyReviews } from '../../api/client';
 import { printBookingReceipt } from '../../utils/printReceipt';
 import './Dashboard.css';
 
@@ -44,6 +43,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [user, setUser] = useState(null);
   const [reservations, setReservations] = useState([]);
+  const [reviewedIds, setReviewedIds] = useState(() => new Set());
   const [hotelImages, setHotelImages] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -63,6 +63,12 @@ const Dashboard = () => {
     try {
       const bookings = await getMyBookings();
       setReservations(Array.isArray(bookings) ? bookings : []);
+      try {
+        const mine = await getMyReviews();
+        setReviewedIds(new Set((Array.isArray(mine) ? mine : []).map((item) => String(item.bookingId))));
+      } catch {
+        setReviewedIds(new Set());
+      }
       try {
         const hotels = await getHotels();
         const images = {};
@@ -343,7 +349,7 @@ const Dashboard = () => {
                           >
                             PDF
                           </button>
-                          {reservation.status === 'checked-out' && type === 'hotel' && !hasReviewForBooking(reservation.id) && (
+                          {reservation.status === 'checked-out' && type === 'hotel' && !reviewedIds.has(String(reservation.id)) && (
                             <Link
                               to={`/hotels/${reservation.hotelId}#reviews`}
                               className="btn-modify-reservation"

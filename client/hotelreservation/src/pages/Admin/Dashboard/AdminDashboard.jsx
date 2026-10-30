@@ -10,7 +10,12 @@ const money = (value) => {
   return amount.toLocaleString('az-AZ', { maximumFractionDigits: 0 });
 };
 
-const paymentLabel = (method) => (method === 'hotel' ? 'Oteldə' : method === 'card' ? 'Kartla' : '—');
+const paymentLabel = (method, percent) => {
+  if (method === 'hotel') {
+    return [20, 30, 40].includes(Number(percent)) ? `Oteldə · ${percent}% avans` : 'Oteldə';
+  }
+  return method === 'card' ? 'Kartla' : '—';
+};
 
 const statusColors = {
   confirmed: { bg: 'rgba(34, 197, 94, 0.1)', text: '#22c55e' },
@@ -76,7 +81,7 @@ const AdminDashboard = () => {
       booking.roomType,
       booking.checkIn,
       booking.checkOut,
-      paymentLabel(booking.paymentMethod),
+      paymentLabel(booking.paymentMethod, booking.depositPercent),
       booking.totalPrice,
       STATUS_LABELS[booking.status] || booking.status,
     ]);
@@ -164,7 +169,7 @@ const AdminDashboard = () => {
                           <div className="muted">{booking.roomType}</div>
                         </td>
                         <td>{booking.checkIn} → {booking.checkOut}</td>
-                        <td>{paymentLabel(booking.paymentMethod)}</td>
+                        <td>{paymentLabel(booking.paymentMethod, booking.depositPercent)}</td>
                         <td>₼{money(booking.totalPrice)}</td>
                         <td>
                           <span className="status-badge" style={{ background: tone.bg, color: tone.text }}>

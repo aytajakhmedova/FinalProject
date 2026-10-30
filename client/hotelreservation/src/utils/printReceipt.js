@@ -21,6 +21,9 @@ export function printBookingReceipt(booking) {
     <p>Qiymət: ₼ ${money(booking.totalPrice)}</p>
     <p>Ödəniş üsulu: ${booking.paymentMethod || ''}</p>
     <p>Ödəniş statusu: ${booking.paymentStatus || ''}</p>
+    ${[20, 30, 40].includes(Number(booking.depositPercent)) ? `
+    <p>Kartla avans (${booking.depositPercent}%): ₼ ${money(booking.depositAmount)}</p>
+    <p>Oteldə qalıq: ₼ ${money(booking.remainingAmount)}</p>` : ''}
     <p>Kart ödənişi demo rejimindədir. Real kart məlumatı saxlanılmır.</p>
     </body></html>`);
   popup.document.close();
