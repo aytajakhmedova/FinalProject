@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useLanguage } from '../../context/LanguageContext';
-import LanguageSwitch from '../../components/LanguageSwitch/LanguageSwitch';
 import { forgotPasswordRequest, resetPasswordRequest } from '../../api/auth';
 import './Auth.css';
 
@@ -82,9 +81,6 @@ const ForgotPassword = () => {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <div className="auth-lang">
-              <LanguageSwitch />
-            </div>
             <h1 className="auth-title">{isReset ? t('auth.resetTitle') : t('auth.forgotTitle')}</h1>
             <p className="auth-subtitle">{isReset ? t('auth.resetSub') : t('auth.forgotSub')}</p>
           </div>

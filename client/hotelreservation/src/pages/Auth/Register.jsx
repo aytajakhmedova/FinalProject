@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaUser, FaEnvelope, FaPhone, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useLanguage } from '../../context/LanguageContext';
-import LanguageSwitch from '../../components/LanguageSwitch/LanguageSwitch';
 import { registerRequest, saveAuthSession } from '../../api/auth';
 import './Auth.css';
 
@@ -107,9 +106,6 @@ const Register = () => {
       <div className="auth-container">
         <div className="auth-card register-card">
           <div className="auth-header">
-            <div className="auth-lang">
-              <LanguageSwitch />
-            </div>
             <h1 className="auth-title">{t('auth.register')}</h1>
             <p className="auth-subtitle">{t('auth.registerSub')}</p>
           </div>

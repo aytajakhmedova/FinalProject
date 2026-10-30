@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { LOCALES, translations } from '../i18n/translations';
+import { createContext, useContext, useEffect, useMemo } from 'react';
+import { translations } from '../i18n/translations';
 
 const LanguageContext = createContext(null);
+const LANG = 'az';
 
 const fill = (text, vars) => {
   if (!vars) return text;
@@ -12,32 +13,19 @@ const fill = (text, vars) => {
 };
 
 export const LanguageProvider = ({ children }) => {
-  const [lang, setLangState] = useState(() => localStorage.getItem('lang') || 'az');
-
-  const setLang = (code) => {
-    const next = translations[code] ? code : 'az';
-    setLangState(next);
-    localStorage.setItem('lang', next);
-  };
-
   useEffect(() => {
-    document.documentElement.lang = lang;
-    const titles = {
-      az: 'AE Hotel — Otel & Travel',
-      tr: 'AE Hotel — Otel & Seyahat',
-      ru: 'AE Hotel — Отель и путешествия',
-      en: 'AE Hotel — Hotel & Travel',
-    };
-    document.title = titles[lang] || titles.az;
-  }, [lang]);
+    localStorage.removeItem('lang');
+    document.documentElement.lang = LANG;
+    document.title = 'AE Hotel — Otel & Travel';
+  }, []);
 
   const value = useMemo(() => {
     const t = (key, vars) => {
-      const text = translations[lang]?.[key] ?? translations.az[key] ?? key;
+      const text = translations.az[key] ?? key;
       return fill(text, vars);
     };
-    return { lang, setLang, t, locale: LOCALES[lang] || 'az-AZ' };
-  }, [lang]);
+    return { lang: LANG, setLang: () => {}, t, locale: 'az-AZ' };
+  }, []);
 
   return (
     <LanguageContext.Provider value={value}>
