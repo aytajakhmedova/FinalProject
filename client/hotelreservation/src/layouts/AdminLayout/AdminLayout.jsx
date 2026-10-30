@@ -14,21 +14,25 @@ import {
   FaCalendarAlt,
   FaPlane,
   FaMapMarkedAlt,
-  FaPercentage
+  FaPercentage,
+  FaBell,
+  FaStar
 } from 'react-icons/fa';
 import './AdminLayout.css';
 import { useLanguage } from '../../context/LanguageContext';
 import { clearAuthSession, getAuthUser, hasRole, isAdminSession } from '../../api/auth';
 
 const ALL_MENU = [
-  { path: '/admin', icon: <FaHome />, label: 'Dashboard', exact: true, roles: ['SuperAdmin', 'Admin', 'HotelManager', 'Receptionist'] },
+  { path: '/admin/resepsiyon', icon: <FaBell />, label: 'Resepsiya', roles: ['Receptionist'] },
+  { path: '/admin', icon: <FaHome />, label: 'Dashboard', exact: true, roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
   { path: '/admin/oteller', icon: <FaHotel />, labelKey: 'admin.hotels', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
   { path: '/admin/hotels', icon: <FaBed />, labelKey: 'admin.rooms', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
-  { path: '/admin/rezervasiyalar', icon: <FaCalendarCheck />, labelKey: 'admin.bookings', roles: ['SuperAdmin', 'Admin', 'HotelManager', 'Receptionist'] },
+  { path: '/admin/rezervasiyalar', icon: <FaCalendarCheck />, labelKey: 'admin.bookings', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
   { path: '/admin/teqvim', icon: <FaCalendarAlt />, labelKey: 'admin.occupancy', roles: ['SuperAdmin', 'Admin', 'HotelManager', 'Receptionist'] },
   { path: '/admin/ucuslar', icon: <FaPlane />, label: 'Uçuşlar', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/turlar', icon: <FaMapMarkedAlt />, label: 'Turlar', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/paketler', icon: <FaPercentage />, label: 'Paketlər və Endirimlər', roles: ['SuperAdmin', 'Admin'] },
+  { path: '/admin/reyler', icon: <FaStar />, label: 'Rəylər', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
   { path: '/admin/users', icon: <FaUsers />, labelKey: 'admin.users', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/analytics', icon: <FaChartBar />, labelKey: 'admin.analytics', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/settings', icon: <FaCog />, labelKey: 'admin.settings', roles: ['SuperAdmin', 'Admin'] },
@@ -76,7 +80,7 @@ const AdminLayout = () => {
       item.exact ? path === item.path : path.startsWith(item.path)
     );
     if (!allowed) {
-      navigate('/admin', { replace: true });
+      navigate(menuItems[0]?.path || '/admin', { replace: true });
     }
   }, [isAdmin, location.pathname, menuItems, navigate]);
 
@@ -102,7 +106,13 @@ const AdminLayout = () => {
         <div className="sidebar-header">
           <div className="sidebar-logo">
             <FaHotel className="logo-icon" />
-            {sidebarOpen && <span className="logo-text">AE Hotel Admin</span>}
+            {sidebarOpen && (
+              <span className="logo-text">
+                {hasRole('Receptionist') && !hasRole('SuperAdmin', 'Admin', 'HotelManager')
+                  ? 'AE Resepsiya'
+                  : 'AE Hotel Admin'}
+              </span>
+            )}
           </div>
           <button 
             className="sidebar-toggle desktop-toggle" 

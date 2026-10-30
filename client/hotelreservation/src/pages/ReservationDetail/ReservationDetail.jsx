@@ -370,6 +370,18 @@ const ReservationDetail = () => {
                   <span>Ödəniş</span>
                   <span>{reservation.paymentMethod || '—'} · {reservation.paymentStatus || '—'}</span>
                 </div>
+                {[20, 30, 40].includes(Number(reservation.depositPercent)) && (
+                  <>
+                    <div className="summary-row">
+                      <span>Kartla avans ({reservation.depositPercent}%)</span>
+                      <span>₼{reservation.depositAmount}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span>Oteldə qalıq</span>
+                      <span>₼{reservation.remainingAmount}</span>
+                    </div>
+                  </>
+                )}
                 <div className="summary-row summary-total">
                   <span>Yekun</span>
                   <strong>₼{reservation.totalPrice}</strong>
