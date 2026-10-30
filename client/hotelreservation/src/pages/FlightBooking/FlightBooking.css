@@ -563,6 +563,17 @@
   background: #A0522D;
 }
 
+.btn-apply-coupon:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.coupon-error {
+  margin: 0.55rem 0 0;
+  color: #c45c4a;
+  font-size: 0.82rem;
+}
+
 /* Cancellation Info */
 .cancellation-info {
   padding-top: 1.5rem;

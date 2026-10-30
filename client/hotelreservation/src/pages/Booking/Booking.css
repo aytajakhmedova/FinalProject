@@ -741,9 +741,46 @@
 }
 
 .pay-hotel-note {
-  margin: 0 0 1rem;
+  margin: 0 0 0.75rem;
   color: #d7b48c;
   font-size: 0.9rem;
+}
+
+.pay-deposit {
+  margin: 0 0 1rem;
+}
+
+.pay-deposit-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.pay-deposit-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.7rem 0.55rem;
+  border-radius: 14px;
+  border: 1px solid rgba(214, 176, 132, 0.32);
+  background: rgba(42, 26, 16, 0.45);
+  color: inherit;
+  cursor: pointer;
+}
+
+.pay-deposit-btn strong {
+  font-size: 0.95rem;
+  color: #f3e2d0;
+}
+
+.pay-deposit-btn span {
+  font-size: 0.75rem;
+  color: #e8c9a0;
+}
+
+.pay-deposit-btn.on {
+  border-color: rgba(226, 193, 154, 0.75);
+  background: rgba(64, 40, 24, 0.6);
 }
 
 .pay-terms {
@@ -962,6 +999,54 @@
   margin: 0 0 0.65rem;
   font-size: 0.95rem;
   color: #e8c9a0;
+}
+
+.pay-coupon {
+  margin: 0 0 1rem;
+}
+
+.pay-coupon label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+  color: #e8c9a0;
+}
+
+.pay-coupon-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pay-coupon-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid rgba(214, 176, 132, 0.32);
+  background: rgba(42, 26, 16, 0.45);
+  color: #f7eadc;
+  text-transform: uppercase;
+}
+
+.pay-coupon-row button {
+  padding: 0.65rem 0.9rem;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #d7c08a, #b0894c);
+  color: #2a1a12;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.pay-coupon-row button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.pay-coupon-ok {
+  margin: 0.4rem 0 0;
+  color: #c4e0b4;
+  font-size: 0.8rem;
 }
 
 .co-totals {

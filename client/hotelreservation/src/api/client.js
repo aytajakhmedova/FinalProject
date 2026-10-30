@@ -127,6 +127,9 @@ export function mapBooking(booking) {
     },
     paymentMethod: booking.paymentMethod,
     totalPrice: Number(booking.totalPrice),
+    depositPercent: Number(booking.depositPercent) || 0,
+    depositAmount: Number(booking.depositAmount) || 0,
+    remainingAmount: Number(booking.remainingAmount) || 0,
   };
 }
 
@@ -172,6 +175,7 @@ export const deleteBooking = (id) => request(`/api/bookings/${id}`, { method: "D
 export const createBooking = (booking) => request("/api/bookings", { method: "POST", body: JSON.stringify(booking) }).then(mapBooking);
 export const getTripSuggestions = (params) => request(withQuery("/api/trip-suggestions", params));
 export const getActiveDiscounts = () => request("/api/discounts/active");
+export const applyCouponCode = (code) => request(`/api/discounts/coupon/${encodeURIComponent(String(code || "").trim())}`);
 export const getDiscounts = () => request("/api/discounts");
 export const createDiscount = (item) => request("/api/discounts", { method: "POST", body: JSON.stringify(item) });
 export const updateDiscount = (id, item) => request(`/api/discounts/${id}`, { method: "PUT", body: JSON.stringify(item) });
@@ -180,7 +184,11 @@ export const getUsers = () => request("/api/users");
 export const updateUserRole = (id, role, assignedHotelId) =>
   request(`/api/users/${id}/role`, { method: "PUT", body: JSON.stringify({ role, assignedHotelId }) });
 export const getHotelReviews = (hotelId) => request(`/api/hotels/${hotelId}/reviews`);
+export const getMyReviews = () => request("/api/reviews/mine");
+export const getAdminReviews = () => request("/api/reviews");
 export const createReview = (review) => request("/api/reviews", { method: "POST", body: JSON.stringify(review) });
+export const approveReview = (id) => request(`/api/reviews/${id}/approve`, { method: "PUT" });
+export const deleteReview = (id) => request(`/api/reviews/${id}`, { method: "DELETE" });
 export const updateBookingDetails = (id, booking) => request(`/api/bookings/${id}`, { method: "PUT", body: JSON.stringify(booking) }).then(mapBooking);
 export const updateBookingStatus = (id, status) => request(`/api/bookings/${id}/status`, { method: "PUT", body: JSON.stringify({ status }) }).then(mapBooking);
 export const emailBookingReceipt = (id) => request(`/api/bookings/${id}/email-receipt`, { method: "POST" }).then(mapBooking);

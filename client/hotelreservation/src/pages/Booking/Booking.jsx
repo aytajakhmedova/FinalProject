@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaCreditCard, FaInfoCircle, FaLock, FaPlane, FaShieldAlt } from 'react-icons/fa';
 import { formatDate } from '../../data/roomsData';
 import { uniqueTourImage } from '../../data/localMedia';
-import { createBooking, getActiveDiscounts, getFlights, getTours, quoteRoom } from '../../api/client';
+import { applyCouponCode, createBooking, getActiveDiscounts, getFlights, getTours, quoteRoom } from '../../api/client';
 import roomPhoto from '../../assets/images/otaq2.jpg';
 import planePhoto from '../../assets/images/ucakk.jpg';
 import { useLanguage } from '../../context/LanguageContext';
@@ -45,6 +45,10 @@ const maskedCard = (value) => {
   return digits.replace(/(.{4})/g, '$1 ').trim();
 };
 
+const DEPOSIT_PERCENTS = [20, 30, 40];
+
+const roundMoney = (value) => Math.round((Number(value) || 0) * 100) / 100;
+
 const Booking = () => {
   const { t } = useLanguage();
   const location = useLocation();
@@ -58,6 +62,7 @@ const Booking = () => {
   const [specialRequests, setSpecialRequests] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('card');
+  const [depositPercent, setDepositPercent] = useState(20);
   const [cardNumber, setCardNumber] = useState('');
   const [cardName, setCardName] = useState('');
   const [expiry, setExpiry] = useState('');
@@ -70,6 +75,10 @@ const Booking = () => {
   const [discounts, setDiscounts] = useState([]);
   const [selectedFlightId, setSelectedFlightId] = useState(null);
   const [selectedTourId, setSelectedTourId] = useState(null);
+  const [couponInput, setCouponInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponBusy, setCouponBusy] = useState(false);
+  const [couponError, setCouponError] = useState('');
 
   const hotel = bookingData?.hotel;
   const room = bookingData?.room;
@@ -157,9 +166,19 @@ const Booking = () => {
   const listTotal = hotelList + flightList + tourList;
   const percentOff = discountPercent > 0 ? listTotal - applyPercent(listTotal, discountPercent) : 0;
   const amountOff = discountPercent <= 0 && discountAmount > 0 ? Math.min(discountAmount, listTotal) : 0;
-  const discountValue = percentOff || amountOff;
-  const grandTotal = Math.round((listTotal - discountValue) * 100) / 100;
+  const comboOff = percentOff || amountOff;
+  const afterCombo = roundMoney(listTotal - comboOff);
+  const couponPercent = Number(appliedCoupon?.percent) || 0;
+  const couponFixed = Number(appliedCoupon?.amount) || 0;
+  const couponOff = couponPercent > 0
+    ? roundMoney(afterCombo - applyPercent(afterCombo, couponPercent))
+    : Math.min(couponFixed, afterCombo);
+  const discountValue = roundMoney(comboOff + couponOff);
+  const grandTotal = roundMoney(listTotal - discountValue);
   const nights = priceBreakdown?.nights || 1;
+  const payNowPercent = paymentMethod === 'hotel' ? depositPercent : 100;
+  const depositAmount = roundMoney(grandTotal * payNowPercent / 100);
+  const remainingAmount = roundMoney(grandTotal - depositAmount);
 
   const formatCardNumber = (value) => {
     const digits = value.replace(/\D/g, '').slice(0, 16);
@@ -172,6 +191,23 @@ const Booking = () => {
     return `${digits.slice(0, 2)}/${digits.slice(2)}`;
   };
 
+  const handleApplyCoupon = () => {
+    const code = couponInput.trim();
+    if (!code || couponBusy) return;
+    setCouponBusy(true);
+    setCouponError('');
+    applyCouponCode(code)
+      .then((rule) => {
+        setAppliedCoupon(rule);
+        setCouponInput(rule.code || code.toUpperCase());
+      })
+      .catch((error) => {
+        setAppliedCoupon(null);
+        setCouponError(error.message || 'Kupon kodu keçərsizdir.');
+      })
+      .finally(() => setCouponBusy(false));
+  };
+
   const handleSubmitBooking = async (e) => {
     e.preventDefault();
     setFormError('');
@@ -181,24 +217,27 @@ const Booking = () => {
       return;
     }
 
-    if (paymentMethod === 'card') {
-      const digits = cardNumber.replace(/\s/g, '');
-      if (digits.length < 16) {
-        setFormError('Kart nömrəsi 16 rəqəm olmalıdır');
-        return;
-      }
-      if (!cardName.trim()) {
-        setFormError('Kart sahibinin adını yazın');
-        return;
-      }
-      if (!/^\d{2}\/\d{2}$/.test(expiry)) {
-        setFormError('Bitmə tarixini AA/İİ formatında yazın');
-        return;
-      }
-      if (cvv.length < 3) {
-        setFormError('CVV 3 rəqəm olmalıdır');
-        return;
-      }
+    if (paymentMethod === 'hotel' && !DEPOSIT_PERCENTS.includes(depositPercent)) {
+      setFormError('Oteldə ödəniş üçün 20%, 30% və ya 40% avans seçin');
+      return;
+    }
+
+    const digits = cardNumber.replace(/\s/g, '');
+    if (digits.length < 16) {
+      setFormError('Kart nömrəsi 16 rəqəm olmalıdır');
+      return;
+    }
+    if (!cardName.trim()) {
+      setFormError('Kart sahibinin adını yazın');
+      return;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+      setFormError('Bitmə tarixini AA/İİ formatında yazın');
+      return;
+    }
+    if (cvv.length < 3) {
+      setFormError('CVV 3 rəqəm olmalıdır');
+      return;
     }
 
     try {
@@ -209,7 +248,16 @@ const Booking = () => {
         return;
       }
 
-      const guest = { guestName, guestEmail, guestPhone, guests, paymentMethod, cardNumber, cardHolder: cardName };
+      const guest = {
+        guestName,
+        guestEmail,
+        guestPhone,
+        guests,
+        paymentMethod,
+        cardNumber,
+        cardHolder: cardName,
+        depositPercent: paymentMethod === 'hotel' ? depositPercent : 100,
+      };
       const booking = await createBooking({
         bookingType: 'hotel',
         hotelId: hotel.id,
@@ -218,6 +266,7 @@ const Booking = () => {
         checkOut,
         specialRequests,
         bundleCombo: combo || undefined,
+        couponCode: appliedCoupon?.code || undefined,
         ...guest,
       });
 
@@ -229,6 +278,7 @@ const Booking = () => {
             bookingType: 'flight',
             flightId: selectedFlight.id,
             bundleCombo: combo,
+            couponCode: appliedCoupon?.code || undefined,
             ...guest,
           }));
         } catch (error) {
@@ -242,6 +292,7 @@ const Booking = () => {
             tourId: selectedTour.id,
             travelDate: pickTourDate(selectedTour, checkIn, checkOut),
             bundleCombo: combo,
+            couponCode: appliedCoupon?.code || undefined,
             ...guest,
           }));
         } catch (error) {
@@ -332,9 +383,11 @@ const Booking = () => {
               >
                 <span className="pm-icon"><FaCreditCard /></span>
                 <span className="pm-copy">
-                  <strong>{t('pay.cardNow')}</strong>
-                  <em>₼ {money(grandTotal)}</em>
-                  <small>{t('pay.payAtHotelHint')}</small>
+                  <strong>{paymentMethod === 'card' ? t('pay.cardNow') : t('pay.atHotel')}</strong>
+                  <em>₼ {money(depositAmount)}</em>
+                  <small>
+                    {paymentMethod === 'card' ? t('pay.payNowHint') : t('pay.payAtHotelHint')}
+                  </small>
                 </span>
                 <span className={`pay-switch ${paymentMethod === 'card' ? 'on' : ''}`} aria-hidden="true">
                   <i />
@@ -355,7 +408,26 @@ const Booking = () => {
               </div>
             </div>
 
-            {paymentMethod === 'card' && (
+            {paymentMethod === 'hotel' && (
+              <div className="pay-deposit">
+                <p className="pay-hotel-note">{t('pay.depositHint')}</p>
+                <div className="pay-deposit-options" role="group" aria-label={t('pay.depositTitle')}>
+                  {DEPOSIT_PERCENTS.map((percent) => (
+                    <button
+                      key={percent}
+                      type="button"
+                      className={`pay-deposit-btn ${depositPercent === percent ? 'on' : ''}`}
+                      onClick={() => setDepositPercent(percent)}
+                    >
+                      <strong>{percent}%</strong>
+                      <span>₼ {money(roundMoney(grandTotal * percent / 100))}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(paymentMethod === 'card' || paymentMethod === 'hotel') && (
               <div className="pay-card-grid">
                 <label className="glass-field">
                   <span>{t('pay.method')}</span>
@@ -419,10 +491,6 @@ const Booking = () => {
                   </select>
                 </label>
               </div>
-            )}
-
-            {paymentMethod === 'hotel' && (
-              <p className="pay-hotel-note">{t('pay.atHotel')}</p>
             )}
 
             <label className="glass-field">
@@ -545,6 +613,29 @@ const Booking = () => {
           <p className="co-dates">{formatDate(checkIn)} — {formatDate(checkOut)}</p>
 
           <h4>{t('pay.priceDetails')}</h4>
+          <div className="pay-coupon">
+            <label htmlFor="pay-coupon">{t('pay.coupon')}</label>
+            <div className="pay-coupon-row">
+              <input
+                id="pay-coupon"
+                value={couponInput}
+                onChange={(event) => {
+                  setCouponInput(event.target.value);
+                  setCouponError('');
+                  if (appliedCoupon) setAppliedCoupon(null);
+                }}
+                placeholder={t('pay.couponPlaceholder')}
+                maxLength={40}
+              />
+              <button type="button" onClick={handleApplyCoupon} disabled={couponBusy || !couponInput.trim()}>
+                {couponBusy ? '...' : t('pay.applyCoupon')}
+              </button>
+            </div>
+            {couponError && <p className="pay-error">{couponError}</p>}
+            {appliedCoupon && !couponError && (
+              <p className="pay-coupon-ok">{t('pay.couponApplied')}</p>
+            )}
+          </div>
           <ul className="co-checks">
             {addonLines.map((line) => (
               <li key={line.key}>
@@ -568,25 +659,43 @@ const Booking = () => {
               <span>{t('pay.hotel')}</span>
               <strong>₼ {money(hotelList)}</strong>
             </div>
-            {discountValue > 0 && (
+            {comboOff > 0 && (
               <div>
                 <span>{discountPercent > 0 ? `−${money(discountPercent)}%` : t('pay.discount')}</span>
-                <strong>−₼ {money(discountValue)}</strong>
+                <strong>−₼ {money(comboOff)}</strong>
+              </div>
+            )}
+            {couponOff > 0 && (
+              <div>
+                <span>{t('pay.couponOff', { code: appliedCoupon?.code || couponInput })}</span>
+                <strong>−₼ {money(couponOff)}</strong>
               </div>
             )}
             <div className="co-grand">
               <span>{t('pay.total')}</span>
               <strong>₼ {money(grandTotal)}</strong>
             </div>
+            {paymentMethod === 'hotel' && (
+              <>
+                <div>
+                  <span>{t('pay.depositNow', { percent: depositPercent })}</span>
+                  <strong>₼ {money(depositAmount)}</strong>
+                </div>
+                <div>
+                  <span>{t('pay.remainHotel')}</span>
+                  <strong>₼ {money(remainingAmount)}</strong>
+                </div>
+              </>
+            )}
           </div>
 
           {formError && <p className="pay-error">{formError}</p>}
 
           <button type="submit" className="pay-submit" disabled={submitting}>
             <span>
-              {paymentMethod === 'card'
-                ? t('pay.pay', { amount: `${money(grandTotal)} ₼` })
-                : t('pay.confirm')}
+              {paymentMethod === 'hotel'
+                ? t('pay.payDeposit', { amount: `${money(depositAmount)} ₼` })
+                : t('pay.pay', { amount: `${money(grandTotal)} ₼` })}
             </span>
             <FaShieldAlt />
           </button>

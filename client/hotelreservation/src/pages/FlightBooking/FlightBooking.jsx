@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaPlane, FaInfoCircle, FaUserPlus, FaMinus, FaPlus } from 'react-icons/fa';
+import { applyCouponCode } from '../../api/client';
 import './FlightBooking.css';
 
 const FlightBooking = () => {
@@ -45,6 +46,8 @@ const FlightBooking = () => {
 
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(0);
+  const [couponError, setCouponError] = useState('');
+  const [couponBusy, setCouponBusy] = useState(false);
 
   const baseFare = flight.price || 180;
   const otherServices = 20;
@@ -83,13 +86,23 @@ const FlightBooking = () => {
   };
 
   const applyCoupon = () => {
-    // Mock coupon validation
-    if (couponCode.toUpperCase() === 'SAVE10') {
-      setDiscount(baseFare * 0.1);
-      alert('Kupon tətbiq edildi! 10% endirim');
-    } else {
-      alert('Keçərsiz kupon kodu');
-    }
+    const code = couponCode.trim();
+    if (!code || couponBusy) return;
+    setCouponBusy(true);
+    setCouponError('');
+    applyCouponCode(code)
+      .then((rule) => {
+        const percent = Number(rule.percent) || 0;
+        const amount = Number(rule.amount) || 0;
+        const off = percent > 0 ? baseFare * (percent / 100) : Math.min(amount, baseFare);
+        setDiscount(off);
+        setCouponCode(rule.code || code.toUpperCase());
+      })
+      .catch((error) => {
+        setDiscount(0);
+        setCouponError(error.message || 'Kupon kodu keçərsizdir.');
+      })
+      .finally(() => setCouponBusy(false));
   };
 
   const handleSubmit = (e) => {
@@ -402,7 +415,7 @@ const FlightBooking = () => {
                 {discount > 0 && (
                   <div className="fare-item discount">
                     <span className="fare-label">Endirim</span>
-                    <span className="fare-value">+₼{discount.toFixed(0)}</span>
+                    <span className="fare-value">−₼{discount.toFixed(0)}</span>
                   </div>
                 )}
 
@@ -424,12 +437,17 @@ const FlightBooking = () => {
                     type="text"
                     placeholder="Kupon kodu"
                     value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
+                    onChange={(e) => {
+                      setCouponCode(e.target.value);
+                      setCouponError('');
+                      setDiscount(0);
+                    }}
                   />
-                  <button type="button" onClick={applyCoupon} className="btn-apply-coupon">
-                    Tətbiq et
+                  <button type="button" onClick={applyCoupon} className="btn-apply-coupon" disabled={couponBusy}>
+                    {couponBusy ? '...' : 'Tətbiq et'}
                   </button>
                 </div>
+                {couponError && <p className="coupon-error">{couponError}</p>}
               </div>
 
               <div className="cancellation-info">
