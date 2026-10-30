@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaHotel, FaPlane, FaCar, FaBars, FaTimes, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { IoNotifications } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdDarkMode, MdLightMode } from 'react-icons/md';
-import LanguageSwitch from '../LanguageSwitch/LanguageSwitch';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { clearAuthSession, getAuthToken } from '../../api/auth';
@@ -20,8 +19,6 @@ const QUICK_ICONS = {
 const Header = ({
   darkMode,
   toggleDarkMode,
-  currency,
-  onCurrencyChange,
   onServiceChange,
   favoriteCount,
 }) => {
@@ -215,18 +212,6 @@ const Header = ({
           </div>
 
           <div className="user-actions">
-            <LanguageSwitch />
-            <select
-              className="currency-select"
-              value={currency}
-              onChange={(e) => onCurrencyChange(e.target.value)}
-              aria-label={t('nav.currency')}
-            >
-              <option value="AZN">₼ AZN</option>
-              <option value="USD">$ USD</option>
-              <option value="EUR">€ EUR</option>
-            </select>
-
             <button className="theme-toggle-btn" onClick={toggleDarkMode} aria-label={t('nav.theme')}>
               {darkMode ? <MdLightMode /> : <MdDarkMode />}
             </button>

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { useLanguage } from '../../context/LanguageContext';
-import LanguageSwitch from '../../components/LanguageSwitch/LanguageSwitch';
-import { getSafeAdminPath, loginRequest, saveAuthSession } from '../../api/auth';
+import { getPostLoginPath, getSafeAdminPath, loginRequest, saveAuthSession } from '../../api/auth';
 import './Auth.css';
 
 const Login = () => {
@@ -67,7 +66,7 @@ const Login = () => {
         setErrors({ form: 'Rezervasiyalar və admin səhifələri üçün admin hesabı lazımdır.' });
         return;
       }
-      navigate(nextPath || '/dashboard', { replace: true });
+      navigate(nextPath || getPostLoginPath(roles), { replace: true });
     } catch (error) {
       setErrors({ form: error.message });
     } finally {
@@ -80,9 +79,6 @@ const Login = () => {
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
-            <div className="auth-lang">
-              <LanguageSwitch />
-            </div>
             <h1 className="auth-title">{t('auth.welcome')}</h1>
             <p className="auth-subtitle">{t('auth.loginSub')}</p>
           </div>
