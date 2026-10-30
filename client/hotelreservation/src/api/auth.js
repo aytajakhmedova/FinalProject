@@ -44,6 +44,18 @@ export function hasRole(...allowed) {
   return Array.isArray(roles) && roles.some((role) => allowed.includes(role));
 }
 
+export function getPostLoginPath(roles) {
+  const list = Array.isArray(roles) ? roles : [];
+  const isReceptionOnly =
+    list.includes("Receptionist") &&
+    !list.some((role) => ["SuperAdmin", "Admin", "HotelManager"].includes(role));
+  if (isReceptionOnly) return "/admin/resepsiyon";
+  if (list.some((role) => ["SuperAdmin", "Admin", "HotelManager"].includes(role))) {
+    return "/admin";
+  }
+  return "/dashboard";
+}
+
 export function getSafeAdminPath(next) {
   if (typeof next !== "string" || !next.startsWith("/admin")) {
     return null;
