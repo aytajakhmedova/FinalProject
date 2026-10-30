@@ -4,8 +4,7 @@ import { FaStar, FaEdit } from 'react-icons/fa';
 import RatingStars from '../RatingStars/RatingStars';
 import ReviewCard from '../ReviewCard/ReviewCard';
 import ReviewForm from '../ReviewForm/ReviewForm';
-import { addStayReview, getReviewsForHotel } from '../../../utils/reviewsStore';
-import { createReview, getHotelReviews, getMyBookings } from '../../../api/client';
+import { createReview, getHotelReviews, getMyBookings, getMyReviews } from '../../../api/client';
 import { getAuthToken } from '../../../api/auth';
 import './ReviewsSection.css';
 
@@ -19,7 +18,7 @@ const normalizeReview = (item) => ({
 const ReviewsSection = ({ hotelId }) => {
   const navigate = useNavigate();
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewsList, setReviewsList] = useState(() => getReviewsForHotel(hotelId));
+  const [reviewsList, setReviewsList] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [stays, setStays] = useState([]);
 
@@ -32,17 +31,14 @@ const ReviewsSection = ({ hotelId }) => {
     } catch {
       apiReviews = [];
     }
-    const local = getReviewsForHotel(hotelId);
-    const merged = [...(Array.isArray(apiReviews) ? apiReviews : []).map(normalizeReview), ...local.map(normalizeReview)]
-      .filter((item, index, list) => list.findIndex((row) => String(row.id) === String(item.id) && String(row.bookingId || '') === String(item.bookingId || '')) === index);
-    setReviewsList(merged);
+    setReviewsList((Array.isArray(apiReviews) ? apiReviews : []).map(normalizeReview));
     if (!loggedIn) {
       setStays([]);
       return;
     }
     try {
-      const mine = await getMyBookings();
-      const reviewed = new Set(merged.map((item) => String(item.bookingId || '')).filter(Boolean));
+      const [mine, myReviews] = await Promise.all([getMyBookings(), getMyReviews().catch(() => [])]);
+      const reviewed = new Set((Array.isArray(myReviews) ? myReviews : []).map((item) => String(item.bookingId || '')).filter(Boolean));
       setStays((Array.isArray(mine) ? mine : []).filter((booking) =>
         String(booking.hotelId) === String(hotelId) &&
         booking.status === 'checked-out' &&
@@ -94,16 +90,12 @@ const ReviewsSection = ({ hotelId }) => {
         comment: newReview.comment,
       });
     } catch (error) {
-      try {
-        addStayReview({ ...newReview, hotelId });
-      } catch (localError) {
-        alert(error.message || localError.message);
-        return;
-      }
+      alert(error.message || 'Rəy göndərilmədi.');
+      return;
     }
     setShowReviewForm(false);
     refresh();
-    alert('Rəyiniz yadda saxlandı. Təşəkkür edirik.');
+    alert('Rəyiniz admin təsdiqinə göndərildi. Təsdiqlənəndən sonra oteldə görünəcək.');
   };
 
   const handleWriteReviewClick = () => {
