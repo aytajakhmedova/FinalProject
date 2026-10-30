@@ -6,6 +6,7 @@ const COMBO_OPTIONS = [
   { value: 'hotel_flight', label: 'Otel + uçuş' },
   { value: 'hotel_tour', label: 'Otel + tur' },
   { value: 'hotel_flight_tour', label: 'Otel + uçuş + tur' },
+  { value: 'coupon', label: 'Kupon kodu' },
 ];
 
 const comboLabel = (combo) => COMBO_OPTIONS.find((item) => item.value === combo)?.label || combo;
@@ -13,6 +14,7 @@ const comboLabel = (combo) => COMBO_OPTIONS.find((item) => item.value === combo)
 const emptyDiscount = () => ({
   name: '',
   combo: 'hotel_flight',
+  code: '',
   percent: 5,
   amount: 0,
   startsAt: '',
@@ -44,6 +46,7 @@ const formatDate = (value) => {
 const toRequest = (item) => ({
   name: (item.name || '').trim(),
   combo: item.combo,
+  code: (item.code || '').trim().toUpperCase() || null,
   percent: Number(item.percent) || 0,
   amount: Number(item.amount) || 0,
   startsAt: item.startsAt ? new Date(item.startsAt).toISOString() : null,
@@ -91,6 +94,10 @@ const AdminDiscounts = () => {
       setSaveError('Faiz və ya məbləğdən birini yazın.');
       return;
     }
+    if ((payload.combo === 'coupon' || payload.code) && !payload.code) {
+      setSaveError('Kupon üçün kod yazın.');
+      return;
+    }
     const isExisting = items.some((item) => item.id === editing.id);
     setSaving(true);
     setSaveError('');
@@ -129,7 +136,7 @@ const AdminDiscounts = () => {
     <div className="admin-page">
       <div className="page-header">
         <h1 className="page-title">Paketlər və Endirimlər</h1>
-        <p className="page-subtitle">Otel + uçuş / tur kombinasiyaları üçün faiz və ya məbləğ təyin edin</p>
+        <p className="page-subtitle">Paket endirimi və ya kupon kodu (məsələn SAVE10) təyin edin</p>
       </div>
 
       {loading && <p className="page-subtitle">Yüklənir...</p>}
@@ -164,6 +171,7 @@ const AdminDiscounts = () => {
                 <tr>
                   <th>Ad</th>
                   <th>Kombinasiya</th>
+                  <th>Kupon</th>
                   <th>Endirim</th>
                   <th>Tarix</th>
                   <th>Status</th>
@@ -175,6 +183,7 @@ const AdminDiscounts = () => {
                   <tr key={item.id}>
                     <td><strong>{item.name}</strong></td>
                     <td>{comboLabel(item.combo)}</td>
+                    <td>{item.code || '—'}</td>
                     <td>
                       {Number(item.percent) > 0 ? `${Number(item.percent)}%` : '—'}
                       {Number(item.amount) > 0 ? ` / ₼${Number(item.amount)}` : ''}
@@ -205,7 +214,7 @@ const AdminDiscounts = () => {
                 ))}
                 {visible.length === 0 && (
                   <tr>
-                    <td colSpan="6">Paket yoxdur</td>
+                    <td colSpan="7">Paket yoxdur</td>
                   </tr>
                 )}
               </tbody>
@@ -232,12 +241,21 @@ const AdminDiscounts = () => {
               Kombinasiya
               <select
                 value={editing.combo}
-                onChange={(e) => setEditing({ ...editing, combo: e.target.value })}
+                onChange={(e) => setEditing({ ...editing, combo: e.target.value, code: e.target.value === 'coupon' ? editing.code : '' })}
               >
                 {COMBO_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
               </select>
+            </label>
+            <label>
+              Kupon kodu
+              <input
+                value={editing.code || ''}
+                onChange={(e) => setEditing({ ...editing, code: e.target.value.toUpperCase(), combo: e.target.value.trim() ? 'coupon' : editing.combo })}
+                maxLength={40}
+                placeholder="SAVE10"
+              />
             </label>
             <label>
               Faiz (%)

@@ -64,7 +64,10 @@ const BookingSuccess = () => {
           {booking.emailSent
             ? `PDF sənəd ${booking.guestEmail || 'email'} ünvanına göndərildi.`
             : 'PDF emailə göndərilmədi. SMTP (Gmail) qoşulmayıb və ya qonaq email real deyil.'}
-          {' '}Kart ödənişi demo rejimindədir.
+          {' '}
+          {[20, 30, 40].includes(Number(booking.depositPercent))
+            ? `Kartla ${booking.depositPercent}% avans (₼${booking.depositAmount}) ödənildi, qalıq ₼${booking.remainingAmount} oteldə.`
+            : 'Kart ödənişi demo rejimindədir.'}
         </p>
 
         <div className="success-actions">
