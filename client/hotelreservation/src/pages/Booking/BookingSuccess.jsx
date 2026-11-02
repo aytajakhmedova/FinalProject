@@ -43,7 +43,11 @@ const BookingSuccess = () => {
           </div>
           <div>
             <FaUsers />
-            <span>{booking.guests} nəfər · {booking.nights} gecə · ₼{total}</span>
+            <span>
+              {booking.guests} nəfər
+              {Number(booking.nights) > 0 ? ` · ${booking.nights} gecə` : ''}
+              {` · ₼${total}`}
+            </span>
           </div>
           {extras.map((extra) => (
             <div key={extra.id}>

@@ -198,6 +198,8 @@ export const updatePaymentStatus = (id, status) => request(`/api/payments/${id}`
 
 export const getSiteContent = () => request("/api/site");
 export const getSiteCities = () => request("/api/site/cities");
+export const getSiteCountries = () => request("/api/site/countries");
+export const getSiteLocations = (city) => request(withQuery("/api/site/locations", { city }));
 export const updateSiteSettings = (settings) => request("/api/site/settings", { method: "PUT", body: JSON.stringify(settings) });
 export const getSiteMenuItems = () => request("/api/site/menu-items");
 export const createSiteMenuItem = (item) => request("/api/site/menu-items", { method: "POST", body: JSON.stringify(item) });
@@ -230,3 +232,33 @@ export async function uploadMedia(file) {
   }
   return data;
 }
+
+const sameCountry = (left, right) =>
+  String(left || "").trim().toLowerCase() === String(right || "").trim().toLowerCase();
+const tourCountry = (tour) => String(tour.destination || "").split(",").slice(1).join(",").trim();
+
+// Prefers the country-aware endpoint; falls back to the catalog lists so the checkout still works
+// against an API build that does not expose /api/trip-suggestions yet.
+export const getTripCountries = () =>
+  request("/api/trip-suggestions/countries").catch(() =>
+    Promise.all([listFlights(), listTours()]).then(([flights, tours]) => {
+      const names = [...flights.map((item) => item.destinationCountry), ...tours.map(tourCountry)]
+        .map((name) => String(name || "").trim())
+        .filter(Boolean);
+      return [...new Set(names)].sort((a, b) => a.localeCompare(b, "az")).map((name) => ({ name, isoCode: "" }));
+    })
+  );
+
+export const getTripSuggestionsByCountry = ({ country, guests = 1 }) =>
+  request(withQuery("/api/trip-suggestions/by-country", { country, guests }))
+    .catch(() =>
+      Promise.all([listFlights(), listTours()]).then(([flights, tours]) => ({
+        flights: flights.filter((item) => sameCountry(item.destinationCountry, country) && item.seatsAvailable >= guests),
+        tours: tours.filter((item) =>
+          sameCountry(tourCountry(item), country) && guests >= (item.minGuests || 1) && guests <= (item.maxGuests || 99)),
+      }))
+    )
+    .then((result) => ({
+      flights: (result.flights || []).map(mapFlight),
+      tours: uniqueListImages((result.tours || []).map(mapTour)),
+    }));

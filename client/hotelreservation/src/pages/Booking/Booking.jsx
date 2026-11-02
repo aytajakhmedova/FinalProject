@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaCreditCard, FaInfoCircle, FaLock, FaPlane, FaShieldAlt } from 'react-icons/fa';
+import { FaArrowLeft, FaCheck, FaChevronDown, FaCompass, FaCreditCard, FaGlobeEurope, FaHotel, FaInfoCircle, FaLock, FaPlane, FaRulerCombined, FaShieldAlt, FaUserFriends } from 'react-icons/fa';
+import CountryFlag from '../../components/common/CountryFlag/CountryFlag';
 import { formatDate } from '../../data/roomsData';
-import { uniqueTourImage } from '../../data/localMedia';
-import { applyCouponCode, createBooking, getActiveDiscounts, getFlights, getTours, quoteRoom } from '../../api/client';
+import { applyCouponCode, createBooking, getActiveDiscounts, getTripCountries, getTripSuggestionsByCountry, quoteRoom } from '../../api/client';
 import roomPhoto from '../../assets/images/otaq2.jpg';
-import planePhoto from '../../assets/images/ucakk.jpg';
 import { useLanguage } from '../../context/LanguageContext';
 import './Booking.css';
 
@@ -13,6 +12,8 @@ const money = (value) => {
   const amount = Number(value) || 0;
   return Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
 };
+
+const fmt = (value) => `₼${(Number(value) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 const uniqueBy = (items, keyFn) => {
   const seen = new Set();
@@ -23,6 +24,18 @@ const uniqueBy = (items, keyFn) => {
     return true;
   });
 };
+
+const AIRLINE_COLORS = ['#c0392b', '#2563a8', '#d68910', '#1e8449', '#7d3c98', '#117a8b'];
+const airlineColor = (name) => {
+  const sum = Array.from(String(name || '')).reduce((total, char) => total + char.charCodeAt(0), 0);
+  return AIRLINE_COLORS[sum % AIRLINE_COLORS.length];
+};
+const airlineInitials = (name) => String(name || '?')
+  .split(/s+/)
+  .filter(Boolean)
+  .slice(0, 2)
+  .map((word) => word[0].toUpperCase())
+  .join('');
 
 const comboKey = (flight, tour) => {
   if (flight && tour) return 'hotel_flight_tour';
@@ -40,11 +53,6 @@ const pickTourDate = (tour, checkIn, checkOut) => {
   return inStay || dates[0] || checkIn;
 };
 
-const maskedCard = (value) => {
-  const digits = String(value || '').replace(/\D/g, '').padEnd(16, '•');
-  return digits.replace(/(.{4})/g, '$1 ').trim();
-};
-
 const DEPOSIT_PERCENTS = [20, 30, 40];
 
 const roundMoney = (value) => Math.round((Number(value) || 0) * 100) / 100;
@@ -54,7 +62,6 @@ const Booking = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const bookingData = location.state;
-  const toursTrackRef = useRef(null);
 
   const [guestName, setGuestName] = useState('');
   const [guestEmail, setGuestEmail] = useState('');
@@ -71,7 +78,13 @@ const Booking = () => {
   const [cardBrand, setCardBrand] = useState('mastercard');
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [suggestions, setSuggestions] = useState({ flights: [], tours: [], message: '' });
+  const [suggestions, setSuggestions] = useState({ flights: [], tours: [] });
+  const [countries, setCountries] = useState([]);
+  const [travelCountry, setTravelCountry] = useState('');
+  const [offersLoading, setOffersLoading] = useState(false);
+  const [offersError, setOffersError] = useState('');
+  const [countryOpen, setCountryOpen] = useState(false);
+  const countryRef = useRef(null);
   const [discounts, setDiscounts] = useState([]);
   const [selectedFlightId, setSelectedFlightId] = useState(null);
   const [selectedTourId, setSelectedTourId] = useState(null);
@@ -102,26 +115,64 @@ const Booking = () => {
   useEffect(() => {
     if (!hotel) return undefined;
     let active = true;
-    Promise.all([
-      getFlights().catch(() => []),
-      getTours().catch(() => []),
-    ])
-      .then(([flightItems, tourItems]) => {
+    getTripCountries()
+      .then((items) => {
         if (!active) return;
-        setSuggestions({
-          message: 'Səyahətini tamamla — bütün uçuş və tur seçimlərinə bax.',
-          flights: uniqueBy(flightItems, (item) => item.id),
-          tours: uniqueBy(tourItems, (item) => item.id),
-        });
+        const list = Array.isArray(items) ? items : [];
+        setCountries(list);
+        const own = list.find((item) => item.name.toLowerCase() === String(hotel.country || '').toLowerCase());
+        if (own) {
+          setOffersLoading(true);
+          setTravelCountry(own.name);
+        }
       })
       .catch(() => {
-        if (!active) return;
-        setSuggestions({ flights: [], tours: [], message: '' });
+        if (active) setCountries([]);
       });
     return () => {
       active = false;
     };
   }, [hotel]);
+
+  useEffect(() => {
+    if (!travelCountry) return undefined;
+    let active = true;
+    getTripSuggestionsByCountry({ country: travelCountry, guests })
+      .then((result) => {
+        if (!active) return;
+        setSuggestions({
+          flights: uniqueBy(result.flights, (item) => item.id),
+          tours: uniqueBy(result.tours, (item) => item.id),
+        });
+      })
+      .catch((error) => {
+        if (!active) return;
+        setSuggestions({ flights: [], tours: [] });
+        setOffersError(error.message || 'Uçuş və tur məlumatları yüklənmədi.');
+      })
+      .finally(() => {
+        if (active) setOffersLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [travelCountry, guests]);
+
+  useEffect(() => {
+    if (!countryOpen) return undefined;
+    const onPointer = (event) => {
+      if (countryRef.current && !countryRef.current.contains(event.target)) setCountryOpen(false);
+    };
+    const onKey = (event) => {
+      if (event.key === 'Escape') setCountryOpen(false);
+    };
+    document.addEventListener('mousedown', onPointer);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onPointer);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [countryOpen]);
 
   useEffect(() => {
     let active = true;
@@ -191,21 +242,38 @@ const Booking = () => {
     return `${digits.slice(0, 2)}/${digits.slice(2)}`;
   };
 
-  const handleApplyCoupon = () => {
-    const code = couponInput.trim();
-    if (!code || couponBusy) return;
+  const handleCountryChange = (value) => {
+    setTravelCountry(value);
+    setOffersLoading(Boolean(value));
+    setOffersError('');
+    setSuggestions({ flights: [], tours: [] });
+    setSelectedFlightId(null);
+    setSelectedTourId(null);
+  };
+
+  const handleApplyCoupon = async (rawValue) => {
+    const code = String(rawValue ?? couponInput).trim();
+    if (!code || couponBusy) return null;
     setCouponBusy(true);
     setCouponError('');
-    applyCouponCode(code)
-      .then((rule) => {
-        setAppliedCoupon(rule);
-        setCouponInput(rule.code || code.toUpperCase());
-      })
-      .catch((error) => {
-        setAppliedCoupon(null);
-        setCouponError(error.message || 'Kupon kodu keçərsizdir.');
-      })
-      .finally(() => setCouponBusy(false));
+    try {
+      const rule = await applyCouponCode(code);
+      const next = {
+        ...rule,
+        code: rule.code || rule.Code || code.toUpperCase(),
+        percent: Number(rule.percent ?? rule.Percent) || 0,
+        amount: Number(rule.amount ?? rule.Amount) || 0,
+      };
+      setAppliedCoupon(next);
+      setCouponInput(next.code);
+      return next;
+    } catch (error) {
+      setAppliedCoupon(null);
+      setCouponError(error.message || 'Kupon kodu keçərsizdir.');
+      return null;
+    } finally {
+      setCouponBusy(false);
+    }
   };
 
   const handleSubmitBooking = async (e) => {
@@ -240,6 +308,13 @@ const Booking = () => {
       return;
     }
 
+    let couponForBooking = appliedCoupon;
+    const typedCoupon = couponInput.trim();
+    if (typedCoupon && typedCoupon.toUpperCase() !== String(appliedCoupon?.code || '').toUpperCase()) {
+      couponForBooking = await handleApplyCoupon(typedCoupon);
+      if (!couponForBooking) return;
+    }
+
     try {
       setSubmitting(true);
       const quote = await quoteRoom(room.id, { checkIn, checkOut, guests });
@@ -266,7 +341,7 @@ const Booking = () => {
         checkOut,
         specialRequests,
         bundleCombo: combo || undefined,
-        couponCode: appliedCoupon?.code || undefined,
+        couponCode: couponForBooking?.code || undefined,
         ...guest,
       });
 
@@ -277,8 +352,9 @@ const Booking = () => {
           extras.push(await createBooking({
             bookingType: 'flight',
             flightId: selectedFlight.id,
+            travelCountry,
             bundleCombo: combo,
-            couponCode: appliedCoupon?.code || undefined,
+            couponCode: couponForBooking?.code || undefined,
             ...guest,
           }));
         } catch (error) {
@@ -290,9 +366,10 @@ const Booking = () => {
           extras.push(await createBooking({
             bookingType: 'tour',
             tourId: selectedTour.id,
+            travelCountry,
             travelDate: pickTourDate(selectedTour, checkIn, checkOut),
             bundleCombo: combo,
-            couponCode: appliedCoupon?.code || undefined,
+            couponCode: couponForBooking?.code || undefined,
             ...guest,
           }));
         } catch (error) {
@@ -313,21 +390,6 @@ const Booking = () => {
       setSubmitting(false);
     }
   };
-
-  const addonLines = [
-    selectedFlight && {
-      key: 'flight',
-      label: `${selectedFlight.flightNumber || selectedFlight.airline}`,
-      amount: flightList,
-      onClear: () => setSelectedFlightId(null),
-    },
-    selectedTour && {
-      key: 'tour',
-      label: selectedTour.name,
-      amount: tourList,
-      onClear: () => setSelectedTourId(null),
-    },
-  ].filter(Boolean);
 
   return (
     <div className="booking-page pay-page">
@@ -375,37 +437,36 @@ const Booking = () => {
             </label>
 
             <h2>{t('pay.cardInfo')}</h2>
-            <div className="pay-method-row">
+            <div className="pay-method-row" role="radiogroup" aria-label="Ödəniş üsulu">
               <button
                 type="button"
+                role="radio"
+                aria-checked={paymentMethod === 'card'}
                 className={`pay-method-card ${paymentMethod === 'card' ? 'on' : ''}`}
-                onClick={() => setPaymentMethod(paymentMethod === 'card' ? 'hotel' : 'card')}
+                onClick={() => setPaymentMethod('card')}
               >
-                <span className="pm-icon"><FaCreditCard /></span>
-                <span className="pm-copy">
-                  <strong>{paymentMethod === 'card' ? t('pay.cardNow') : t('pay.atHotel')}</strong>
-                  <em>₼ {money(depositAmount)}</em>
-                  <small>
-                    {paymentMethod === 'card' ? t('pay.payNowHint') : t('pay.payAtHotelHint')}
-                  </small>
+                <span className="pm-head">
+                  <span className="pm-icon"><FaCreditCard /></span>
+                  <span className="pm-radio" aria-hidden="true" />
                 </span>
-                <span className={`pay-switch ${paymentMethod === 'card' ? 'on' : ''}`} aria-hidden="true">
-                  <i />
-                </span>
+                <strong>{t('pay.cardNow')}</strong>
+                <em>{fmt(grandTotal)}</em>
+                <small>{t('pay.payNowHint')}</small>
               </button>
-
-              <div className="glass-card-visual" aria-hidden="true">
-                <div className="gcv-top">
-                  <span>Credit Card</span>
-                  <span className="gcv-wave" />
-                </div>
-                <span className="gcv-chip" />
-                <p className="gcv-num">{maskedCard(cardNumber)}</p>
-                <div className="gcv-bottom">
-                  <span>{(cardName || 'CARD HOLDER').toUpperCase()}</span>
-                  <span>{expiry || 'MM/YY'}</span>
-                </div>
-              </div>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={paymentMethod === 'hotel'}
+                className={`pay-method-card ${paymentMethod === 'hotel' ? 'on' : ''}`}
+                onClick={() => setPaymentMethod('hotel')}
+              >
+                <span className="pm-head">
+                  <span className="pm-icon"><FaHotel /></span>
+                  <span className="pm-radio" aria-hidden="true" />
+                </span>
+                <strong>{t('pay.atHotel')}</strong>
+                <small>{t('pay.payAtHotelHint')}</small>
+              </button>
             </div>
 
             {paymentMethod === 'hotel' && (
@@ -420,7 +481,7 @@ const Booking = () => {
                       onClick={() => setDepositPercent(percent)}
                     >
                       <strong>{percent}%</strong>
-                      <span>₼ {money(roundMoney(grandTotal * percent / 100))}</span>
+                      <span>{fmt(roundMoney(grandTotal * percent / 100))}</span>
                     </button>
                   ))}
                 </div>
@@ -515,88 +576,183 @@ const Booking = () => {
           <div className="pay-enrich">
             <div className="pay-enrich-head">
               <h2>{t('pay.enrich')}</h2>
-              <span>{t('pay.completeTrip')}</span>
+              <span>Daha çox seçim, daha yaxşı təcrübə!</span>
             </div>
 
-            {(suggestions.flights.length > 0 || suggestions.tours.length > 0) && (
-              <>
-                <div className="offer-track">
-                  {suggestions.flights.map((flight) => {
-                    const active = selectedFlightId === flight.id;
-                    const list = Number(flight.price) * Number(guests);
-                    const priced = active && discountPercent > 0 ? applyPercent(list, discountPercent) : list;
-                    return (
-                      <button
-                        key={flight.id}
-                        type="button"
-                        className={`offer-card flight ${active ? 'active' : ''}`}
-                        aria-pressed={active}
-                        onClick={() => setSelectedFlightId(active ? null : flight.id)}
-                        style={{ backgroundImage: `url(${planePhoto})` }}
-                      >
-                        <span className="offer-shade" />
-                        <FaPlane className="offer-plane" />
-                        <span className="offer-copy">
-                          <strong>{flight.airline}</strong>
-                          <em>{flight.flightNumber}</em>
-                          <b>₼ {money(priced)}</b>
-                        </span>
-                      </button>
-                    );
-                  })}
-                  {suggestions.tours.map((tour) => {
-                    const active = selectedTourId === tour.id;
-                    const list = Number(tour.price) * Number(guests);
-                    const priced = active && discountPercent > 0 ? applyPercent(list, discountPercent) : list;
-                    const image = tour.image || uniqueTourImage(tour.id);
-                    return (
-                      <button
-                        key={tour.id}
-                        type="button"
-                        className={`offer-card tour ${active ? 'active' : ''}`}
-                        aria-pressed={active}
-                        onClick={() => setSelectedTourId(active ? null : tour.id)}
-                        style={{ backgroundImage: `url(${image})` }}
-                      >
-                        <span className="offer-shade" />
-                        <span className="offer-copy">
-                          <strong>{tour.name}</strong>
-                          <b>₼ {money(priced)}</b>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="offer-more-row">
+            <div className="enrich-country">
+              <div className="enrich-country-row">
+                <span className="country-label">
+                  <FaGlobeEurope /> Səyahət ölkəsi:
+                </span>
+                <div className="country-select" ref={countryRef}>
                   <button
                     type="button"
-                    className="offer-more"
-                    onClick={() => {
-                      const track = document.querySelector('.offer-track');
-                      if (track) track.scrollBy({ left: 280, behavior: 'smooth' });
-                    }}
+                    className={`country-trigger ${countryOpen ? 'open' : ''}`}
+                    aria-haspopup="listbox"
+                    aria-expanded={countryOpen}
+                    onClick={() => setCountryOpen((open) => !open)}
                   >
-                    {t('pay.selectTours')}
+                    <CountryFlag name={travelCountry} isoCode={countries.find((item) => item.name === travelCountry)?.isoCode} className="country-flag" />
+                    <span className="country-name">{travelCountry || 'Ölkə seçin'}</span>
+                    <FaChevronDown className="country-chevron" />
                   </button>
-                </div>
-                <span ref={toursTrackRef} className="tours-anchor" />
-
-                <ul className="offer-checks">
-                  {addonLines.length === 0 && (
-                    <li className="empty">{t('pay.completeTrip')}</li>
+                  {countryOpen && (
+                    <ul className="country-menu" role="listbox">
+                      {countries.length === 0 && <li className="country-none">Ölkə siyahısı boşdur</li>}
+                      {countries.map(({ name: item, isoCode }) => (
+                        <li key={item} role="option" aria-selected={item === travelCountry}>
+                          <button
+                            type="button"
+                            className={item === travelCountry ? 'selected' : ''}
+                            onClick={() => {
+                              handleCountryChange(item);
+                              setCountryOpen(false);
+                            }}
+                          >
+                            <CountryFlag name={item} isoCode={isoCode} className="country-flag" />
+                            <span>{item}</span>
+                            {item === travelCountry && <FaCheck />}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
                   )}
-                  {addonLines.map((line) => (
-                    <li key={line.key}>
-                      <label>
-                        <input type="checkbox" checked readOnly onClick={line.onClear} />
-                        <span>{line.label}</span>
-                      </label>
-                      <em>+{money(line.amount)}₼</em>
-                    </li>
-                  ))}
-                </ul>
-              </>
+                </div>
+              </div>
+              <p className="enrich-hint">
+                <FaInfoCircle /> Ölkə dəyişdirildikdə uçuş və tur seçimləri yenilənəcək. Bu seçimlər könüllüdür.
+              </p>
+            </div>
+
+            {!travelCountry && (
+              <div className="enrich-placeholder">
+                <FaGlobeEurope />
+                <strong>Səyahət ölkəsini seçin</strong>
+                <p>Seçdiyiniz ölkəyə uyğun uçuş biletləri və tur paketləri burada görünəcək. Bu seçimlər könüllüdür.</p>
+              </div>
+            )}
+            {offersError && <p className="pay-error">{offersError}</p>}
+            {travelCountry && (
+            <div className="enrich-grid">
+              <section className="enrich-panel" aria-label="Uçuş bileti">
+                <header className="enrich-panel-head">
+                  <span className="enrich-panel-icon"><FaPlane /></span>
+                  <div>
+                    <h3>Uçuş bileti</h3>
+                    <p>{travelCountry} istiqamətli uçuşlar</p>
+                  </div>
+                </header>
+
+                <div className="enrich-list">
+                  {offersLoading && <p className="enrich-empty">Yüklənir...</p>}
+                  {!offersLoading && suggestions.flights.length === 0 && (
+                    <p className="enrich-empty">Bu ölkə üçün uyğun uçuş tapılmadı.</p>
+                  )}
+                  {!offersLoading && suggestions.flights.map((flight) => {
+                    const active = selectedFlightId === flight.id;
+                    return (
+                      <article key={flight.id} className={`offer-card flight-card ${active ? 'active' : ''}`}>
+                        <div className="flight-top">
+                          <span className="airline-logo" style={{ background: airlineColor(flight.airline) }}>
+                            {airlineInitials(flight.airline)}
+                          </span>
+                          <div className="flight-name">
+                            <strong>{flight.airline}</strong>
+                            <em>{flight.flightNumber}</em>
+                          </div>
+                          <span className={`pick-dot ${active ? 'on' : ''}`} aria-hidden="true">
+                            {active && <FaCheck />}
+                          </span>
+                        </div>
+
+                        <div className="flight-route">
+                          <div className="route-point">
+                            <b>{flight.originCode}</b>
+                            <span>{flight.originCity}</span>
+                          </div>
+                          <span className="route-line" aria-hidden="true"><FaPlane /></span>
+                          <div className="route-point end">
+                            <b>{flight.destinationCode}</b>
+                            <span>{flight.destinationCity}</span>
+                          </div>
+                        </div>
+
+                        <div className="flight-times">
+                          <b>{flight.departTime}</b>
+                          <span>{flight.duration}</span>
+                          <b>{flight.arriveTime}</b>
+                          <em>{formatDate(String(flight.departureAt).slice(0, 10))}</em>
+                        </div>
+
+                        <div className="offer-foot">
+                          <div className="offer-price">
+                            <strong>{fmt(Number(flight.price) * Number(guests))}</strong>
+                            <small>{guests} nəfər</small>
+                          </div>
+                          <button
+                            type="button"
+                            className="offer-pick"
+                            aria-pressed={active}
+                            onClick={() => setSelectedFlightId(active ? null : flight.id)}
+                          >
+                            {active ? 'Seçildi' : 'Bilet seç'}
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </section>
+
+              <section className="enrich-panel" aria-label="Turlar">
+                <header className="enrich-panel-head">
+                  <span className="enrich-panel-icon"><FaCompass /></span>
+                  <div>
+                    <h3>Turlar</h3>
+                    <p>{travelCountry} üzrə mövcud turlar</p>
+                  </div>
+                </header>
+
+                <div className="enrich-list">
+                  {offersLoading && <p className="enrich-empty">Yüklənir...</p>}
+                  {!offersLoading && suggestions.tours.length === 0 && (
+                    <p className="enrich-empty">Bu ölkə üçün uyğun tur tapılmadı.</p>
+                  )}
+                  {!offersLoading && suggestions.tours.map((tour) => {
+                    const active = selectedTourId === tour.id;
+                    return (
+                      <article key={tour.id} className={`offer-card tour-card ${active ? 'active' : ''}`}>
+                        <div className="tour-media">
+                          <img src={tour.image} alt={tour.name} />
+                          <span className={`pick-dot ${active ? 'on' : ''}`} aria-hidden="true">
+                            {active && <FaCheck />}
+                          </span>
+                        </div>
+                        <div className="tour-body">
+                          <strong className="tour-name">{tour.name}</strong>
+                          <span className="tour-duration">{tour.duration}</span>
+                          <p className="tour-desc">{tour.description}</p>
+                        </div>
+                        <div className="offer-foot">
+                          <div className="offer-price">
+                            <strong>{fmt(Number(tour.price) * Number(guests))}</strong>
+                            <small>{guests} nəfər</small>
+                          </div>
+                          <button
+                            type="button"
+                            className="offer-pick"
+                            aria-pressed={active}
+                            onClick={() => setSelectedTourId(active ? null : tour.id)}
+                          >
+                            {active ? 'Seçildi' : 'Turu seç'}
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              </section>
+            </div>
             )}
           </div>
         </section>
@@ -607,10 +763,28 @@ const Booking = () => {
             <img src={coverImage} alt={room.name} />
           </div>
           <h3>{room.name}</h3>
-          <p className="co-line">
-            {t('pay.nightsLine', { nights, room: room.name, price: money(hotelList) })}
+          <p className="co-meta">
+            <span><FaUserFriends /> {guests} qonaq</span>
+            {room.size && <span><FaRulerCombined /> {room.size}</span>}
+            <span><FaHotel /> {hotel.title || hotel.name}</span>
           </p>
-          <p className="co-dates">{formatDate(checkIn)} — {formatDate(checkOut)}</p>
+
+          <div className="co-stay">
+            <div>
+              <span>Giriş tarixi</span>
+              <strong>{formatDate(checkIn)}</strong>
+              <em>Çət · {hotel.checkIn || '14:00'}</em>
+            </div>
+            <div className="co-nights">
+              <b>{nights}</b>
+              <span>gecə</span>
+            </div>
+            <div>
+              <span>Çıxış tarixi</span>
+              <strong>{formatDate(checkOut)}</strong>
+              <em>Çıx · {hotel.checkOut || '12:00'}</em>
+            </div>
+          </div>
 
           <h4>{t('pay.priceDetails')}</h4>
           <div className="pay-coupon">
@@ -620,14 +794,26 @@ const Booking = () => {
                 id="pay-coupon"
                 value={couponInput}
                 onChange={(event) => {
-                  setCouponInput(event.target.value);
+                  setCouponInput(event.target.value.toUpperCase());
                   setCouponError('');
                   if (appliedCoupon) setAppliedCoupon(null);
                 }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault();
+                    handleApplyCoupon();
+                  }
+                }}
+                onBlur={() => {
+                  if (couponInput.trim() && couponInput.trim().toUpperCase() !== String(appliedCoupon?.code || '').toUpperCase()) {
+                    handleApplyCoupon();
+                  }
+                }}
                 placeholder={t('pay.couponPlaceholder')}
                 maxLength={40}
+                autoComplete="off"
               />
-              <button type="button" onClick={handleApplyCoupon} disabled={couponBusy || !couponInput.trim()}>
+              <button type="button" onMouseDown={(event) => event.preventDefault()} onClick={() => handleApplyCoupon()} disabled={couponBusy || !couponInput.trim()}>
                 {couponBusy ? '...' : t('pay.applyCoupon')}
               </button>
             </div>
@@ -636,54 +822,48 @@ const Booking = () => {
               <p className="pay-coupon-ok">{t('pay.couponApplied')}</p>
             )}
           </div>
-          <ul className="co-checks">
-            {addonLines.map((line) => (
-              <li key={line.key}>
-                <label>
-                  <input type="checkbox" checked readOnly onClick={line.onClear} />
-                  <span>{line.label}</span>
-                </label>
-                <em>+{money(line.amount)}₼</em>
-              </li>
-            ))}
-          </ul>
-
           <div className="co-totals">
-            {(selectedFlight || selectedTour) && (
+            <div>
+              <span>Otel ({nights} gecə)</span>
+              <strong>{fmt(hotelList)}</strong>
+            </div>
+            {selectedFlight && (
               <div>
-                <span>{t('pay.completeTrip')}</span>
-                <strong>₼ {money(flightList + tourList)}</strong>
+                <span>Uçuş bileti</span>
+                <strong>{fmt(flightList)}</strong>
               </div>
             )}
-            <div>
-              <span>{t('pay.hotel')}</span>
-              <strong>₼ {money(hotelList)}</strong>
-            </div>
-            {comboOff > 0 && (
+            {selectedTour && (
               <div>
-                <span>{discountPercent > 0 ? `−${money(discountPercent)}%` : t('pay.discount')}</span>
-                <strong>−₼ {money(comboOff)}</strong>
+                <span>Tur paketi</span>
+                <strong>{fmt(tourList)}</strong>
+              </div>
+            )}
+            {comboOff > 0 && (
+              <div className="co-minus">
+                <span>{discountPercent > 0 ? `Endirim (−${money(discountPercent)}%)` : t('pay.discount')}</span>
+                <strong>−{fmt(comboOff)}</strong>
               </div>
             )}
             {couponOff > 0 && (
-              <div>
+              <div className="co-minus">
                 <span>{t('pay.couponOff', { code: appliedCoupon?.code || couponInput })}</span>
-                <strong>−₼ {money(couponOff)}</strong>
+                <strong>−{fmt(couponOff)}</strong>
               </div>
             )}
             <div className="co-grand">
-              <span>{t('pay.total')}</span>
-              <strong>₼ {money(grandTotal)}</strong>
+              <span>Yekun məbləğ</span>
+              <strong>{fmt(grandTotal)}</strong>
             </div>
             {paymentMethod === 'hotel' && (
               <>
                 <div>
                   <span>{t('pay.depositNow', { percent: depositPercent })}</span>
-                  <strong>₼ {money(depositAmount)}</strong>
+                  <strong>{fmt(depositAmount)}</strong>
                 </div>
                 <div>
                   <span>{t('pay.remainHotel')}</span>
-                  <strong>₼ {money(remainingAmount)}</strong>
+                  <strong>{fmt(remainingAmount)}</strong>
                 </div>
               </>
             )}
@@ -692,14 +872,14 @@ const Booking = () => {
           {formError && <p className="pay-error">{formError}</p>}
 
           <button type="submit" className="pay-submit" disabled={submitting}>
+            <FaLock />
             <span>
               {paymentMethod === 'hotel'
-                ? t('pay.payDeposit', { amount: `${money(depositAmount)} ₼` })
-                : t('pay.pay', { amount: `${money(grandTotal)} ₼` })}
+                ? t('pay.payDeposit', { amount: fmt(depositAmount) })
+                : t('pay.pay', { amount: fmt(grandTotal) })}
             </span>
-            <FaShieldAlt />
           </button>
-          <p className="pay-secure"><FaLock /> {t('pay.secure')}</p>
+          <p className="pay-secure"><FaShieldAlt /> {t('pay.secure')}</p>
         </aside>
       </form>
     </div>
