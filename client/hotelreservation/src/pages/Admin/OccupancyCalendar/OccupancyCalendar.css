@@ -1,11 +1,11 @@
 .occupancy-calendar-page {
-  padding: 2rem;
-  background: var(--bg-primary);
-  min-height: 100vh;
+  padding: 0;
+  background: transparent;
+  min-height: auto;
 }
 
 .calendar-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
 }
 
 .header-title {
@@ -16,25 +16,25 @@
 }
 
 .header-title svg {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #8B5A3C;
 }
 
 .header-title h1 {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .header-subtitle {
   font-size: 1rem;
-  color: var(--text-secondary);
-  margin-left: 3rem;
+  color: var(--text-muted);
+  margin-left: 2.5rem;
 }
 
 .occupancy-hotel-select,
 .occupancy-month-input {
-  margin: 1rem 0 0 3rem;
+  margin: 1rem 0 0 2.5rem;
   padding: 0.6rem 0.9rem;
   border-radius: 10px;
   border: 1px solid var(--border-color);
@@ -50,7 +50,7 @@
 .occupancy-message {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 2.5rem 2rem;
   text-align: center;
   color: var(--text-secondary);
@@ -66,7 +66,7 @@
   padding: 0.6rem 1rem;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #8B5A3C, #A0522D);
+  background: linear-gradient(135deg, #8B5A3C, #6f4429);
   color: #fff;
   font-weight: 700;
   cursor: pointer;
@@ -87,7 +87,7 @@
   padding: 1.5rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 14px;
   transition: all 0.3s ease;
 }
 
@@ -219,7 +219,7 @@
   margin-bottom: 2rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 1.5rem;
 }
 
@@ -236,7 +236,7 @@
 
 .room-column-header {
   padding: 0.75rem;
-  background: var(--bg-primary);
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 8px;
   font-weight: 700;
   color: var(--text-primary);
@@ -245,12 +245,12 @@
 
 .day-header {
   padding: 0.75rem 0.5rem;
-  background: var(--bg-primary);
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 8px;
   font-weight: 600;
   color: var(--text-primary);
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .day-header.today {
@@ -266,7 +266,7 @@
 
 .room-info {
   padding: 1rem;
-  background: var(--bg-primary);
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -280,18 +280,18 @@
 }
 
 .room-type {
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   color: var(--text-secondary);
 }
 
 .room-capacity {
-  font-size: 0.8rem;
+  font-size: 0.88rem;
   color: var(--text-secondary);
 }
 
 .day-cell {
   height: 70px;
-  background: var(--bg-primary);
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -354,7 +354,7 @@
 .daily-occupancy-section {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 2rem;
 }
 
@@ -396,7 +396,7 @@
 }
 
 .bar-label {
-  font-size: 0.75rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
   font-weight: 600;
 }

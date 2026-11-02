@@ -18,10 +18,10 @@ const paymentLabel = (method, percent) => {
 };
 
 const statusColors = {
-  confirmed: { bg: 'rgba(34, 197, 94, 0.1)', text: '#22c55e' },
-  'checked-in': { bg: 'rgba(59, 130, 246, 0.12)', text: '#2563eb' },
-  'checked-out': { bg: 'rgba(107, 114, 128, 0.12)', text: '#4b5563' },
-  cancelled: { bg: 'rgba(239, 68, 68, 0.1)', text: '#ef4444' },
+  confirmed: { bg: 'rgba(74, 222, 128, 0.12)', text: '#7ddc9a' },
+  'checked-in': { bg: 'rgba(96, 165, 250, 0.14)', text: '#7db4f5' },
+  'checked-out': { bg: 'rgba(240, 164, 93, 0.14)', text: '#f0a45d' },
+  cancelled: { bg: 'rgba(248, 113, 113, 0.13)', text: '#f08a8a' },
 };
 
 const AdminDashboard = () => {

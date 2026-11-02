@@ -1,3 +1,5 @@
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { Fragment } from 'react';
 import React, { useEffect, useState } from 'react';
 import { createRoom, deleteRoom, getHotels, getRooms, updateRoom } from '../../api/client';
 import './Hotels/AdminHotels.css';
@@ -87,77 +89,7 @@ const AdminRooms = () => {
       });
   };
 
-  return (
-    <div className="admin-page">
-      <div className="page-header">
-        <h1 className="page-title">Otaq İdarəetməsi</h1>
-        <p className="page-subtitle">Otaq tipi, qiymət, tutum və statusu idarə edin</p>
-      </div>
-
-      {loading && <p className="page-subtitle">Yüklənir...</p>}
-      {loadError && (
-        <div className="coming-soon-card">
-          <h2>Məlumat yüklənmədi</h2>
-          <p>{loadError}</p>
-        </div>
-      )}
-
-      {!loading && !loadError && (
-        <>
-          <div className="inventory-toolbar">
-            <button
-              className="btn-admin-primary"
-              onClick={() => setEditing(emptyRoom(hotels[0]?.id))}
-              disabled={hotels.length === 0}
-            >
-              + Otaq əlavə et
-            </button>
-          </div>
-
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Otaq</th>
-                  <th>Otel</th>
-                  <th>Tutum</th>
-                  <th>Qiymət</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {rooms.map((room) => (
-                  <tr key={room.id}>
-                    <td>
-                      <strong>{room.name}</strong>
-                      <div className="muted">{room.size} · {room.bedType}</div>
-                    </td>
-                    <td>{room.hotelName || hotelName(room.hotelId)}</td>
-                    <td>{room.capacity} nəfər</td>
-                    <td>₼{room.pricePerNight}</td>
-                    <td>
-                      {room.available === false ? 'Bağlı' : 'Açıq'}
-                      {room.housekeepingStatus === 'cleaning' ? ' · Təmizlik' : ''}
-                    </td>
-                    <td className="table-actions">
-                      <button onClick={() => setEditing({ ...room })}>Redaktə</button>
-                      <button className="danger" onClick={() => handleDelete(room.id)}>Sil</button>
-                    </td>
-                  </tr>
-                ))}
-                {rooms.length === 0 && (
-                  <tr>
-                    <td colSpan="6">Otaq yoxdur</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-
-      {editing && (
+  const editForm = editing && (
         <form className="admin-edit-card" onSubmit={handleSave}>
           <h3>{rooms.some((room) => room.id === editing.id) ? 'Otağı redaktə et' : 'Yeni otaq'}</h3>
           {saveError && <p className="muted">{saveError}</p>}
@@ -223,10 +155,94 @@ const AdminRooms = () => {
           </div>
           <div className="admin-form-actions">
             <button type="submit" className="btn-admin-primary">Yadda saxla</button>
-            <button type="button" onClick={() => setEditing(null)}>Bağla</button>
+            <button type="button" onClick={() => setEditing(null)}>Ləğv et</button>
           </div>
         </form>
+  );
+
+  return (
+    <div className="admin-page">
+      <div className="page-header">
+        <h1 className="page-title">Otaq İdarəetməsi</h1>
+        <p className="page-subtitle">Otaq tipi, qiymət, tutum və statusu idarə edin</p>
+      </div>
+
+      {loading && <p className="page-subtitle">Yüklənir...</p>}
+      {loadError && (
+        <div className="coming-soon-card">
+          <h2>Məlumat yüklənmədi</h2>
+          <p>{loadError}</p>
+        </div>
       )}
+
+      {!loading && !loadError && (
+        <>
+          <div className="inventory-toolbar">
+            <button
+              className="btn-admin-primary"
+              onClick={() => setEditing(emptyRoom(hotels[0]?.id))}
+              disabled={hotels.length === 0}
+            >
+              + Otaq əlavə et
+            </button>
+          </div>
+
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Otaq</th>
+                  <th>Otel</th>
+                  <th>Tutum</th>
+                  <th>Qiymət</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {editing && !editing.id && (
+                  <tr className="edit-row">
+                    <td colSpan="6">{editForm}</td>
+                  </tr>
+                )}
+                {rooms.map((room) => (
+                  <Fragment key={room.id}>
+                  <tr>
+                    <td>
+                      <strong>{room.name}</strong>
+                      <div className="muted">{room.size} · {room.bedType}</div>
+                    </td>
+                    <td>{room.hotelName || hotelName(room.hotelId)}</td>
+                    <td>{room.capacity} nəfər</td>
+                    <td>₼{room.pricePerNight}</td>
+                    <td>
+                      <span className={`status-badge ${room.available === false ? 'status-cancelled' : 'status-confirmed'}`}>
+                      {room.available === false ? 'Bağlı' : 'Açıq'}</span>
+                      {room.housekeepingStatus === 'cleaning' ? ' · Təmizlik' : ''}
+                    </td>
+                    <td className="table-actions">
+                      <button onClick={() => setEditing({ ...room })}>Redaktə</button>
+                      <button className="danger" onClick={() => handleDelete(room.id)}><FaRegTrashAlt aria-label="Sil" /></button>
+                    </td>
+                  </tr>
+                  {editing?.id === room.id && (
+                    <tr className="edit-row">
+                      <td colSpan="6">{editForm}</td>
+                    </tr>
+                  )}
+                  </Fragment>
+                ))}
+                {rooms.length === 0 && (
+                  <tr>
+                    <td colSpan="6">Otaq yoxdur</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
     </div>
   );
 };

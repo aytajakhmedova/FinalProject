@@ -188,7 +188,11 @@ const AdminBookings = () => {
                       </td>
                       <td>{formatDates(booking)}</td>
                       <td>₼{Number(booking.totalPrice || 0).toLocaleString('az-AZ', { maximumFractionDigits: 0 })}</td>
-                      <td>{STATUS_LABELS[booking.status] || booking.status}</td>
+                      <td>
+                        <span className={`status-badge status-${booking.status}`}>
+                          {STATUS_LABELS[booking.status] || booking.status}
+                        </span>
+                      </td>
                       <td className="table-actions">
                         {nextStatuses.map((status) => (
                           <button

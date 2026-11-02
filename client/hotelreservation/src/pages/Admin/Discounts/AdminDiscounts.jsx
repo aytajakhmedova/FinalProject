@@ -1,3 +1,5 @@
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createDiscount, deleteDiscount, getDiscounts, updateDiscount } from '../../../api/client';
 import '../Hotels/AdminHotels.css';
@@ -132,98 +134,7 @@ const AdminDiscounts = () => {
       .finally(() => setDeletingId(null));
   };
 
-  return (
-    <div className="admin-page">
-      <div className="page-header">
-        <h1 className="page-title">Paketlər və Endirimlər</h1>
-        <p className="page-subtitle">Paket endirimi və ya kupon kodu (məsələn SAVE10) təyin edin</p>
-      </div>
-
-      {loading && <p className="page-subtitle">Yüklənir...</p>}
-      {loadError && (
-        <div className="coming-soon-card">
-          <h2>Məlumat yüklənmədi</h2>
-          <p>{loadError}</p>
-          <div className="admin-form-actions">
-            <button type="button" className="btn-admin-primary" onClick={() => loadItems()}>
-              Yenidən yoxla
-            </button>
-          </div>
-        </div>
-      )}
-
-      {!loading && !loadError && (
-        <>
-          <div className="inventory-toolbar">
-            <button
-              className="btn-admin-primary"
-              onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing(emptyDiscount()); }}
-            >
-              + Paket əlavə et
-            </button>
-          </div>
-          {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}
-          {saveError && !editing && <p className="muted">{saveError}</p>}
-
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Ad</th>
-                  <th>Kombinasiya</th>
-                  <th>Kupon</th>
-                  <th>Endirim</th>
-                  <th>Tarix</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {visible.map((item) => (
-                  <tr key={item.id}>
-                    <td><strong>{item.name}</strong></td>
-                    <td>{comboLabel(item.combo)}</td>
-                    <td>{item.code || '—'}</td>
-                    <td>
-                      {Number(item.percent) > 0 ? `${Number(item.percent)}%` : '—'}
-                      {Number(item.amount) > 0 ? ` / ₼${Number(item.amount)}` : ''}
-                    </td>
-                    <td>
-                      {formatDate(item.startsAt)}
-                      <div className="muted">{formatDate(item.endsAt)}</div>
-                    </td>
-                    <td>{item.isActive ? 'Aktiv' : 'Deaktiv'}</td>
-                    <td className="table-actions">
-                      <button onClick={() => {
-                        setSaveError('');
-                        setSuccessMessage('');
-                        setEditing({
-                          ...emptyDiscount(),
-                          ...item,
-                          startsAt: toDateTimeLocal(item.startsAt),
-                          endsAt: toDateTimeLocal(item.endsAt),
-                        });
-                      }}>
-                        Redaktə
-                      </button>
-                      <button className="danger" onClick={() => handleDelete(item)} disabled={deletingId === item.id}>
-                        {deletingId === item.id ? 'Silinir...' : 'Sil'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {visible.length === 0 && (
-                  <tr>
-                    <td colSpan="7">Paket yoxdur</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-
-      {editing && (
+  const editForm = editing && (
         <form className="admin-edit-card" onSubmit={handleSave}>
           <h3>{items.some((item) => item.id === editing.id) ? 'Paketi redaktə et' : 'Yeni paket'}</h3>
           {saveError && <p className="muted">{saveError}</p>}
@@ -312,7 +223,111 @@ const AdminDiscounts = () => {
             <button type="button" onClick={() => setEditing(null)}>Ləğv et</button>
           </div>
         </form>
+  );
+
+  return (
+    <div className="admin-page">
+      <div className="page-header">
+        <h1 className="page-title">Paketlər və Endirimlər</h1>
+        <p className="page-subtitle">Paket endirimi və ya kupon kodu (məsələn SAVE10) təyin edin</p>
+      </div>
+
+      {loading && <p className="page-subtitle">Yüklənir...</p>}
+      {loadError && (
+        <div className="coming-soon-card">
+          <h2>Məlumat yüklənmədi</h2>
+          <p>{loadError}</p>
+          <div className="admin-form-actions">
+            <button type="button" className="btn-admin-primary" onClick={() => loadItems()}>
+              Yenidən yoxla
+            </button>
+          </div>
+        </div>
       )}
+
+      {!loading && !loadError && (
+        <>
+          <div className="inventory-toolbar">
+            <button
+              className="btn-admin-primary"
+              onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing(emptyDiscount()); }}
+            >
+              + Paket əlavə et
+            </button>
+          </div>
+          {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}
+          {saveError && !editing && <p className="muted">{saveError}</p>}
+
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Ad</th>
+                  <th>Kombinasiya</th>
+                  <th>Kupon</th>
+                  <th>Endirim</th>
+                  <th>Tarix</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {editing && !editing.id && (
+                  <tr className="edit-row">
+                    <td colSpan="7">{editForm}</td>
+                  </tr>
+                )}
+                {visible.map((item) => (
+                  <Fragment key={item.id}>
+                  <tr>
+                    <td><strong>{item.name}</strong></td>
+                    <td>{comboLabel(item.combo)}</td>
+                    <td>{item.code || '—'}</td>
+                    <td>
+                      {Number(item.percent) > 0 ? `${Number(item.percent)}%` : '—'}
+                      {Number(item.amount) > 0 ? ` / ₼${Number(item.amount)}` : ''}
+                    </td>
+                    <td>
+                      {formatDate(item.startsAt)}
+                      <div className="muted">{formatDate(item.endsAt)}</div>
+                    </td>
+                    <td><span className={`status-badge ${item.isActive ? 'status-confirmed' : 'status-cancelled'}`}>{item.isActive ? 'Aktiv' : 'Deaktiv'}</span></td>
+                    <td className="table-actions">
+                      <button onClick={() => {
+                        setSaveError('');
+                        setSuccessMessage('');
+                        setEditing({
+                          ...emptyDiscount(),
+                          ...item,
+                          startsAt: toDateTimeLocal(item.startsAt),
+                          endsAt: toDateTimeLocal(item.endsAt),
+                        });
+                      }}>
+                        Redaktə
+                      </button>
+                      <button className="danger" onClick={() => handleDelete(item)} disabled={deletingId === item.id}>
+                        {deletingId === item.id ? 'Silinir...' : <FaRegTrashAlt aria-label="Sil" />}
+                      </button>
+                    </td>
+                  </tr>
+                  {editing?.id === item.id && (
+                    <tr className="edit-row">
+                      <td colSpan="7">{editForm}</td>
+                    </tr>
+                  )}
+                  </Fragment>
+                ))}
+                {visible.length === 0 && (
+                  <tr>
+                    <td colSpan="7">Paket yoxdur</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
     </div>
   );
 };

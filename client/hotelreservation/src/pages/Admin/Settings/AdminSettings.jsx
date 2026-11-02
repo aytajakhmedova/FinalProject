@@ -1,3 +1,5 @@
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { Fragment } from 'react';
 import React, { useEffect, useState } from 'react';
 import {
   createSiteAdvantage,
@@ -100,6 +102,89 @@ const AdminSettings = () => {
     );
   }
 
+  const menuForm = editingMenu && (
+        <form className="admin-edit-card" onSubmit={(e) => {
+          e.preventDefault();
+          const action = editingMenu.id ? updateSiteMenuItem(editingMenu.id, editingMenu) : createSiteMenuItem(editingMenu);
+          action.then(() => { setEditingMenu(null); load(); reload(); });
+        }}>
+          <h3>Menyu elementi</h3>
+          <div className="admin-form-grid">
+            <label>Ad<input value={editingMenu.label} onChange={(e) => setEditingMenu({ ...editingMenu, label: e.target.value })} required /></label>
+            <label>URL<input value={editingMenu.url} onChange={(e) => setEditingMenu({ ...editingMenu, url: e.target.value })} required /></label>
+            <label>Yer
+              <select value={editingMenu.placement} onChange={(e) => setEditingMenu({ ...editingMenu, placement: e.target.value })}>
+                <option value="discover">discover</option>
+                <option value="pages">pages</option>
+                <option value="quick">quick</option>
+                <option value="footer">footer</option>
+              </select>
+            </label>
+            <label>İkon<input value={editingMenu.iconKey} onChange={(e) => setEditingMenu({ ...editingMenu, iconKey: e.target.value })} placeholder="hotel, plane, car" /></label>
+            <label>Sıra<input type="number" value={editingMenu.sortOrder} onChange={(e) => setEditingMenu({ ...editingMenu, sortOrder: Number(e.target.value) })} /></label>
+            <label>Aktiv
+              <select value={String(editingMenu.isActive)} onChange={(e) => setEditingMenu({ ...editingMenu, isActive: e.target.value === 'true' })}>
+                <option value="true">Bəli</option>
+                <option value="false">Xeyr</option>
+              </select>
+            </label>
+          </div>
+          <div className="admin-form-actions">
+            <button type="submit" className="btn-admin-primary">Yadda saxla</button>
+            <button type="button" onClick={() => setEditingMenu(null)}>Ləğv et</button>
+          </div>
+        </form>
+  );
+
+  const slideForm = editingSlide && (
+        <form className="admin-edit-card" onSubmit={(e) => {
+          e.preventDefault();
+          const action = editingSlide.id ? updateSiteSlide(editingSlide.id, editingSlide) : createSiteSlide(editingSlide);
+          action.then(() => { setEditingSlide(null); load(); reload(); });
+        }}>
+          <h3>Slayd</h3>
+          <div className="admin-form-grid">
+            <label className="full">Şəkil
+              <input value={editingSlide.imageUrl} onChange={(e) => setEditingSlide({ ...editingSlide, imageUrl: e.target.value })} required />
+              <input type="file" accept="image/*" onChange={(e) => uploadMedia(e.target.files?.[0]).then((data) => setEditingSlide({ ...editingSlide, imageUrl: data.url }))} />
+            </label>
+            <label>Başlıq<input value={editingSlide.title} onChange={(e) => setEditingSlide({ ...editingSlide, title: e.target.value })} /></label>
+            <label>Sıra<input type="number" value={editingSlide.sortOrder} onChange={(e) => setEditingSlide({ ...editingSlide, sortOrder: Number(e.target.value) })} /></label>
+            <label>Aktiv
+              <select value={String(editingSlide.isActive)} onChange={(e) => setEditingSlide({ ...editingSlide, isActive: e.target.value === 'true' })}>
+                <option value="true">Bəli</option>
+                <option value="false">Xeyr</option>
+              </select>
+            </label>
+          </div>
+          <div className="admin-form-actions">
+            <button type="submit" className="btn-admin-primary">Yadda saxla</button>
+            <button type="button" onClick={() => setEditingSlide(null)}>Ləğv et</button>
+          </div>
+        </form>
+  );
+
+  const advantageForm = editingAdvantage && (
+        <form className="admin-edit-card" onSubmit={(e) => {
+          e.preventDefault();
+          const action = editingAdvantage.id ? updateSiteAdvantage(editingAdvantage.id, editingAdvantage) : createSiteAdvantage(editingAdvantage);
+          action.then(() => { setEditingAdvantage(null); load(); reload(); });
+        }}>
+          <h3>Üstünlük</h3>
+          <div className="admin-form-grid">
+            <label>Başlıq<input value={editingAdvantage.title} onChange={(e) => setEditingAdvantage({ ...editingAdvantage, title: e.target.value })} required /></label>
+            <label>İkon<input value={editingAdvantage.iconKey} onChange={(e) => setEditingAdvantage({ ...editingAdvantage, iconKey: e.target.value })} placeholder="utensils, bolt, shield, clock" /></label>
+            <label>Rəng<input value={editingAdvantage.color} onChange={(e) => setEditingAdvantage({ ...editingAdvantage, color: e.target.value })} /></label>
+            <label>Sıra<input type="number" value={editingAdvantage.sortOrder} onChange={(e) => setEditingAdvantage({ ...editingAdvantage, sortOrder: Number(e.target.value) })} /></label>
+            <label className="full">Açıqlama<textarea value={editingAdvantage.description} onChange={(e) => setEditingAdvantage({ ...editingAdvantage, description: e.target.value })} /></label>
+          </div>
+          <div className="admin-form-actions">
+            <button type="submit" className="btn-admin-primary">Yadda saxla</button>
+            <button type="button" onClick={() => setEditingAdvantage(null)}>Ləğv et</button>
+          </div>
+        </form>
+  );
+
   return (
     <div className="admin-page">
       <div className="page-header">
@@ -167,55 +252,34 @@ const AdminSettings = () => {
           <table className="admin-table">
             <thead><tr><th>Yer</th><th>Ad</th><th>URL</th><th></th></tr></thead>
             <tbody>
+              {editingMenu && !editingMenu.id && (
+                <tr className="edit-row">
+                  <td colSpan="4">{menuForm}</td>
+                </tr>
+              )}
               {menus.map((item) => (
-                <tr key={item.id}>
+                <Fragment key={item.id}>
+                <tr>
                   <td>{item.placement}</td>
                   <td>{item.label}</td>
                   <td>{item.url}</td>
                   <td className="table-actions">
                     <button type="button" onClick={() => setEditingMenu(item)}>Redaktə</button>
-                    <button type="button" className="danger" onClick={() => deleteSiteMenuItem(item.id).then(load).then(reload)}>Sil</button>
+                    <button type="button" className="danger" onClick={() => deleteSiteMenuItem(item.id).then(load).then(reload)}><FaRegTrashAlt aria-label="Sil" /></button>
                   </td>
                 </tr>
+                {editingMenu?.id === item.id && (
+                  <tr className="edit-row">
+                    <td colSpan="4">{menuForm}</td>
+                  </tr>
+                )}
+                </Fragment>
               ))}
             </tbody>
           </table>
         </div>
       </div>
 
-      {editingMenu && (
-        <form className="admin-edit-card" onSubmit={(e) => {
-          e.preventDefault();
-          const action = editingMenu.id ? updateSiteMenuItem(editingMenu.id, editingMenu) : createSiteMenuItem(editingMenu);
-          action.then(() => { setEditingMenu(null); load(); reload(); });
-        }}>
-          <h3>Menyu elementi</h3>
-          <div className="admin-form-grid">
-            <label>Ad<input value={editingMenu.label} onChange={(e) => setEditingMenu({ ...editingMenu, label: e.target.value })} required /></label>
-            <label>URL<input value={editingMenu.url} onChange={(e) => setEditingMenu({ ...editingMenu, url: e.target.value })} required /></label>
-            <label>Yer
-              <select value={editingMenu.placement} onChange={(e) => setEditingMenu({ ...editingMenu, placement: e.target.value })}>
-                <option value="discover">discover</option>
-                <option value="pages">pages</option>
-                <option value="quick">quick</option>
-                <option value="footer">footer</option>
-              </select>
-            </label>
-            <label>İkon<input value={editingMenu.iconKey} onChange={(e) => setEditingMenu({ ...editingMenu, iconKey: e.target.value })} placeholder="hotel, plane, car" /></label>
-            <label>Sıra<input type="number" value={editingMenu.sortOrder} onChange={(e) => setEditingMenu({ ...editingMenu, sortOrder: Number(e.target.value) })} /></label>
-            <label>Aktiv
-              <select value={String(editingMenu.isActive)} onChange={(e) => setEditingMenu({ ...editingMenu, isActive: e.target.value === 'true' })}>
-                <option value="true">Bəli</option>
-                <option value="false">Xeyr</option>
-              </select>
-            </label>
-          </div>
-          <div className="admin-form-actions">
-            <button type="submit" className="btn-admin-primary">Yadda saxla</button>
-            <button type="button" onClick={() => setEditingMenu(null)}>Bağla</button>
-          </div>
-        </form>
-      )}
 
       <div className="admin-edit-card">
         <h3>Slider / qalereya</h3>
@@ -224,48 +288,33 @@ const AdminSettings = () => {
           <table className="admin-table">
             <thead><tr><th>Başlıq</th><th>Şəkil</th><th></th></tr></thead>
             <tbody>
+              {editingSlide && !editingSlide.id && (
+                <tr className="edit-row">
+                  <td colSpan="3">{slideForm}</td>
+                </tr>
+              )}
               {slides.map((item) => (
-                <tr key={item.id}>
+                <Fragment key={item.id}>
+                <tr>
                   <td>{item.title}</td>
                   <td className="muted">{item.imageUrl}</td>
                   <td className="table-actions">
                     <button type="button" onClick={() => setEditingSlide(item)}>Redaktə</button>
-                    <button type="button" className="danger" onClick={() => deleteSiteSlide(item.id).then(load).then(reload)}>Sil</button>
+                    <button type="button" className="danger" onClick={() => deleteSiteSlide(item.id).then(load).then(reload)}><FaRegTrashAlt aria-label="Sil" /></button>
                   </td>
                 </tr>
+                {editingSlide?.id === item.id && (
+                  <tr className="edit-row">
+                    <td colSpan="3">{slideForm}</td>
+                  </tr>
+                )}
+                </Fragment>
               ))}
             </tbody>
           </table>
         </div>
       </div>
 
-      {editingSlide && (
-        <form className="admin-edit-card" onSubmit={(e) => {
-          e.preventDefault();
-          const action = editingSlide.id ? updateSiteSlide(editingSlide.id, editingSlide) : createSiteSlide(editingSlide);
-          action.then(() => { setEditingSlide(null); load(); reload(); });
-        }}>
-          <h3>Slayd</h3>
-          <div className="admin-form-grid">
-            <label className="full">Şəkil
-              <input value={editingSlide.imageUrl} onChange={(e) => setEditingSlide({ ...editingSlide, imageUrl: e.target.value })} required />
-              <input type="file" accept="image/*" onChange={(e) => uploadMedia(e.target.files?.[0]).then((data) => setEditingSlide({ ...editingSlide, imageUrl: data.url }))} />
-            </label>
-            <label>Başlıq<input value={editingSlide.title} onChange={(e) => setEditingSlide({ ...editingSlide, title: e.target.value })} /></label>
-            <label>Sıra<input type="number" value={editingSlide.sortOrder} onChange={(e) => setEditingSlide({ ...editingSlide, sortOrder: Number(e.target.value) })} /></label>
-            <label>Aktiv
-              <select value={String(editingSlide.isActive)} onChange={(e) => setEditingSlide({ ...editingSlide, isActive: e.target.value === 'true' })}>
-                <option value="true">Bəli</option>
-                <option value="false">Xeyr</option>
-              </select>
-            </label>
-          </div>
-          <div className="admin-form-actions">
-            <button type="submit" className="btn-admin-primary">Yadda saxla</button>
-            <button type="button" onClick={() => setEditingSlide(null)}>Bağla</button>
-          </div>
-        </form>
-      )}
 
       <div className="admin-edit-card">
         <h3>Üstünlüklər</h3>
@@ -274,41 +323,33 @@ const AdminSettings = () => {
           <table className="admin-table">
             <thead><tr><th>Başlıq</th><th>İkon</th><th></th></tr></thead>
             <tbody>
+              {editingAdvantage && !editingAdvantage.id && (
+                <tr className="edit-row">
+                  <td colSpan="3">{advantageForm}</td>
+                </tr>
+              )}
               {advantages.map((item) => (
-                <tr key={item.id}>
+                <Fragment key={item.id}>
+                <tr>
                   <td>{item.title}</td>
                   <td>{item.iconKey}</td>
                   <td className="table-actions">
                     <button type="button" onClick={() => setEditingAdvantage(item)}>Redaktə</button>
-                    <button type="button" className="danger" onClick={() => deleteSiteAdvantage(item.id).then(load).then(reload)}>Sil</button>
+                    <button type="button" className="danger" onClick={() => deleteSiteAdvantage(item.id).then(load).then(reload)}><FaRegTrashAlt aria-label="Sil" /></button>
                   </td>
                 </tr>
+                {editingAdvantage?.id === item.id && (
+                  <tr className="edit-row">
+                    <td colSpan="3">{advantageForm}</td>
+                  </tr>
+                )}
+                </Fragment>
               ))}
             </tbody>
           </table>
         </div>
       </div>
 
-      {editingAdvantage && (
-        <form className="admin-edit-card" onSubmit={(e) => {
-          e.preventDefault();
-          const action = editingAdvantage.id ? updateSiteAdvantage(editingAdvantage.id, editingAdvantage) : createSiteAdvantage(editingAdvantage);
-          action.then(() => { setEditingAdvantage(null); load(); reload(); });
-        }}>
-          <h3>Üstünlük</h3>
-          <div className="admin-form-grid">
-            <label>Başlıq<input value={editingAdvantage.title} onChange={(e) => setEditingAdvantage({ ...editingAdvantage, title: e.target.value })} required /></label>
-            <label>İkon<input value={editingAdvantage.iconKey} onChange={(e) => setEditingAdvantage({ ...editingAdvantage, iconKey: e.target.value })} placeholder="utensils, bolt, shield, clock" /></label>
-            <label>Rəng<input value={editingAdvantage.color} onChange={(e) => setEditingAdvantage({ ...editingAdvantage, color: e.target.value })} /></label>
-            <label>Sıra<input type="number" value={editingAdvantage.sortOrder} onChange={(e) => setEditingAdvantage({ ...editingAdvantage, sortOrder: Number(e.target.value) })} /></label>
-            <label className="full">Açıqlama<textarea value={editingAdvantage.description} onChange={(e) => setEditingAdvantage({ ...editingAdvantage, description: e.target.value })} /></label>
-          </div>
-          <div className="admin-form-actions">
-            <button type="submit" className="btn-admin-primary">Yadda saxla</button>
-            <button type="button" onClick={() => setEditingAdvantage(null)}>Bağla</button>
-          </div>
-        </form>
-      )}
     </div>
   );
 };

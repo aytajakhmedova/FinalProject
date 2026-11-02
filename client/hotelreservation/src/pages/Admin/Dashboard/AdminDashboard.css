@@ -14,7 +14,7 @@
 }
 
 .dashboard-title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0 0 0.5rem 0;
@@ -22,7 +22,7 @@
 
 .dashboard-subtitle {
   font-size: 1rem;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -79,7 +79,7 @@
   gap: 1.25rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
@@ -108,7 +108,7 @@
 }
 
 .stat-label {
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: var(--text-secondary);
 }
 
@@ -157,7 +157,7 @@
 }
 
 .section-title {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
@@ -173,80 +173,6 @@
 .section-link:hover {
   color: #A0522D;
 }
-
-/* Bookings Table */
-.bookings-table-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  overflow-x: auto;
-  max-width: 100%;
-}
-
-.bookings-table {
-  width: 100%;
-  min-width: 720px;
-  border-collapse: collapse;
-}
-
-.bookings-table thead {
-  background: var(--bg-primary);
-}
-
-.bookings-table th {
-  padding: 1rem 1.5rem;
-  text-align: left;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.bookings-table tbody tr {
-  border-top: 1px solid var(--border-color);
-  transition: background 0.2s ease;
-}
-
-.bookings-table tbody tr:hover {
-  background: var(--bg-primary);
-}
-
-.bookings-table td {
-  padding: 1rem 1.25rem;
-  color: var(--text-primary);
-}
-
-.guest-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.admin-dashboard .muted {
-  color: var(--text-muted);
-  font-size: 0.82rem;
-}
-
-.guest-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #8B5A3C 0%, #A0522D 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-  font-size: 0.9rem;
-}
-
-.status-badge {
-  display: inline-block;
-  padding: 0.375rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
 }
 
 /* Responsive */
@@ -287,4 +213,82 @@
   .bookings-table td {
     padding: 0.875rem 1rem;
   }
+}
+
+/* Bookings table: same borderless system as .admin-table */
+.bookings-table-card {
+  background: linear-gradient(180deg, rgba(42, 31, 26, 0.95), rgba(32, 24, 19, 0.95));
+  border: 1px solid rgba(139, 90, 60, 0.14);
+  border-radius: 16px;
+  padding: 0.75rem 1rem 1rem;
+  overflow-x: auto;
+  max-width: 100%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.bookings-table {
+  width: 100%;
+  min-width: 720px;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+}
+
+.bookings-table th {
+  padding: 0.25rem 1rem;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #b9976f;
+  background: transparent;
+  text-transform: none;
+}
+
+.bookings-table td {
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  color: var(--text-primary);
+  border: none;
+  background: rgba(255, 255, 255, 0.025);
+  transition: background 0.2s ease;
+}
+
+.bookings-table td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+.bookings-table td:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+.bookings-table tbody tr:hover td {
+  background: rgba(212, 176, 140, 0.07);
+}
+
+.guest-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-dashboard .muted {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.guest-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8B5A3C 0%, #6f4429 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.bookings-table .status-badge {
+  border: none;
 }

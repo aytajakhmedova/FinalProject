@@ -1,5 +1,7 @@
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { Fragment } from 'react';
 import React, { useEffect, useState } from 'react';
-import { createHotel, deleteHotel, getHotels, updateHotel, uploadMedia } from '../../../api/client';
+import { createHotel, deleteHotel, getHotels, getSiteCities, getSiteCountries, getSiteLocations, updateHotel, uploadMedia } from '../../../api/client';
 import './AdminHotels.css';
 
 const emptyHotel = () => ({
@@ -46,6 +48,13 @@ const AdminHotelManager = () => {
   const [saveError, setSaveError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Dropdown data
+  const [countries, setCountries] = useState([]);
+  const [allCities, setAllCities] = useState([]);
+  const [filteredCities, setFilteredCities] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [loadingLocations, setLoadingLocations] = useState(false);
+
   const loadHotels = (silent = false) => {
     if (!silent) setLoading(true);
     return getHotels()
@@ -64,7 +73,62 @@ const AdminHotelManager = () => {
 
   useEffect(() => {
     loadHotels();
+    // Load countries and cities
+    getSiteCountries()
+      .then(setCountries)
+      .catch(() => setCountries([]));
+    getSiteCities()
+      .then(setAllCities)
+      .catch(() => setAllCities([]));
   }, []);
+
+  const handleCountryChange = (country) => {
+    setEditing({ ...editing, country, city: '', location: '' });
+    const citiesForCountry = allCities.filter(c => c.country === country);
+    setFilteredCities(citiesForCountry);
+    setLocations([]);
+  };
+
+  const handleCityChange = (city) => {
+    setEditing({ ...editing, city, location: '' });
+    setLocations([]);
+    if (city) {
+      setLoadingLocations(true);
+      getSiteLocations(city)
+        .then(setLocations)
+        .catch(() => setLocations([]))
+        .finally(() => setLoadingLocations(false));
+    }
+  };
+
+  const handleEditHotel = (hotel) => {
+    setSaveError('');
+    setSuccessMessage('');
+    setEditing({ ...hotel, amenities: hotel.amenities || [] });
+    
+    // Load cities for selected country
+    if (hotel.country) {
+      const citiesForCountry = allCities.filter(c => c.country === hotel.country);
+      setFilteredCities(citiesForCountry);
+    }
+    
+    // Load locations for selected city
+    if (hotel.city) {
+      setLoadingLocations(true);
+      getSiteLocations(hotel.city)
+        .then(setLocations)
+        .catch(() => setLocations([]))
+        .finally(() => setLoadingLocations(false));
+    }
+  };
+
+  const handleNewHotel = () => {
+    setSaveError('');
+    setSuccessMessage('');
+    setEditing(emptyHotel());
+    setFilteredCities([]);
+    setLocations([]);
+  };
 
   const handleSave = (event) => {
     event.preventDefault();
@@ -108,81 +172,7 @@ const AdminHotelManager = () => {
       .finally(() => setDeletingId(null));
   };
 
-  return (
-    <div className="admin-page">
-      <div className="page-header">
-        <h1 className="page-title">Otellər</h1>
-        <p className="page-subtitle">Otel adı, ünvan, təsvir, qiymət və şəkli idarə edin</p>
-      </div>
-
-      {loading && <p className="page-subtitle">Yüklənir...</p>}
-      {loadError && (
-        <div className="coming-soon-card">
-          <h2>Məlumat yüklənmədi</h2>
-          <p>{loadError}</p>
-          <div className="admin-form-actions">
-            <button type="button" className="btn-admin-primary" onClick={() => loadHotels()}>
-              Yenidən yoxla
-            </button>
-          </div>
-        </div>
-      )}
-
-      {!loading && !loadError && (
-        <>
-          <div className="inventory-toolbar">
-            <button className="btn-admin-primary" onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing(emptyHotel()); }}>
-              + Otel əlavə et
-            </button>
-          </div>
-
-          {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}
-          {saveError && !editing && <p className="muted">{saveError}</p>}
-
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Otel</th>
-                  <th>Ünvan</th>
-                  <th>Qiymət</th>
-                  <th>Ulduz</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {hotels.map((hotel) => (
-                  <tr key={hotel.id}>
-                    <td>
-                      <strong>{hotel.title}</strong>
-                      <div className="muted">{hotel.city}{hotel.country ? `, ${hotel.country}` : ''}</div>
-                      <div className="muted">{hotel.rooms?.length || 0} otaq</div>
-                    </td>
-                    <td>{hotel.address || hotel.location || '—'}</td>
-                    <td>₼{hotel.pricePerNight}</td>
-                    <td>{hotel.stars}</td>
-                    <td className="table-actions">
-                      <button onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing({ ...hotel, amenities: hotel.amenities || [] }); }}>
-                        Redaktə
-                      </button>
-                      <button className="danger" onClick={() => handleDelete(hotel)} disabled={deletingId === hotel.id}>
-                        {deletingId === hotel.id ? 'Silinir...' : 'Sil'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {hotels.length === 0 && (
-                  <tr>
-                    <td colSpan="5">Otel yoxdur</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-
-      {editing && (
+  const editForm = editing && (
         <form className="admin-edit-card" onSubmit={handleSave}>
           <h3>{hotels.some((hotel) => hotel.id === editing.id) ? 'Oteli redaktə et' : 'Yeni otel'}</h3>
           {saveError && <p className="muted">{saveError}</p>}
@@ -208,36 +198,59 @@ const AdminHotelManager = () => {
               />
             </label>
             <label>
-              Şəhər
-              <input
-                value={editing.city}
-                onChange={(e) => setEditing({ ...editing, city: e.target.value })}
-                maxLength={100}
+              Ölkə *
+              <select
+                value={editing.country}
+                onChange={(e) => handleCountryChange(e.target.value)}
                 required
-              />
+              >
+                <option value="">Ölkə seçin</option>
+                {countries.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
-              Ölkə
-              <input
-                value={editing.country}
-                onChange={(e) => setEditing({ ...editing, country: e.target.value })}
-                maxLength={100}
+              Şəhər *
+              <select
+                value={editing.city}
+                onChange={(e) => handleCityChange(e.target.value)}
                 required
-              />
+                disabled={!editing.country}
+              >
+                <option value="">Şəhər seçin</option>
+                {filteredCities.map((city) => (
+                  <option key={city.name} value={city.name}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Turistik məkan (Location) *
+              <select
+                value={editing.location}
+                onChange={(e) => setEditing({ ...editing, location: e.target.value })}
+                required
+                disabled={!editing.city || loadingLocations}
+              >
+                <option value="">
+                  {loadingLocations ? 'Yüklənir...' : 'Məkan seçin'}
+                </option>
+                {locations.map((location) => (
+                  <option key={location} value={location}>
+                    {location}
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
               Ünvan
               <input
                 value={editing.address}
                 onChange={(e) => setEditing({ ...editing, address: e.target.value })}
-                maxLength={300}
-              />
-            </label>
-            <label>
-              Məkan
-              <input
-                value={editing.location}
-                onChange={(e) => setEditing({ ...editing, location: e.target.value })}
                 maxLength={300}
               />
             </label>
@@ -329,10 +342,107 @@ const AdminHotelManager = () => {
             <button type="submit" className="btn-admin-primary" disabled={saving}>
               {saving ? 'Yadda saxlanılır...' : 'Yadda saxla'}
             </button>
-            <button type="button" onClick={() => { setEditing(null); setSaveError(''); }}>Bağla</button>
+            <button type="button" onClick={() => { setEditing(null); setSaveError(''); }}>Ləğv et</button>
           </div>
         </form>
+  );
+
+  return (
+    <div className="admin-page">
+      <div className="page-header page-header-row">
+        <div>
+          <h1 className="page-title">Otellər</h1>
+          <p className="page-subtitle">Otel adı, ünvan, təsvir, qiymət və şəkli idarə edin</p>
+        </div>
+        {!loading && !loadError && (
+          <button className="btn-admin-primary" onClick={handleNewHotel}>
+            + Otel əlavə et
+          </button>
+        )}
+      </div>
+
+      {loading && <p className="page-subtitle">Yüklənir...</p>}
+      {loadError && (
+        <div className="coming-soon-card">
+          <h2>Məlumat yüklənmədi</h2>
+          <p>{loadError}</p>
+          <div className="admin-form-actions">
+            <button type="button" className="btn-admin-primary" onClick={() => loadHotels()}>
+              Yenidən yoxla
+            </button>
+          </div>
+        </div>
       )}
+
+      {!loading && !loadError && (
+        <>
+          {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}
+          {saveError && !editing && <p className="muted">{saveError}</p>}
+
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Otel</th>
+                  <th>Ünvan</th>
+                  <th>Qiymət</th>
+                  <th>Ulduz</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {editing && !editing.id && (
+                  <tr className="edit-row">
+                    <td colSpan="5">{editForm}</td>
+                  </tr>
+                )}
+                {hotels.map((hotel) => (
+                  <Fragment key={hotel.id}>
+                  <tr>
+                    <td>
+                      <div className="cell-media">
+                        {hotel.mainImage && <img className="cell-thumb" src={hotel.mainImage} alt="" />}
+                        <div>
+                          <strong>{hotel.title}</strong>
+                          <div className="muted">{hotel.city}{hotel.country ? `, ${hotel.country}` : ''} • {hotel.rooms?.length || 0} otaq</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{hotel.address || hotel.location || '—'}</td>
+                    <td>₼{hotel.pricePerNight}</td>
+                    <td>
+                      <span className="star-rating">
+                        {'★'.repeat(Number(hotel.stars) || 0)}{'☆'.repeat(Math.max(0, 5 - (Number(hotel.stars) || 0)))}
+                      </span>{' '}
+                      {hotel.stars}
+                    </td>
+                    <td className="table-actions">
+                      <button onClick={() => handleEditHotel(hotel)}>
+                        Redaktə
+                      </button>
+                      <button className="danger" onClick={() => handleDelete(hotel)} disabled={deletingId === hotel.id}>
+                        {deletingId === hotel.id ? 'Silinir...' : <FaRegTrashAlt aria-label="Sil" />}
+                      </button>
+                    </td>
+                  </tr>
+                  {editing?.id === hotel.id && (
+                    <tr className="edit-row">
+                      <td colSpan="5">{editForm}</td>
+                    </tr>
+                  )}
+                  </Fragment>
+                ))}
+                {hotels.length === 0 && (
+                  <tr>
+                    <td colSpan="5">Otel yoxdur</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
     </div>
   );
 };

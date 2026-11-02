@@ -1,5 +1,7 @@
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { createTour, deleteTour, listTours, updateTour } from '../../../api/client';
+import { createTour, deleteTour, listTours, updateTour, uploadMedia } from '../../../api/client';
 import '../Hotels/AdminHotels.css';
 
 const splitList = (value) => (Array.isArray(value)
@@ -99,6 +101,7 @@ const AdminTours = () => {
   const [loadError, setLoadError] = useState('');
   const [saveError, setSaveError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [dateInput, setDateInput] = useState('');
 
   const loadTours = (silent = false) => {
     if (!silent) setLoading(true);
@@ -119,6 +122,25 @@ const AdminTours = () => {
   useEffect(() => {
     loadTours();
   }, []);
+
+  const handleAddDate = () => {
+    if (!dateInput.trim()) return;
+    const currentDates = splitList(editing.availableDatesText);
+    if (currentDates.includes(dateInput.trim())) {
+      setSaveError('Bu tarix artıq əlavə edilib.');
+      return;
+    }
+    const newDates = [...currentDates, dateInput.trim()].sort();
+    setEditing({ ...editing, availableDatesText: newDates.join(', ') });
+    setDateInput('');
+    setSaveError('');
+  };
+
+  const handleRemoveDate = (dateToRemove) => {
+    const currentDates = splitList(editing.availableDatesText);
+    const newDates = currentDates.filter(d => d !== dateToRemove);
+    setEditing({ ...editing, availableDatesText: newDates.join(', ') });
+  };
 
   const categories = useMemo(() => (
     [...new Set(tours.map((tour) => tour.category).filter(Boolean))].sort()
@@ -188,112 +210,7 @@ const AdminTours = () => {
       .finally(() => setDeletingId(null));
   };
 
-  return (
-    <div className="admin-page">
-      <div className="page-header">
-        <h1 className="page-title">Turlar</h1>
-        <p className="page-subtitle">Tur adı, istiqamət, qiymət, tarix və yer limitlərini idarə edin</p>
-      </div>
-
-      {loading && <p className="page-subtitle">Yüklənir...</p>}
-      {loadError && (
-        <div className="coming-soon-card">
-          <h2>Məlumat yüklənmədi</h2>
-          <p>{loadError}</p>
-          <div className="admin-form-actions">
-            <button type="button" className="btn-admin-primary" onClick={() => loadTours()}>
-              Yenidən yoxla
-            </button>
-          </div>
-        </div>
-      )}
-
-      {!loading && !loadError && (
-        <>
-          <div className="inventory-toolbar">
-            <button
-              className="btn-admin-primary"
-              onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing(emptyTour()); }}
-            >
-              + Tur əlavə et
-            </button>
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Ad, istiqamət və ya tarix axtar"
-            />
-            <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
-              <option value="all">Bütün kateqoriyalar</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-            <select value={difficultyFilter} onChange={(e) => setDifficultyFilter(e.target.value)}>
-              <option value="all">Bütün çətinliklər</option>
-              {difficulties.map((difficulty) => (
-                <option key={difficulty} value={difficulty}>{difficulty}</option>
-              ))}
-            </select>
-          </div>
-
-          {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}
-          {saveError && !editing && <p className="muted">{saveError}</p>}
-
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Tur adı</th>
-                  <th>İstiqamət</th>
-                  <th>Qiymət</th>
-                  <th>Tarix</th>
-                  <th>Digər</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {visible.map((tour) => (
-                  <tr key={tour.id}>
-                    <td>
-                      <strong>{tour.name}</strong>
-                      <div className="muted">{tour.category || 'Kateqoriya yoxdur'}</div>
-                    </td>
-                    <td>{tour.destination || '—'}</td>
-                    <td>₼{Number(tour.price || 0).toLocaleString('az-AZ', { maximumFractionDigits: 0 })}</td>
-                    <td>
-                      {(tour.availableDates || []).length
-                        ? (tour.availableDates || []).join(', ')
-                        : '—'}
-                    </td>
-                    <td>
-                      {tour.duration || '—'}
-                      <div className="muted">
-                        {tour.difficulty || '—'} · {tour.minGuests}-{tour.maxGuests} nəfər
-                      </div>
-                    </td>
-                    <td className="table-actions">
-                      <button onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing(toEditTour(tour)); }}>
-                        Redaktə
-                      </button>
-                      <button className="danger" onClick={() => handleDelete(tour)} disabled={deletingId === tour.id}>
-                        {deletingId === tour.id ? 'Silinir...' : 'Sil'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {visible.length === 0 && (
-                  <tr>
-                    <td colSpan="6">{tours.length === 0 ? 'Tur yoxdur' : 'Uyğun tur tapılmadı'}</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-
-      {editing && (
+  const editForm = editing && (
         <form className="admin-edit-card" onSubmit={handleSave}>
           <h3>{tours.some((tour) => tour.id === editing.id) ? 'Turu redaktə et' : 'Yeni tur'}</h3>
           {saveError && <p className="muted">{saveError}</p>}
@@ -392,20 +309,90 @@ const AdminTours = () => {
               />
             </label>
             <label className="full">
-              Mövcud tarixlər (vergüllə, yyyy-mm-dd)
-              <input
-                value={editing.availableDatesText}
-                onChange={(e) => setEditing({ ...editing, availableDatesText: e.target.value })}
-                placeholder="2026-11-01, 2026-11-15"
-              />
+              Mövcud tarixlər (yyyy-mm-dd)
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px', alignItems: 'center' }}>
+                <input
+                  type="date"
+                  value={dateInput}
+                  onChange={(e) => setDateInput(e.target.value)}
+                  style={{ flex: 1, padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+                />
+                <button
+                  type="button"
+                  onClick={handleAddDate}
+                  className="btn-admin-primary"
+                  style={{ whiteSpace: 'nowrap' }}
+                >
+                  + Əlavə et
+                </button>
+              </div>
+              {splitList(editing.availableDatesText).length > 0 && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '8px', background: '#f5f5f5', borderRadius: '4px' }}>
+                  {splitList(editing.availableDatesText).map((date) => (
+                    <div
+                      key={date}
+                      style={{
+                        padding: '6px 12px',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        borderRadius: '20px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                      }}
+                    >
+                      <span>📅 {date}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveDate(date)}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.3)',
+                          border: 'none',
+                          color: 'white',
+                          cursor: 'pointer',
+                          fontSize: '18px',
+                          padding: '0 4px',
+                          lineHeight: '1',
+                          borderRadius: '50%',
+                          width: '20px',
+                          height: '20px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          transition: 'background 0.2s',
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.5)'}
+                        onMouseLeave={(e) => e.target.style.background = 'rgba(255, 255, 255, 0.3)'}
+                        title="Sil"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </label>
             <label className="full">
               Şəkil
               <input
-                value={editing.imageFile}
+                value={editing.imageFile || ''}
                 onChange={(e) => setEditing({ ...editing, imageFile: e.target.value })}
-                maxLength={200}
+                maxLength={400}
                 placeholder="Fayl adı və ya şəkil ünvanı"
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  uploadMedia(file)
+                    .then((data) => setEditing((prev) => ({ ...prev, imageFile: data.url })))
+                    .catch((err) => setSaveError(err.message || 'Şəkil yüklənmədi.'));
+                }}
               />
             </label>
             <label className="full">
@@ -452,10 +439,128 @@ const AdminTours = () => {
             <button type="submit" className="btn-admin-primary" disabled={saving}>
               {saving ? 'Yadda saxlanılır...' : 'Yadda saxla'}
             </button>
-            <button type="button" onClick={() => { setEditing(null); setSaveError(''); }}>Bağla</button>
+            <button type="button" onClick={() => { setEditing(null); setSaveError(''); }}>Ləğv et</button>
           </div>
         </form>
+  );
+
+  return (
+    <div className="admin-page">
+      <div className="page-header">
+        <h1 className="page-title">Turlar</h1>
+        <p className="page-subtitle">Tur adı, istiqamət, qiymət, tarix və yer limitlərini idarə edin</p>
+      </div>
+
+      {loading && <p className="page-subtitle">Yüklənir...</p>}
+      {loadError && (
+        <div className="coming-soon-card">
+          <h2>Məlumat yüklənmədi</h2>
+          <p>{loadError}</p>
+          <div className="admin-form-actions">
+            <button type="button" className="btn-admin-primary" onClick={() => loadTours()}>
+              Yenidən yoxla
+            </button>
+          </div>
+        </div>
       )}
+
+      {!loading && !loadError && (
+        <>
+          <div className="inventory-toolbar">
+            <button
+              className="btn-admin-primary"
+              onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing(emptyTour()); }}
+            >
+              + Tur əlavə et
+            </button>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Ad, istiqamət və ya tarix axtar"
+            />
+            <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+              <option value="all">Bütün kateqoriyalar</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+            <select value={difficultyFilter} onChange={(e) => setDifficultyFilter(e.target.value)}>
+              <option value="all">Bütün çətinliklər</option>
+              {difficulties.map((difficulty) => (
+                <option key={difficulty} value={difficulty}>{difficulty}</option>
+              ))}
+            </select>
+          </div>
+
+          {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}
+          {saveError && !editing && <p className="muted">{saveError}</p>}
+
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Tur adı</th>
+                  <th>İstiqamət</th>
+                  <th>Qiymət</th>
+                  <th>Tarix</th>
+                  <th>Digər</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {editing && !editing.id && (
+                  <tr className="edit-row">
+                    <td colSpan="6">{editForm}</td>
+                  </tr>
+                )}
+                {visible.map((tour) => (
+                  <Fragment key={tour.id}>
+                  <tr>
+                    <td>
+                      <strong>{tour.name}</strong>
+                      <div className="muted">{tour.category || 'Kateqoriya yoxdur'}</div>
+                    </td>
+                    <td>{tour.destination || '—'}</td>
+                    <td>₼{Number(tour.price || 0).toLocaleString('az-AZ', { maximumFractionDigits: 0 })}</td>
+                    <td>
+                      {(tour.availableDates || []).length
+                        ? (tour.availableDates || []).join(', ')
+                        : '—'}
+                    </td>
+                    <td>
+                      {tour.duration || '—'}
+                      <div className="muted">
+                        {tour.difficulty || '—'} · {tour.minGuests}-{tour.maxGuests} nəfər
+                      </div>
+                    </td>
+                    <td className="table-actions">
+                      <button onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing(toEditTour(tour)); }}>
+                        Redaktə
+                      </button>
+                      <button className="danger" onClick={() => handleDelete(tour)} disabled={deletingId === tour.id}>
+                        {deletingId === tour.id ? 'Silinir...' : <FaRegTrashAlt aria-label="Sil" />}
+                      </button>
+                    </td>
+                  </tr>
+                  {editing?.id === tour.id && (
+                    <tr className="edit-row">
+                      <td colSpan="6">{editForm}</td>
+                    </tr>
+                  )}
+                  </Fragment>
+                ))}
+                {visible.length === 0 && (
+                  <tr>
+                    <td colSpan="6">{tours.length === 0 ? 'Tur yoxdur' : 'Uyğun tur tapılmadı'}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
     </div>
   );
 };

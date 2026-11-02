@@ -1,5 +1,7 @@
+import { FaRegTrashAlt } from 'react-icons/fa';
+import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { createFlight, deleteFlight, listFlights, updateFlight } from '../../../api/client';
+import { createFlight, deleteFlight, getSiteCities, getSiteCountries, listFlights, updateFlight } from '../../../api/client';
 import '../Hotels/AdminHotels.css';
 
 const CABIN_LABELS = {
@@ -99,6 +101,12 @@ const AdminFlights = () => {
   const [saveError, setSaveError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Dropdown data
+  const [countries, setCountries] = useState([]);
+  const [allCities, setAllCities] = useState([]);
+  const [originCities, setOriginCities] = useState([]);
+  const [destinationCities, setDestinationCities] = useState([]);
+
   const loadFlights = (silent = false) => {
     if (!silent) setLoading(true);
     return listFlights()
@@ -117,6 +125,13 @@ const AdminFlights = () => {
 
   useEffect(() => {
     loadFlights();
+    // Load countries and cities
+    getSiteCountries()
+      .then(setCountries)
+      .catch(() => setCountries([]));
+    getSiteCities()
+      .then(setAllCities)
+      .catch(() => setAllCities([]));
   }, []);
 
   const origins = useMemo(() => {
@@ -156,6 +171,44 @@ const AdminFlights = () => {
     });
   }, [flights, search, cabinFilter, originFilter]);
 
+  const handleOriginCountryChange = (country) => {
+    setEditing({ ...editing, originCountry: country, originCity: '' });
+    const citiesForCountry = allCities.filter(c => c.country === country);
+    setOriginCities(citiesForCountry);
+  };
+
+  const handleDestinationCountryChange = (country) => {
+    setEditing({ ...editing, destinationCountry: country, destinationCity: '' });
+    const citiesForCountry = allCities.filter(c => c.country === country);
+    setDestinationCities(citiesForCountry);
+  };
+
+  const handleEditFlight = (flight) => {
+    setSaveError('');
+    setSuccessMessage('');
+    setEditing(toEditFlight(flight));
+    
+    // Load cities for origin country
+    if (flight.originCountry) {
+      const citiesForCountry = allCities.filter(c => c.country === flight.originCountry);
+      setOriginCities(citiesForCountry);
+    }
+    
+    // Load cities for destination country
+    if (flight.destinationCountry) {
+      const citiesForCountry = allCities.filter(c => c.country === flight.destinationCountry);
+      setDestinationCities(citiesForCountry);
+    }
+  };
+
+  const handleNewFlight = () => {
+    setSaveError('');
+    setSuccessMessage('');
+    setEditing(emptyFlight());
+    setOriginCities([]);
+    setDestinationCities([]);
+  };
+
   const handleSave = (event) => {
     event.preventDefault();
     if (!editing || saving) return;
@@ -194,114 +247,7 @@ const AdminFlights = () => {
       .finally(() => setDeletingId(null));
   };
 
-  return (
-    <div className="admin-page">
-      <div className="page-header">
-        <h1 className="page-title">Uçuşlar</h1>
-        <p className="page-subtitle">Uçuş nömrəsi, marşrut, tarix, qiymət və yer sayını idarə edin</p>
-      </div>
-
-      {loading && <p className="page-subtitle">Yüklənir...</p>}
-      {loadError && (
-        <div className="coming-soon-card">
-          <h2>Məlumat yüklənmədi</h2>
-          <p>{loadError}</p>
-          <div className="admin-form-actions">
-            <button type="button" className="btn-admin-primary" onClick={() => loadFlights()}>
-              Yenidən yoxla
-            </button>
-          </div>
-        </div>
-      )}
-
-      {!loading && !loadError && (
-        <>
-          <div className="inventory-toolbar">
-            <button
-              className="btn-admin-primary"
-              onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing(emptyFlight()); }}
-            >
-              + Uçuş əlavə et
-            </button>
-            <input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Nömrə, aviaşirkət və ya şəhər axtar"
-            />
-            <select value={originFilter} onChange={(e) => setOriginFilter(e.target.value)}>
-              <option value="all">Bütün istiqamətlər</option>
-              {origins.map(([code, label]) => (
-                <option key={code} value={code}>{label}</option>
-              ))}
-            </select>
-            <select value={cabinFilter} onChange={(e) => setCabinFilter(e.target.value)}>
-              <option value="all">Bütün siniflər</option>
-              {Object.entries(CABIN_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
-          </div>
-
-          {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}
-          {saveError && !editing && <p className="muted">{saveError}</p>}
-
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Uçuş nömrəsi</th>
-                  <th>Haradan-haraya</th>
-                  <th>Tarix</th>
-                  <th>Qiymət</th>
-                  <th>Sinif / yer</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {visible.map((flight) => (
-                  <tr key={flight.id}>
-                    <td>
-                      <strong>{flight.flightNumber}</strong>
-                      <div className="muted">{flight.airline}</div>
-                    </td>
-                    <td>
-                      {flight.originCode} → {flight.destinationCode}
-                      <div className="muted">
-                        {flight.originCity}{flight.originCountry ? `, ${flight.originCountry}` : ''} → {flight.destinationCity}{flight.destinationCountry ? `, ${flight.destinationCountry}` : ''}
-                      </div>
-                    </td>
-                    <td>
-                      {formatDateTime(flight.departureAt)}
-                      <div className="muted">{flight.duration || stopLabel(flight.stops)}</div>
-                    </td>
-                    <td>₼{Number(flight.price || 0).toLocaleString('az-AZ', { maximumFractionDigits: 0 })}</td>
-                    <td>
-                      {CABIN_LABELS[flight.cabinClass] || flight.cabinClass || 'Ekonom'}
-                      <div className="muted">{flight.seatsAvailable} yer · {flight.refundable ? 'Geri qaytarılan' : 'Qaytarılmayan'}</div>
-                    </td>
-                    <td className="table-actions">
-                      <button onClick={() => { setSaveError(''); setSuccessMessage(''); setEditing(toEditFlight(flight)); }}>
-                        Redaktə
-                      </button>
-                      <button className="danger" onClick={() => handleDelete(flight)} disabled={deletingId === flight.id}>
-                        {deletingId === flight.id ? 'Silinir...' : 'Sil'}
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {visible.length === 0 && (
-                  <tr>
-                    <td colSpan="6">{flights.length === 0 ? 'Uçuş yoxdur' : 'Uyğun uçuş tapılmadı'}</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-
-      {editing && (
+  const editForm = editing && (
         <form className="admin-edit-card" onSubmit={handleSave}>
           <h3>{flights.some((flight) => flight.id === editing.id) ? 'Uçuşu redaktə et' : 'Yeni uçuş'}</h3>
           {saveError && <p className="muted">{saveError}</p>}
@@ -334,20 +280,35 @@ const AdminFlights = () => {
               />
             </label>
             <label>
-              Haradan şəhər
-              <input
-                value={editing.originCity}
-                onChange={(e) => setEditing({ ...editing, originCity: e.target.value })}
-                maxLength={100}
-              />
+              Haradan ölkə *
+              <select
+                value={editing.originCountry}
+                onChange={(e) => handleOriginCountryChange(e.target.value)}
+                required
+              >
+                <option value="">Ölkə seçin</option>
+                {countries.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
-              Haradan ölkə
-              <input
-                value={editing.originCountry}
-                onChange={(e) => setEditing({ ...editing, originCountry: e.target.value })}
-                maxLength={100}
-              />
+              Haradan şəhər *
+              <select
+                value={editing.originCity}
+                onChange={(e) => setEditing({ ...editing, originCity: e.target.value })}
+                required
+                disabled={!editing.originCountry}
+              >
+                <option value="">Şəhər seçin</option>
+                {originCities.map((city) => (
+                  <option key={city.name} value={city.name}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
               Haraya (kod)
@@ -359,20 +320,35 @@ const AdminFlights = () => {
               />
             </label>
             <label>
-              Haraya şəhər
-              <input
-                value={editing.destinationCity}
-                onChange={(e) => setEditing({ ...editing, destinationCity: e.target.value })}
-                maxLength={100}
-              />
+              Haraya ölkə *
+              <select
+                value={editing.destinationCountry}
+                onChange={(e) => handleDestinationCountryChange(e.target.value)}
+                required
+              >
+                <option value="">Ölkə seçin</option>
+                {countries.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
-              Haraya ölkə
-              <input
-                value={editing.destinationCountry}
-                onChange={(e) => setEditing({ ...editing, destinationCountry: e.target.value })}
-                maxLength={100}
-              />
+              Haraya şəhər *
+              <select
+                value={editing.destinationCity}
+                onChange={(e) => setEditing({ ...editing, destinationCity: e.target.value })}
+                required
+                disabled={!editing.destinationCountry}
+              >
+                <option value="">Şəhər seçin</option>
+                {destinationCities.map((city) => (
+                  <option key={city.name} value={city.name}>
+                    {city.name}
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
               Gediş
@@ -454,10 +430,130 @@ const AdminFlights = () => {
             <button type="submit" className="btn-admin-primary" disabled={saving}>
               {saving ? 'Yadda saxlanılır...' : 'Yadda saxla'}
             </button>
-            <button type="button" onClick={() => { setEditing(null); setSaveError(''); }}>Bağla</button>
+            <button type="button" onClick={() => { setEditing(null); setSaveError(''); }}>Ləğv et</button>
           </div>
         </form>
+  );
+
+  return (
+    <div className="admin-page">
+      <div className="page-header">
+        <h1 className="page-title">Uçuşlar</h1>
+        <p className="page-subtitle">Uçuş nömrəsi, marşrut, tarix, qiymət və yer sayını idarə edin</p>
+      </div>
+
+      {loading && <p className="page-subtitle">Yüklənir...</p>}
+      {loadError && (
+        <div className="coming-soon-card">
+          <h2>Məlumat yüklənmədi</h2>
+          <p>{loadError}</p>
+          <div className="admin-form-actions">
+            <button type="button" className="btn-admin-primary" onClick={() => loadFlights()}>
+              Yenidən yoxla
+            </button>
+          </div>
+        </div>
       )}
+
+      {!loading && !loadError && (
+        <>
+          <div className="inventory-toolbar">
+            <button
+              className="btn-admin-primary"
+              onClick={handleNewFlight}
+            >
+              + Uçuş əlavə et
+            </button>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Nömrə, aviaşirkət və ya şəhər axtar"
+            />
+            <select value={originFilter} onChange={(e) => setOriginFilter(e.target.value)}>
+              <option value="all">Bütün istiqamətlər</option>
+              {origins.map(([code, label]) => (
+                <option key={code} value={code}>{label}</option>
+              ))}
+            </select>
+            <select value={cabinFilter} onChange={(e) => setCabinFilter(e.target.value)}>
+              <option value="all">Bütün siniflər</option>
+              {Object.entries(CABIN_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </div>
+
+          {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}
+          {saveError && !editing && <p className="muted">{saveError}</p>}
+
+          <div className="admin-table-wrap">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Uçuş nömrəsi</th>
+                  <th>Haradan-haraya</th>
+                  <th>Tarix</th>
+                  <th>Qiymət</th>
+                  <th>Sinif / yer</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {editing && !editing.id && (
+                  <tr className="edit-row">
+                    <td colSpan="6">{editForm}</td>
+                  </tr>
+                )}
+                {visible.map((flight) => (
+                  <Fragment key={flight.id}>
+                  <tr>
+                    <td>
+                      <strong>{flight.flightNumber}</strong>
+                      <div className="muted">{flight.airline}</div>
+                    </td>
+                    <td>
+                      {flight.originCode} → {flight.destinationCode}
+                      <div className="muted">
+                        {flight.originCity}{flight.originCountry ? `, ${flight.originCountry}` : ''} → {flight.destinationCity}{flight.destinationCountry ? `, ${flight.destinationCountry}` : ''}
+                      </div>
+                    </td>
+                    <td>
+                      {formatDateTime(flight.departureAt)}
+                      <div className="muted">{flight.duration || stopLabel(flight.stops)}</div>
+                    </td>
+                    <td>₼{Number(flight.price || 0).toLocaleString('az-AZ', { maximumFractionDigits: 0 })}</td>
+                    <td>
+                      {CABIN_LABELS[flight.cabinClass] || flight.cabinClass || 'Ekonom'}
+                      <div className="muted">{flight.seatsAvailable} yer · {flight.refundable ? 'Geri qaytarılan' : 'Qaytarılmayan'}</div>
+                    </td>
+                    <td className="table-actions">
+                      <button onClick={() => handleEditFlight(flight)}>
+                        Redaktə
+                      </button>
+                      <button className="danger" onClick={() => handleDelete(flight)} disabled={deletingId === flight.id}>
+                        {deletingId === flight.id ? 'Silinir...' : <FaRegTrashAlt aria-label="Sil" />}
+                      </button>
+                    </td>
+                  </tr>
+                  {editing?.id === flight.id && (
+                    <tr className="edit-row">
+                      <td colSpan="6">{editForm}</td>
+                    </tr>
+                  )}
+                  </Fragment>
+                ))}
+                {visible.length === 0 && (
+                  <tr>
+                    <td colSpan="6">{flights.length === 0 ? 'Uçuş yoxdur' : 'Uyğun uçuş tapılmadı'}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
     </div>
   );
 };

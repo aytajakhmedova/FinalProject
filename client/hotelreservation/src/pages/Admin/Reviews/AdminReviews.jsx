@@ -1,3 +1,4 @@
+import { FaRegTrashAlt } from 'react-icons/fa';
 import React, { useEffect, useMemo, useState } from 'react';
 import { approveReview, deleteReview, getAdminReviews } from '../../../api/client';
 import '../Hotels/AdminHotels.css';
@@ -117,20 +118,24 @@ const AdminReviews = () => {
                         {review.createdAt ? new Date(review.createdAt).toLocaleDateString('az-AZ') : ''}
                       </div>
                     </td>
-                    <td>{'★'.repeat(Number(review.rating) || 0)}</td>
+                    <td><span className="star-rating">{'★'.repeat(Number(review.rating) || 0)}</span></td>
                     <td>
                       <strong>{review.title}</strong>
                       <div className="muted">{review.comment}</div>
                     </td>
-                    <td>{review.isApproved ? 'Təsdiqlənib' : 'Gözləyir'}</td>
+                    <td>
+                      <span className={`status-badge ${review.isApproved ? 'status-confirmed' : 'status-pending'}`}>
+                        {review.isApproved ? 'Təsdiqlənib' : 'Gözləyir'}
+                      </span>
+                    </td>
                     <td className="table-actions">
                       {!review.isApproved && (
                         <button type="button" disabled={busyId === review.id} onClick={() => approve(review)}>
                           Təsdiqlə
                         </button>
                       )}
-                      <button type="button" disabled={busyId === review.id} onClick={() => remove(review)}>
-                        Sil
+                      <button type="button" className="danger" disabled={busyId === review.id} onClick={() => remove(review)}>
+                        <FaRegTrashAlt aria-label="Sil" />
                       </button>
                     </td>
                   </tr>

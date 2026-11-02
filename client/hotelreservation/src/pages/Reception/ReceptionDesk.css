@@ -11,7 +11,7 @@
   align-items: flex-end;
   margin-bottom: 1.5rem;
   padding: 1.35rem 1.5rem;
-  border-radius: 22px;
+  border-radius: 14px;
   background:
     radial-gradient(1200px 180px at 10% -40%, rgba(226, 193, 154, 0.18), transparent 60%),
     linear-gradient(145deg, rgba(64, 40, 24, 0.55), rgba(28, 18, 12, 0.35));

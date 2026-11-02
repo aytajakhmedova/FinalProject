@@ -18,6 +18,7 @@ import {
   FaBell,
   FaStar
 } from 'react-icons/fa';
+import logoImage from '../../assets/images/AE_HOTEL_transparent_logo.png';
 import './AdminLayout.css';
 import { useLanguage } from '../../context/LanguageContext';
 import { clearAuthSession, getAuthUser, hasRole, isAdminSession } from '../../api/auth';
@@ -105,12 +106,12 @@ const AdminLayout = () => {
       <aside className={`admin-sidebar ${sidebarOpen ? 'open' : 'collapsed'} ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <FaHotel className="logo-icon" />
+            <img className="logo-img" src={logoImage} alt="AEHotel" />
             {sidebarOpen && (
               <span className="logo-text">
                 {hasRole('Receptionist') && !hasRole('SuperAdmin', 'Admin', 'HotelManager')
                   ? 'AE Resepsiya'
-                  : 'AE Hotel Admin'}
+                  : 'AEHotel'}
               </span>
             )}
           </div>
@@ -137,6 +138,15 @@ const AdminLayout = () => {
         </nav>
 
         <div className="sidebar-footer">
+          <div className="admin-user">
+            <div className="admin-avatar">{(user?.name || 'A').charAt(0).toUpperCase()}</div>
+            {sidebarOpen && (
+              <div className="admin-user-info">
+                <span className="admin-user-name">{user?.name || user?.email || 'Admin'}</span>
+                <span className="admin-user-role">{roleName}</span>
+              </div>
+            )}
+          </div>
           <button className="logout-btn" onClick={handleLogout}>
             <span className="nav-icon"><FaSignOutAlt /></span>
             {sidebarOpen && <span className="nav-label">{t('admin.logout')}</span>}
@@ -152,16 +162,6 @@ const AdminLayout = () => {
           >
             <FaBars />
           </button>
-          
-          <div className="topbar-right">
-            <div className="admin-user">
-              <div className="admin-avatar">{(user?.name || 'A').charAt(0).toUpperCase()}</div>
-              <div className="admin-user-info">
-                <span className="admin-user-name">{user?.name || user?.email || 'Admin'}</span>
-                <span className="admin-user-role">{roleName}</span>
-              </div>
-            </div>
-          </div>
         </header>
 
         <main className="admin-content">
