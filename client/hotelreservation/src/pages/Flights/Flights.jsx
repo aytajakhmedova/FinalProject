@@ -1,7 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FaExchangeAlt, FaCalendarAlt, FaPlane, FaGlobeAmericas, FaMapMarkerAlt, FaLock } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import ucakImage from '../../assets/images/ucakk.jpg';
+import istanbulImage from '../../assets/images/istanbul.jpg';
+import dubaiImage from '../../assets/images/dubai.jpg';
+import parisImage from '../../assets/images/paris.jpg';
+import londonImage from '../../assets/images/london.jpg';
+import { MEDIA } from '../../data/localMedia';
 import { useLanguage } from '../../context/LanguageContext';
 import './Flights.css';
 
@@ -148,26 +152,29 @@ const Flights = () => {
     {
       id: 1,
       airline: 'AZAL',
-      discount: '899 AZN endirim',
-      type: 'Daxili uçuşlar',
+      amount: '899 ₼',
+      label: t('flights.offerOff'),
+      type: t('flights.offerDomestic'),
+      route: 'Bakı — Naxçıvan',
       code: 'AZAL125F',
-      color: 'linear-gradient(135deg, #8B5A3C 0%, #3A2118 100%)'
     },
     {
       id: 2,
       airline: 'Turkish Airlines',
-      discount: '13% endirim',
-      type: 'Beynəlxalq uçuşlar',
+      amount: '13%',
+      label: t('flights.offerOff'),
+      type: t('flights.offerIntl'),
+      route: 'Bakı — İstanbul',
       code: 'TK125F',
-      color: 'linear-gradient(135deg, #A0522D 0%, #6B4423 100%)'
     },
     {
       id: 3,
       airline: 'Emirates',
-      discount: '2.400 AZN endirim',
-      type: 'Beynəlxalq uçuşlar',
+      amount: '2.400 ₼',
+      label: t('flights.offerOff'),
+      type: t('flights.offerIntl'),
+      route: 'Bakı — Dubai',
       code: 'EK125F',
-      color: 'linear-gradient(135deg, #D2691E 0%, #8B5A3C 100%)'
     },
   ];
 
@@ -176,7 +183,7 @@ const Flights = () => {
       id: 1,
       name: 'İstanbul',
       country: 'Türkiyə',
-      image: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=500',
+      image: istanbulImage,
       rating: 4.8,
       info: 'Növbəti uçuş 15 Yanvar',
       code: 'IST'
@@ -185,7 +192,7 @@ const Flights = () => {
       id: 2,
       name: 'Dubai',
       country: 'BƏƏ',
-      image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=500',
+      image: dubaiImage,
       rating: 4.9,
       info: 'Gündəlik 2 uçuş',
       code: 'DXB'
@@ -194,7 +201,7 @@ const Flights = () => {
       id: 3,
       name: 'Paris',
       country: 'Fransa',
-      image: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500',
+      image: parisImage,
       rating: 4.7,
       info: 'Həftədə 5 uçuş',
       code: 'CDG'
@@ -203,7 +210,7 @@ const Flights = () => {
       id: 4,
       name: 'London',
       country: 'Böyük Britaniya',
-      image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=500',
+      image: londonImage,
       rating: 4.6,
       info: 'Növbəti uçuş 12 Yanvar',
       code: 'LHR'
@@ -225,8 +232,17 @@ const Flights = () => {
 
   return (
     <div className="flights-page">
-      {/* Hero Section */}
-      <section className="flights-hero" style={{ backgroundImage: `url(${ucakImage})` }}>
+      {/* Hero Section with Video */}
+      <section className="flights-hero">
+        <video 
+          className="flights-hero-video"
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+        >
+          <source src={MEDIA.flightVideo} type="video/mp4" />
+        </video>
         <div className="flights-hero-overlay">
           <div className="flights-hero-content">
             <p className="flights-hero-kicker">AE Hotel Uçuşlar</p>
@@ -413,22 +429,37 @@ const Flights = () => {
         </div>
       </section>
 
-      {/* Special Offers */}
       <section className="special-offers-section">
         <div className="container">
-          <h2 className="section-title">{t('flights.offers')}</h2>
-          <div className="offers-grid">
-            {specialOffers.map(offer => (
-              <div key={offer.id} className="offer-card" style={{ background: offer.color }}>
-                <div className="offer-badge">Endirim</div>
-                <h3 className="offer-airline">{offer.airline}</h3>
-                <p className="offer-discount">{offer.discount}</p>
-                <p className="offer-type">{offer.type}</p>
-                <div className="offer-footer">
-                  <span className="offer-code">{offer.code}</span>
-                  <button className="offer-button">→</button>
+          <div className="flight-offers-head">
+            <h2 className="section-title">{t('flights.offers')}</h2>
+            <p className="flight-offers-sub">{t('flights.offerSub')}</p>
+          </div>
+          <div className="flight-offers-grid">
+            {specialOffers.map((offer) => (
+              <article key={offer.id} className="flight-offer">
+                <div className="flight-offer-top">
+                  <span className="flight-offer-badge">{t('flights.offerBadge')}</span>
+                  <FaPlane className="flight-offer-mark" />
                 </div>
-              </div>
+                <h3 className="flight-offer-airline">{offer.airline}</h3>
+                <p className="flight-offer-amount">
+                  <strong>{offer.amount}</strong>
+                  <span>{offer.label}</span>
+                </p>
+                <p className="flight-offer-route">{offer.route}</p>
+                <p className="flight-offer-type">{offer.type}</p>
+                <div className="flight-offer-footer">
+                  <span className="flight-offer-code">{offer.code}</span>
+                  <button
+                    type="button"
+                    className="flight-offer-btn"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  >
+                    {t('flights.offerUse')}
+                  </button>
+                </div>
+              </article>
             ))}
           </div>
         </div>
@@ -446,8 +477,8 @@ const Flights = () => {
                 onClick={() => handleDestinationClick(destination)}
                 style={{ cursor: 'pointer' }}
               >
-                <div className="destination-image-wrapper">
-                  <img src={destination.image} alt={destination.name} className="destination-image" />
+                <div className="flight-dest-photo">
+                  <img src={destination.image} alt={destination.name} />
                   <div className="destination-rating">
                     {destination.rating} ⭐
                   </div>

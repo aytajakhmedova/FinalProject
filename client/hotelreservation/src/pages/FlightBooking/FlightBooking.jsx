@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaPlane, FaInfoCircle, FaUserPlus, FaMinus, FaPlus } from 'react-icons/fa';
-import { applyCouponCode } from '../../api/client';
+import { applyCouponCode, createBooking } from '../../api/client';
+import { getAuthToken } from '../../api/auth';
 import './FlightBooking.css';
 
 const FlightBooking = () => {
@@ -45,13 +46,19 @@ const FlightBooking = () => {
   });
 
   const [couponCode, setCouponCode] = useState('');
+  const [appliedCode, setAppliedCode] = useState('');
   const [discount, setDiscount] = useState(0);
   const [couponError, setCouponError] = useState('');
   const [couponBusy, setCouponBusy] = useState(false);
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
+  const [formError, setFormError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const baseFare = flight.price || 180;
-  const otherServices = 20;
-  const totalFare = baseFare - discount + otherServices;
+  const baseFare = (Number(flight.price) || 0) * passengers.length;
+  const totalFare = Math.max(0, Math.round((baseFare - discount) * 100) / 100);
 
   const addPassenger = () => {
     setPassengers([...passengers, {
@@ -96,21 +103,75 @@ const FlightBooking = () => {
         const amount = Number(rule.amount) || 0;
         const off = percent > 0 ? baseFare * (percent / 100) : Math.min(amount, baseFare);
         setDiscount(off);
-        setCouponCode(rule.code || code.toUpperCase());
+        const nextCode = rule.code || code.toUpperCase();
+        setCouponCode(nextCode);
+        setAppliedCode(nextCode);
       })
       .catch((error) => {
         setDiscount(0);
+        setAppliedCode('');
         setCouponError(error.message || 'Kupon kodu keçərsizdir.');
       })
       .finally(() => setCouponBusy(false));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Validate and proceed to payment
-    console.log('Booking:', { flight, passengers, contactInfo });
-    alert('Ödənişə yönləndirilirsiniz...');
-    // navigate('/payment', { state: { flight, passengers, contactInfo, totalFare } });
+    setFormError('');
+
+    if (!flight?.id) {
+      setFormError('Uçuş seçilməyib. Siyahıdan uçuş seçib yenidən cəhd edin.');
+      return;
+    }
+    if (!getAuthToken()) {
+      navigate('/login');
+      return;
+    }
+
+    const lead = passengers[0] || {};
+    const guestName = `${lead.firstName || ''} ${lead.lastName || ''}`.trim();
+    const digits = cardNumber.replace(/\D/g, '');
+    if (!guestName) {
+      setFormError('Sərnişinin adını yazın.');
+      return;
+    }
+    if (digits.length < 16) {
+      setFormError('Kart nömrəsi 16 rəqəm olmalıdır.');
+      return;
+    }
+    if (!cardName.trim()) {
+      setFormError('Kart sahibinin adını yazın.');
+      return;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+      setFormError('Bitmə tarixini AA/İİ formatında yazın.');
+      return;
+    }
+    if (cvv.length < 3) {
+      setFormError('CVV 3 rəqəm olmalıdır.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const booking = await createBooking({
+        bookingType: 'flight',
+        flightId: flight.id,
+        guests: passengers.length,
+        guestName,
+        guestEmail: contactInfo.email,
+        guestPhone: contactInfo.mobile,
+        paymentMethod: 'card',
+        cardNumber: digits,
+        cardHolder: cardName.trim(),
+        couponCode: appliedCode || undefined,
+      });
+      navigate('/booking-success', { state: { booking } });
+    } catch (error) {
+      setFormError(error.message || 'Ödəniş alınmadı.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -392,8 +453,61 @@ const FlightBooking = () => {
                   </div>
                 </div>
 
-                <button type="submit" className="btn-proceed-payment">
-                  Ödənişə Keç
+                <div className="contact-section">
+                  <h3 className="subsection-title">Kart məlumatları</h3>
+                  <div className="form-grid">
+                    <div className="form-group span-2">
+                      <label>Kart nömrəsi</label>
+                      <input
+                        inputMode="numeric"
+                        autoComplete="cc-number"
+                        placeholder="•••• •••• •••• ••••"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value.replace(/[^\d ]/g, '').slice(0, 19))}
+                        required
+                      />
+                    </div>
+                    <div className="form-group span-2">
+                      <label>Kart sahibinin adı</label>
+                      <input
+                        autoComplete="cc-name"
+                        placeholder="Ad Soyad"
+                        value={cardName}
+                        onChange={(e) => setCardName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Bitmə tarixi</label>
+                      <input
+                        inputMode="numeric"
+                        autoComplete="cc-exp"
+                        placeholder="AA/İİ"
+                        value={expiry}
+                        onChange={(e) => {
+                          const digits = e.target.value.replace(/\D/g, '').slice(0, 4);
+                          setExpiry(digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits);
+                        }}
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>CVV</label>
+                      <input
+                        inputMode="numeric"
+                        autoComplete="cc-csc"
+                        placeholder="•••"
+                        value={cvv}
+                        onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {formError && <p className="coupon-error">{formError}</p>}
+                <button type="submit" className="btn-proceed-payment" disabled={submitting}>
+                  {submitting ? 'Ödənilir...' : `₼${totalFare} ödə`}
                 </button>
               </form>
             </section>
@@ -419,11 +533,6 @@ const FlightBooking = () => {
                   </div>
                 )}
 
-                <div className="fare-item">
-                  <span className="fare-label">Digər Xidmətlər</span>
-                  <span className="fare-value">₼{otherServices}</span>
-                </div>
-
                 <div className="fare-total">
                   <span className="total-label">Cəmi</span>
                   <span className="total-value">₼{totalFare}</span>
@@ -438,9 +547,10 @@ const FlightBooking = () => {
                     placeholder="Kupon kodu"
                     value={couponCode}
                     onChange={(e) => {
-                      setCouponCode(e.target.value);
+                      setCouponCode(e.target.value.toUpperCase());
                       setCouponError('');
                       setDiscount(0);
+                      setAppliedCode('');
                     }}
                   />
                   <button type="button" onClick={applyCoupon} className="btn-apply-coupon" disabled={couponBusy}>

@@ -24,6 +24,10 @@ const TourDetail = () => {
   const [guestCount, setGuestCount] = useState(2);
   const [bookingError, setBookingError] = useState('');
   const [booking, setBooking] = useState(false);
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -62,6 +66,27 @@ const TourDetail = () => {
       return;
     }
     const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const digits = cardNumber.replace(/\D/g, '');
+    if (!user.email) {
+      setBookingError('Hesabda email yoxdur. Profilə email yazın.');
+      return;
+    }
+    if (digits.length < 16) {
+      setBookingError('Kart nömrəsi 16 rəqəm olmalıdır.');
+      return;
+    }
+    if (!cardName.trim()) {
+      setBookingError('Kart sahibinin adını yazın.');
+      return;
+    }
+    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+      setBookingError('Bitmə tarixini AA/İİ formatında yazın.');
+      return;
+    }
+    if (cvv.length < 3) {
+      setBookingError('CVV 3 rəqəm olmalıdır.');
+      return;
+    }
     setBooking(true);
     setBookingError('');
     createBooking({
@@ -72,6 +97,8 @@ const TourDetail = () => {
       guestName: user.name || user.email || 'Qonaq',
       guestEmail: user.email,
       paymentMethod: 'card',
+      cardNumber: digits,
+      cardHolder: cardName.trim(),
     })
       .then((created) => {
         navigate('/booking-success', { state: { booking: created } });
@@ -239,15 +266,15 @@ const TourDetail = () => {
                     required
                   >
                     <option value="">Tarix seçin</option>
-                    {tour.availableDates.map(date => (
-                      <option key={date} value={date}>
-                        {new Date(date).toLocaleDateString('az-AZ', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </option>
-                    ))}
+                    {tour.availableDates.map(date => {
+                      const [year, month, day] = String(date).slice(0, 10).split('-');
+                      const label = year && month && day ? `${day}.${month}.${year}` : date;
+                      return (
+                        <option key={date} value={date}>
+                          {label}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
 
@@ -283,7 +310,60 @@ const TourDetail = () => {
                   </div>
                 </div>
 
-                {bookingError && <p className="booking-note">{bookingError}</p>}
+                <div className="form-group">
+                  <label className="form-label">Kart nömrəsi</label>
+                  <input
+                    className="form-select"
+                    inputMode="numeric"
+                    autoComplete="cc-number"
+                    placeholder="•••• •••• •••• ••••"
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(e.target.value.replace(/[^\d ]/g, '').slice(0, 19))}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Kart sahibinin adı</label>
+                  <input
+                    className="form-select"
+                    autoComplete="cc-name"
+                    placeholder="Ad Soyad"
+                    value={cardName}
+                    onChange={(e) => setCardName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="tour-card-row">
+                  <div className="form-group">
+                    <label className="form-label">Bitmə tarixi</label>
+                    <input
+                      className="form-select"
+                      inputMode="numeric"
+                      autoComplete="cc-exp"
+                      placeholder="AA/İİ"
+                      value={expiry}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/\D/g, '').slice(0, 4);
+                        setExpiry(digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits);
+                      }}
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">CVV</label>
+                    <input
+                      className="form-select"
+                      inputMode="numeric"
+                      autoComplete="cc-csc"
+                      placeholder="•••"
+                      value={cvv}
+                      onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {bookingError && <p className="booking-note is-error">{bookingError}</p>}
                 <button type="submit" className="btn-book-tour" disabled={booking}>
                   {booking ? 'Göndərilir...' : 'Rezervasiya et'}
                 </button>

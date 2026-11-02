@@ -4,6 +4,7 @@ import { FaSearch, FaFilter, FaSort } from 'react-icons/fa';
 import HotelCard from '../../components/common/HotelCard/HotelCard';
 import { getHotels } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
+import { MEDIA } from '../../data/localMedia';
 import './Hotels.css';
 
 const Hotels = () => {
@@ -104,14 +105,29 @@ const Hotels = () => {
 
   return (
     <div className="hotels-page">
+      {/* Hero Section with Video */}
+      <section className="hotels-hero">
+        <video 
+          className="hotels-hero-video"
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+        >
+          <source src={MEDIA.hotelVideo} type="video/mp4" />
+        </video>
+        <div className="hotels-hero-overlay"></div>
+        <div className="hotels-hero-content">
+          <h1 className="hotels-hero-title">{t('hotels.title')}</h1>
+          <p className="hotels-hero-subtitle">
+            {loadError || t('hotels.found', { count: sortedHotels.length })}
+          </p>
+        </div>
+      </section>
+
       {/* Search Header */}
       <section className="hotels-search-section">
         <div className="hotels-container">
-          <h1 className="hotels-page-title">{t('hotels.title')}</h1>
-          <p className="hotels-page-subtitle">
-            {loadError || t('hotels.found', { count: sortedHotels.length })}
-          </p>
-
           <div className="hotels-search-bar">
             <div className="search-input-wrapper">
               <FaSearch className="search-icon" />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHotel, FaPlane, FaCar, FaBars, FaTimes, FaUser, FaSignOutAlt } from 'react-icons/fa';
+import { FaHotel, FaPlane, FaCar, FaBars, FaTimes, FaUser, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
 import { IoNotifications } from 'react-icons/io5';
 import { MdKeyboardArrowDown, MdDarkMode, MdLightMode } from 'react-icons/md';
 import { useLanguage } from '../../context/LanguageContext';
@@ -259,6 +259,10 @@ const Header = ({
                       </div>
                     </div>
                     <div className="user-menu-divider"></div>
+                    <Link to="/dashboard" className="user-menu-item" onClick={() => setUserMenuOpen(false)}>
+                      <FaClipboardList />
+                      <span>Rezervasiyalarım</span>
+                    </Link>
                     <Link to="/profile" className="user-menu-item" onClick={() => setUserMenuOpen(false)}>
                       <FaUser />
                       <span>{t('nav.profile')}</span>

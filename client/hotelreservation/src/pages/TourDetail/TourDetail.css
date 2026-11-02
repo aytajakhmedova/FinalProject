@@ -359,15 +359,28 @@
   color: #8B5A3C;
 }
 
+.tour-card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
 .form-select {
+  width: 100%;
   padding: 0.875rem 1rem;
   background: var(--bg-primary);
   border: 2px solid var(--border-color);
   border-radius: 12px;
   color: var(--text-primary);
+  color-scheme: dark;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.booking-note.is-error {
+  color: #e07a7a;
 }
 
 .form-select:focus {

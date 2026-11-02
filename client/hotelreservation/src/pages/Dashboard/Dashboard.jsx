@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { FaCalendarAlt, FaMapMarkerAlt, FaUsers, FaCheckCircle, FaHourglass, FaTimesCircle, FaClipboardList } from 'react-icons/fa';
+import { FaCalendarAlt, FaCheckCircle, FaClipboardList } from 'react-icons/fa';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAuthToken } from '../../api/auth';
 import { deleteBooking, getHotels, getMyBookings, getMyReviews } from '../../api/client';
@@ -23,11 +23,41 @@ const bookingSubtitle = (reservation) => {
   return reservation.roomType || reservation.roomName || reservation.itemName;
 };
 
-const typeLabel = (reservation, t) => {
-  const type = bookingTypeOf(reservation);
-  if (type === 'flight') return t('nav.flight');
-  if (type === 'tour') return t('nav.tour');
-  return t('nav.hotel');
+const stayDate = (value) => {
+  const text = String(value || '').slice(0, 10);
+  const [year, month, day] = text.split('-');
+  if (!year || !month || !day) return value ? String(value) : '';
+  return `${day}.${month}.${year}`;
+};
+
+const stayRange = (reservation) => {
+  const start = stayDate(reservation.checkIn);
+  const end = stayDate(reservation.checkOut);
+  if (start && end && start !== end) return `${start} – ${end}`;
+  return start || end || '—';
+};
+
+const stayStatus = (status) => {
+  const key = String(status || '').toLowerCase();
+  if (key === 'confirmed') return 'Təsdiqlənib';
+  if (key === 'checked-in') return 'Giriş edilib';
+  if (key === 'checked-out') return 'Çıxış edilib';
+  if (key === 'cancelled') return 'Ləğv edilib';
+  return status || 'Təsdiqlənib';
+};
+
+const payStatus = (status) => {
+  const key = String(status || '').toLowerCase();
+  if (key === 'paid') return 'Ödənilib';
+  if (key === 'deposit') return 'Avans ödənilib';
+  if (key === 'pending') return 'Gözləyir';
+  if (key === 'cancelled' || key === 'refunded') return 'Ləğv edilib';
+  return status || 'Gözləyir';
+};
+
+const money = (value) => {
+  const amount = Number(value) || 0;
+  return Number.isInteger(amount) ? String(amount) : amount.toFixed(2);
 };
 
 const statsFrom = (bookings) => ({
@@ -113,16 +143,6 @@ const Dashboard = () => {
       .join('')
       .toUpperCase()
       .slice(0, 2);
-  };
-
-  const getStatusBadge = (status) => {
-    const badges = {
-      confirmed: { text: t('status.confirmed'), className: 'badge-confirmed', icon: <FaCheckCircle /> },
-      'checked-in': { text: t('status.checkedIn'), className: 'badge-checked-in', icon: <FaHourglass /> },
-      'checked-out': { text: t('status.checkedOut'), className: 'badge-completed', icon: <FaCheckCircle /> },
-      cancelled: { text: t('status.cancelled'), className: 'badge-cancelled', icon: <FaTimesCircle /> },
-    };
-    return badges[status] || badges.confirmed;
   };
 
   const filteredReservations = activeTab === 'all' 
@@ -268,107 +288,51 @@ const Dashboard = () => {
           ) : filteredReservations.length > 0 ? (
             <div className="reservations-grid">
               {filteredReservations.map(reservation => {
-                const badge = getStatusBadge(reservation.status);
                 const type = bookingTypeOf(reservation);
                 const title = bookingTitle(reservation);
                 const image = type === 'hotel' ? hotelImages[String(reservation.hotelId)] : '';
-                const firstDateLabel = type === 'hotel' ? t('dash.checkIn') : t('dash.travelDate');
-                const firstDate = reservation.checkIn || '—';
-                const secondDate = reservation.checkOut || '—';
+                const room = bookingSubtitle(reservation);
+                const statusKey = String(reservation.status || '').toLowerCase();
                 return (
-                  <div key={reservation.id} className="reservation-card">
-                    <div className={`reservation-image${image ? '' : ' is-empty'}`}>
-                      {image ? <img src={image} alt={title} /> : null}
-                      <div className={`reservation-status-badge ${badge.className}`}>
-                        {badge.icon}
-                        <span>{badge.text}</span>
+                  <article key={reservation.id} className="stay-card">
+                    <div className="stay-top">
+                      <div className={`stay-photo${image ? '' : ' is-empty'}`}>
+                        {image ? <img src={image} alt="" /> : <span>{(title || 'R').charAt(0)}</span>}
+                      </div>
+                      <div className="stay-main">
+                        <h3>{title}</h3>
+                        <p>{stayRange(reservation)}</p>
+                        <p>{reservation.guests || 1} qonaq{room ? ` · ${room}` : ''}</p>
+                        <strong>{money(reservation.totalPrice)} ₼</strong>
                       </div>
                     </div>
-
-                    <div className="reservation-content">
-                      <div className="reservation-header">
-                        <h3 className="reservation-hotel-name">{title}</h3>
-                        <div className="reservation-id">#{reservation.confirmationNumber || reservation.code || reservation.id}</div>
-                      </div>
-
-                      <div className="reservation-location">
-                        <FaMapMarkerAlt />
-                        <span>{reservation.location}</span>
-                      </div>
-
-                      <div className="reservation-room-type">
-                        {typeLabel(reservation, t)} · {bookingSubtitle(reservation)}
-                      </div>
-
-                      <div className="reservation-details">
-                        <div className="detail-item">
-                          <FaCalendarAlt className="detail-icon" />
-                          <div className="detail-text">
-                            <span className="detail-label">{firstDateLabel}</span>
-                            <span className="detail-value">{firstDate}</span>
-                          </div>
-                        </div>
-
-                        <div className="detail-item">
-                          <FaCalendarAlt className="detail-icon" />
-                          <div className="detail-text">
-                            <span className="detail-label">{t('dash.checkOut')}</span>
-                            <span className="detail-value">{secondDate}</span>
-                          </div>
-                        </div>
-
-                        <div className="detail-item">
-                          <FaUsers className="detail-icon" />
-                          <div className="detail-text">
-                            <span className="detail-label">{t('dash.guests')}</span>
-                            <span className="detail-value">{t('dash.people', { count: reservation.guests })}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="reservation-footer">
-                        <div className="reservation-price">
-                          <span className="price-label">
-                            {reservation.nights > 0
-                              ? t('dash.nights', { count: reservation.nights })
-                              : typeLabel(reservation, t)}
-                          </span>
-                          <span className="price-amount">₼{reservation.totalPrice}</span>
-                        </div>
-                        <div className="reservation-actions">
-                          <Link 
-                            to={`/reservations/${reservation.id}`} 
-                            className="btn-view-reservation"
-                          >
-                            {t('dash.details')}
-                          </Link>
-                          <button
-                            type="button"
-                            className="btn-modify-reservation"
-                            onClick={() => printBookingReceipt(reservation)}
-                          >
-                            PDF
-                          </button>
-                          {reservation.status === 'checked-out' && type === 'hotel' && !reviewedIds.has(String(reservation.id)) && (
-                            <Link
-                              to={`/hotels/${reservation.hotelId}#reviews`}
-                              className="btn-modify-reservation"
-                            >
-                              {t('dash.review')}
-                            </Link>
-                          )}
-                          {canCancelReservation(reservation.status) && (
-                            <button 
-                              className="btn-cancel-reservation"
-                              onClick={() => handleCancelReservation(reservation)}
-                            >
-                              {t('dash.cancel')}
-                            </button>
-                          )}
-                        </div>
-                      </div>
+                    <div className="stay-code">
+                      <span>Rezervasiya kodu</span>
+                      <strong>{reservation.confirmationNumber || reservation.code || reservation.id}</strong>
                     </div>
-                  </div>
+                    <div className="stay-row">
+                      <span>Status</span>
+                      <em className={statusKey === 'confirmed' || statusKey === 'checked-in' ? 'is-ok' : ''}>{stayStatus(reservation.status)}</em>
+                    </div>
+                    <div className="stay-row">
+                      <span>Ödəniş statusu</span>
+                      <b>{payStatus(reservation.paymentStatus)}</b>
+                    </div>
+                    <Link to={`/reservations/${reservation.id}`} className="stay-more">
+                      Ətraflı məlumat
+                    </Link>
+                    <div className="stay-actions">
+                      <button type="button" onClick={() => printBookingReceipt(reservation)}>PDF</button>
+                      {reservation.status === 'checked-out' && type === 'hotel' && !reviewedIds.has(String(reservation.id)) && (
+                        <Link to={`/hotels/${reservation.hotelId}#reviews`}>{t('dash.review')}</Link>
+                      )}
+                      {canCancelReservation(reservation.status) && (
+                        <button type="button" className="is-cancel" onClick={() => handleCancelReservation(reservation)}>
+                          {t('dash.cancel')}
+                        </button>
+                      )}
+                    </div>
+                  </article>
                 );
               })}
             </div>

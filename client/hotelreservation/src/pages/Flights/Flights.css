@@ -3,18 +3,27 @@
   background: var(--bg-primary);
 }
 
-/* Hero Section */
+/* Hero Section with Video */
 .flights-hero {
   position: relative;
-  min-height: 600px;
+  min-height: 550px;
   height: auto;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  overflow: visible;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  overflow: visible;
+}
+
+.flights-hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  z-index: 0;
+  filter: brightness(0.65) saturate(1.15);
 }
 
 .flights-hero-overlay {
@@ -23,22 +32,22 @@
   width: 100%;
   background: linear-gradient(
     180deg,
-    rgba(26, 20, 16, 0.55) 0%,
-    rgba(26, 20, 16, 0.72) 55%,
-    rgba(26, 20, 16, 0.88) 100%
+    rgba(26, 20, 16, 0.4) 0%,
+    rgba(26, 20, 16, 0.7) 100%
   );
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 6.5rem 1.5rem 0;
+  padding: 3rem 1.5rem 0;
   overflow: visible;
+  z-index: 1;
 }
 
 .flights-hero-content {
   max-width: 1180px;
   width: 100%;
-  z-index: 1;
-  transform: translateY(72px);
+  z-index: 2;
+  transform: translateY(68px);
 }
 
 .flights-hero-kicker {
@@ -52,7 +61,7 @@
 }
 
 .flights-hero-title {
-  font-size: clamp(2rem, 4vw, 3.1rem);
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 800;
   color: white;
   text-align: center;
@@ -63,7 +72,7 @@
 
 .flights-hero-subtitle {
   text-align: center;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 1.02rem;
   margin: 0 0 1.45rem;
 }
@@ -71,14 +80,14 @@
 /* Search Card */
 .flights-search-card {
   position: relative;
-  background: linear-gradient(180deg, rgba(52, 38, 30, 0.96) 0%, rgba(32, 22, 18, 0.98) 100%);
+  background: linear-gradient(180deg, rgba(52, 38, 30, 0.97) 0%, rgba(32, 22, 18, 0.99) 100%);
   backdrop-filter: blur(22px);
-  border-radius: 24px;
-  padding: 1.25rem 1.35rem 1.35rem;
+  border-radius: 20px;
+  padding: 1.15rem 1.25rem 1.25rem;
   box-shadow:
-    0 28px 60px rgba(58, 33, 24, 0.4),
-    0 0 0 1px rgba(210, 105, 30, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 24px 55px rgba(58, 33, 24, 0.45),
+    0 0 0 1px rgba(210, 105, 30, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   overflow: visible;
 }
 
@@ -389,112 +398,159 @@
   margin: 0 0 1.6rem;
 }
 
-/* Special Offers */
-.offers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 2rem;
+.flight-offers-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
 }
 
-.offer-card {
-  padding: 1.75rem;
-  border-radius: 20px;
+.flights-page .flight-offers-head .section-title {
+  margin: 0;
+}
+
+.flight-offers-sub {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.flight-offers-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.flight-offer {
   position: relative;
-  overflow: hidden;
-  min-height: 250px;
+  min-height: 260px;
+  padding: 1.35rem 1.4rem 1.25rem;
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.offer-card::after {
-  content: '✈';
-  position: absolute;
-  right: -8px;
-  bottom: -18px;
-  font-size: 7.5rem;
-  opacity: 0.12;
-  color: #fff;
-  pointer-events: none;
-  transform: rotate(-18deg);
-}
-
-.offer-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
-}
-
-.offer-badge {
-  display: inline-flex;
-  align-self: flex-start;
-  width: fit-content;
-  padding: 0.4rem 0.9rem;
-  background: rgba(255, 255, 255, 0.2);
+  overflow: hidden;
   border-radius: 20px;
-  color: white;
-  font-size: 0.82rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  border: 1px solid rgba(201, 160, 122, 0.28);
+  background:
+    linear-gradient(160deg, rgba(58, 33, 24, 0.96) 0%, rgba(26, 16, 12, 0.98) 100%);
+  color: #f6eadc;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
 }
 
-.offer-airline {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 0.5rem;
+.flight-offer::after {
+  content: '';
+  position: absolute;
+  right: -28px;
+  bottom: -36px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(226, 193, 154, 0.16) 0%, transparent 70%);
+  pointer-events: none;
 }
 
-.offer-discount {
-  font-size: 2rem;
-  font-weight: 700;
-  color: white;
-  margin: 1rem 0;
+.flight-offer:hover {
+  transform: translateY(-4px);
+  border-color: rgba(226, 193, 154, 0.5);
 }
 
-.offer-type {
-  font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 1.5rem;
-}
-
-.offer-footer {
+.flight-offer-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 1rem;
-  margin-top: auto;
-  border-top: 1px dashed rgba(255, 255, 255, 0.3);
+  margin-bottom: 0.85rem;
 }
 
-.offer-code {
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px dashed rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 600;
+.flight-offer-badge {
+  display: inline-flex;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(226, 193, 154, 0.16);
+  border: 1px solid rgba(226, 193, 154, 0.35);
+  color: #f0d7b4;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-.offer-button {
-  width: 40px;
-  height: 40px;
-  background: white;
-  border: none;
-  border-radius: 50%;
-  color: #3A2118;
-  font-size: 1.2rem;
-  cursor: pointer;
+.flight-offer-mark {
+  color: rgba(240, 215, 180, 0.7);
+  font-size: 1.05rem;
+}
+
+.flight-offer-airline {
+  margin: 0 0 0.65rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f7eadc;
+}
+
+.flight-offer-amount {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin: 0 0 0.85rem;
+  white-space: nowrap;
+}
+
+.flight-offer-amount strong {
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #f0d7b4;
+}
+
+.flight-offer-amount span {
+  color: rgba(243, 226, 208, 0.72);
+  font-size: 0.92rem;
+}
+
+.flight-offer-route,
+.flight-offer-type {
+  margin: 0;
+  color: rgba(243, 226, 208, 0.78);
+  font-size: 0.88rem;
+}
+
+.flight-offer-type {
+  margin-bottom: 1.1rem;
+}
+
+.flight-offer-footer {
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 1;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 0.95rem;
+  border-top: 1px dashed rgba(226, 193, 154, 0.28);
 }
 
-.offer-button:hover {
-  transform: translateX(4px);
+.flight-offer-code {
+  padding: 0.38rem 0.7rem;
+  border-radius: 8px;
+  border: 1px dashed rgba(226, 193, 154, 0.4);
+  color: #f0d7b4;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.flight-offer-btn {
+  padding: 0.48rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #c9a07a 0%, #b08558 100%);
+  color: #2a1a12;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.flight-offer-btn:hover {
+  filter: brightness(1.06);
 }
 
 /* Popular Destinations */
@@ -518,29 +574,27 @@
   border-color: rgba(139, 90, 60, 0.25);
 }
 
-.destination-image-wrapper {
+.flights-page .flight-dest-photo {
   position: relative;
-  height: 210px;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
+  background: #1a1410;
 }
 
-.destination-image-wrapper::after {
+.flights-page .flight-dest-photo::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 45%, rgba(26, 20, 16, 0.45) 100%);
+  background: linear-gradient(180deg, transparent 62%, rgba(26, 20, 16, 0.38) 100%);
   pointer-events: none;
 }
 
-.destination-image {
+.flights-page .flight-dest-photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.destination-card:hover .destination-image {
-  transform: scale(1.1);
+  object-position: center;
+  display: block;
 }
 
 .destination-rating {
@@ -695,6 +749,10 @@
 }
 
 @media (max-width: 768px) {
+  .flight-offers-grid {
+    grid-template-columns: 1fr;
+  }
+
   .flights-hero {
     height: auto;
     min-height: 350px;
@@ -729,8 +787,17 @@
     font-size: 1.75rem;
   }
 
-  .offer-discount {
-    font-size: 1.5rem;
+  .flight-offers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .flight-offers-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .flight-offer-amount strong {
+    font-size: 1.7rem;
   }
 
   .destination-name {

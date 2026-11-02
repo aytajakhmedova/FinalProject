@@ -68,8 +68,18 @@ const Tours = () => {
 
   return (
     <div className="tours-page">
-      {/* Hero Section */}
-      <section className="tours-hero" style={{ '--tours-hero-image': `url(${MEDIA.tourGondolas})` }}>
+      {/* Hero Section with Video */}
+      <section className="tours-hero">
+        <video 
+          className="tours-hero-video"
+          autoPlay 
+          loop 
+          muted 
+          playsInline
+        >
+          <source src={MEDIA.tourVideo} type="video/mp4" />
+        </video>
+        <div className="tours-hero-overlay"></div>
         <div className="tours-hero-content">
           <h1 className="tours-hero-title">{t('tours.title')}</h1>
           <p className="tours-hero-subtitle">

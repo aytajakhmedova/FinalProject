@@ -5,8 +5,11 @@ import tourCastleDay from '../assets/images/TUR1.jpg';
 import tourBalloons from '../assets/images/TUR2.jpg';
 import tourBoats from '../assets/videos/VIDE01.png';
 import tourCastleNight from '../assets/videos/VIDEOO.png';
-import tourGondolas from '../assets/videos/TUR VIDEOS.png';
+import tourGondolas from '../assets/videos/VIDEOO.png';
 import hotelPromo from '../assets/videos/aehotel-promo.mp4';
+import tourVideo from '../assets/videos/YENITURVIDEOS.mp4';
+import flightVideo from '../assets/videos/UCUS1.mp4';
+import hotelVideo from '../assets/videos/OTELVIDEOS.mp4';
 
 export const MEDIA = {
   aeHotel,
@@ -18,6 +21,9 @@ export const MEDIA = {
   tourCastleNight,
   tourGondolas,
   hotelPromo,
+  tourVideo,
+  flightVideo,
+  hotelVideo,
 };
 
 const HOTEL_FALLBACKS = [aeHotel, hotelDining, hotelNightPool];
