@@ -1,0 +1,128 @@
+.an-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.an-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid rgba(139, 90, 60, 0.14);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(42, 31, 26, 0.95), rgba(32, 24, 19, 0.95));
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.an-kpi span {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.an-kpi strong {
+  font-size: 1.9rem;
+  font-weight: 750;
+  color: #f2d9b4;
+  line-height: 1.15;
+}
+
+.an-kpi small {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.an-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 1rem;
+}
+
+.an-panel {
+  min-width: 0;
+  padding: 1.2rem 1.3rem 1.3rem;
+  border: 1px solid rgba(139, 90, 60, 0.14);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(42, 31, 26, 0.95), rgba(32, 24, 19, 0.95));
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.an-panel h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--text-primary);
+}
+
+.an-panel > p {
+  margin: 0.15rem 0 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.an-bars {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.an-bars li {
+  display: grid;
+  grid-template-columns: minmax(90px, 0.9fr) minmax(0, 2fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.an-bar-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.an-bar-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.an-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #8b5a3c, #d9b98e);
+}
+
+.an-bar-value {
+  min-width: 80px;
+  text-align: right;
+  font-size: 0.92rem;
+  color: #f2d9b4;
+  white-space: nowrap;
+}
+
+.an-empty {
+  margin: 0;
+  padding: 0.6rem 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 520px) {
+  .an-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .an-bars li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .an-bar-track {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+}

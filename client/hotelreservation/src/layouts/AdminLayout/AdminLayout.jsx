@@ -35,7 +35,7 @@ const ALL_MENU = [
   { path: '/admin/paketler', icon: <FaPercentage />, label: 'Paketlər və Endirimlər', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/reyler', icon: <FaStar />, label: 'Rəylər', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
   { path: '/admin/users', icon: <FaUsers />, labelKey: 'admin.users', roles: ['SuperAdmin', 'Admin'] },
-  { path: '/admin/analytics', icon: <FaChartBar />, labelKey: 'admin.analytics', roles: ['SuperAdmin', 'Admin'] },
+  { path: '/admin/analytics', icon: <FaChartBar />, labelKey: 'admin.analytics', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
   { path: '/admin/settings', icon: <FaCog />, labelKey: 'admin.settings', roles: ['SuperAdmin', 'Admin'] },
 ];
 
@@ -54,6 +54,7 @@ const AdminLayout = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isAdmin = isAdminSession();
   const user = getAuthUser();
+  const needsHotel = hasRole('HotelManager', 'Receptionist') && !hasRole('SuperAdmin', 'Admin');
   const roleName = Array.isArray(user?.roles) ? (ROLE_LABELS[user.roles[0]] || user.roles[0]) : 'Admin';
 
   const menuItems = useMemo(
@@ -165,6 +166,11 @@ const AdminLayout = () => {
         </header>
 
         <main className="admin-content">
+          {needsHotel && !user?.assignedHotelId && (
+            <div className="admin-notice">
+              Sizə hələ otel təyin edilməyib. Administrator "İstifadəçilər" bölməsində sizə otel təyin etdikdən sonra yenidən daxil olun.
+            </div>
+          )}
           <Outlet />
         </main>
       </div>

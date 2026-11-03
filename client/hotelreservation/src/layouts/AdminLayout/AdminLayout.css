@@ -330,3 +330,13 @@
     padding: 1rem;
   }
 }
+
+.admin-notice {
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1.1rem;
+  border: 1px solid rgba(217, 164, 106, 0.4);
+  border-radius: 12px;
+  background: rgba(217, 164, 106, 0.1);
+  color: #f0d7b4;
+  font-size: 0.95rem;
+}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaHotel, FaCalendarCheck, FaUsers, FaMoneyBillWave } from 'react-icons/fa';
 import { getHotels, getBookings } from '../../../api/client';
 import { STATUS_LABELS } from '../../../utils/bookingsStore';
+import { hasRole } from '../../../api/auth';
 import './AdminDashboard.css';
 
 const money = (value) => {
@@ -25,6 +26,7 @@ const statusColors = {
 };
 
 const AdminDashboard = () => {
+  const isManager = hasRole('HotelManager') && !hasRole('SuperAdmin', 'Admin');
   const [hotels, setHotels] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,12 +64,14 @@ const AdminDashboard = () => {
       .reduce((sum, booking) => sum + (Number(booking.totalPrice) || 0), 0);
 
     return [
-      { icon: <FaHotel />, label: 'Otellər', value: String(hotels.length), color: '#8B5A3C' },
+      isManager
+        ? { icon: <FaHotel />, label: 'Otaqlar', value: String(hotels.reduce((sum, hotel) => sum + (hotel.rooms?.length || 0), 0)), color: '#8B5A3C' }
+        : { icon: <FaHotel />, label: 'Otellər', value: String(hotels.length), color: '#8B5A3C' },
       { icon: <FaCalendarCheck />, label: 'Aktiv rezervasiyalar', value: String(active.length), color: '#22c55e' },
       { icon: <FaUsers />, label: 'Qonaqlar', value: String(guests.size), color: '#f59e0b' },
       { icon: <FaMoneyBillWave />, label: 'Ümumi gəlir', value: `₼${money(revenue)}`, color: '#8B5A3C' },
     ];
-  }, [bookings, hotels.length]);
+  }, [bookings, hotels, isManager]);
 
   const recent = bookings.slice(0, 6);
 
@@ -102,7 +106,9 @@ const AdminDashboard = () => {
       <div className="dashboard-header">
         <div>
           <h1 className="dashboard-title">Dashboard</h1>
-          <p className="dashboard-subtitle">Canlı rezervasiya və ödəniş xülasəsi</p>
+          <p className="dashboard-subtitle">
+            {isManager && hotels[0] ? `${hotels[0].title} · canlı rezervasiya və gəlir xülasəsi` : 'Canlı rezervasiya və ödəniş xülasəsi'}
+          </p>
         </div>
         <div className="dashboard-actions">
           <button className="btn-secondary" onClick={exportBookings} disabled={!!loadError || loading}>İxrac et</button>

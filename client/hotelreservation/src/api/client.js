@@ -1,5 +1,5 @@
 import { getAuthToken } from "./auth";
-import { uniqueHotelImage, uniqueListImages, uniqueTourImage } from "../data/localMedia";
+import { hotelGallery, uniqueListImages, uniqueTourImage } from "../data/localMedia";
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5080";
 
@@ -55,12 +55,15 @@ export function mapRoom(room) {
 }
 
 export function mapHotel(hotel) {
-  const image = resolveImage(hotel.imageFile) || uniqueHotelImage(hotel.id);
+  // The gallery comes from the backend; hotelGallery only supplies one photo for a hotel that has none saved.
+  const saved = (hotel.galleryImages || []).map(resolveImage).filter(Boolean);
+  const images = saved.length ? [...new Set(saved)] : hotelGallery(hotel, resolveImage(hotel.imageFile), 1);
+  const image = images[0];
   return {
     ...hotel,
     reviews: hotel.reviewCount,
     mainImage: image,
-    images: image ? [image] : [],
+    images,
     amenities: hotel.amenities || [],
     checkIn: hotel.checkInTime,
     checkOut: hotel.checkOutTime,
@@ -200,6 +203,9 @@ export const getSiteContent = () => request("/api/site");
 export const getSiteCities = () => request("/api/site/cities");
 export const getSiteCountries = () => request("/api/site/countries");
 export const getSiteLocations = (city) => request(withQuery("/api/site/locations", { city }));
+export const getLocationCountries = () => request("/api/locations/countries");
+export const getLocationCities = (countryId) => request(`/api/locations/countries/${countryId}/cities`);
+export const getLocationTouristPlaces = (cityId) => request(`/api/locations/cities/${cityId}/tourist-places`);
 export const updateSiteSettings = (settings) => request("/api/site/settings", { method: "PUT", body: JSON.stringify(settings) });
 export const getSiteMenuItems = () => request("/api/site/menu-items");
 export const createSiteMenuItem = (item) => request("/api/site/menu-items", { method: "POST", body: JSON.stringify(item) });

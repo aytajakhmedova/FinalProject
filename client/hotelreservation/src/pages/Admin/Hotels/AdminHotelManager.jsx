@@ -1,14 +1,15 @@
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useState } from 'react';
-import { createHotel, deleteHotel, getHotels, getSiteCities, getSiteCountries, getSiteLocations, updateHotel, uploadMedia } from '../../../api/client';
+import { createHotel, deleteHotel, getHotels, getLocationCities, getLocationCountries, getLocationTouristPlaces, updateHotel, uploadMedia } from '../../../api/client';
+import { hasRole } from '../../../api/auth';
 import './AdminHotels.css';
 
 const emptyHotel = () => ({
   title: '',
-  city: '',
-  country: '',
-  location: '',
+  countryId: '',
+  cityId: '',
+  touristPlaceId: '',
   address: '',
   stars: 4,
   description: '',
@@ -23,9 +24,9 @@ const emptyHotel = () => ({
 
 const toHotelRequest = (hotel) => ({
   title: hotel.title.trim(),
-  city: hotel.city.trim(),
-  country: hotel.country.trim(),
-  location: (hotel.location || '').trim(),
+  countryId: Number(hotel.countryId) || null,
+  cityId: Number(hotel.cityId) || null,
+  touristPlaceId: Number(hotel.touristPlaceId) || null,
   address: (hotel.address || '').trim(),
   stars: Number(hotel.stars) || 1,
   description: hotel.description || '',
@@ -39,6 +40,8 @@ const toHotelRequest = (hotel) => ({
 });
 
 const AdminHotelManager = () => {
+  // A hotel manager only edits the hotel assigned to them: no new hotels, no deleting.
+  const isManager = hasRole('HotelManager') && !hasRole('SuperAdmin', 'Admin');
   const [hotels, setHotels] = useState([]);
   const [editing, setEditing] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,10 +53,10 @@ const AdminHotelManager = () => {
 
   // Dropdown data
   const [countries, setCountries] = useState([]);
-  const [allCities, setAllCities] = useState([]);
-  const [filteredCities, setFilteredCities] = useState([]);
-  const [locations, setLocations] = useState([]);
-  const [loadingLocations, setLoadingLocations] = useState(false);
+  const [cities, setCities] = useState([]);
+  const [places, setPlaces] = useState([]);
+  const [loadingCities, setLoadingCities] = useState(false);
+  const [loadingPlaces, setLoadingPlaces] = useState(false);
 
   const loadHotels = (silent = false) => {
     if (!silent) setLoading(true);
@@ -73,61 +76,63 @@ const AdminHotelManager = () => {
 
   useEffect(() => {
     loadHotels();
-    // Load countries and cities
-    getSiteCountries()
+    getLocationCountries()
       .then(setCountries)
       .catch(() => setCountries([]));
-    getSiteCities()
-      .then(setAllCities)
-      .catch(() => setAllCities([]));
   }, []);
 
-  const handleCountryChange = (country) => {
-    setEditing({ ...editing, country, city: '', location: '' });
-    const citiesForCountry = allCities.filter(c => c.country === country);
-    setFilteredCities(citiesForCountry);
-    setLocations([]);
+  const loadCities = (countryId) => {
+    setCities([]);
+    if (!countryId) return Promise.resolve();
+    setLoadingCities(true);
+    return getLocationCities(countryId)
+      .then(setCities)
+      .catch(() => setCities([]))
+      .finally(() => setLoadingCities(false));
   };
 
-  const handleCityChange = (city) => {
-    setEditing({ ...editing, city, location: '' });
-    setLocations([]);
-    if (city) {
-      setLoadingLocations(true);
-      getSiteLocations(city)
-        .then(setLocations)
-        .catch(() => setLocations([]))
-        .finally(() => setLoadingLocations(false));
-    }
+  const loadPlaces = (cityId) => {
+    setPlaces([]);
+    if (!cityId) return Promise.resolve();
+    setLoadingPlaces(true);
+    return getLocationTouristPlaces(cityId)
+      .then(setPlaces)
+      .catch(() => setPlaces([]))
+      .finally(() => setLoadingPlaces(false));
+  };
+
+  // Changing the country clears the city and place; changing the city clears the place.
+  const handleCountryChange = (countryId) => {
+    setEditing({ ...editing, countryId, cityId: '', touristPlaceId: '' });
+    setPlaces([]);
+    loadCities(countryId);
+  };
+
+  const handleCityChange = (cityId) => {
+    setEditing({ ...editing, cityId, touristPlaceId: '' });
+    loadPlaces(cityId);
   };
 
   const handleEditHotel = (hotel) => {
     setSaveError('');
     setSuccessMessage('');
-    setEditing({ ...hotel, amenities: hotel.amenities || [] });
-    
-    // Load cities for selected country
-    if (hotel.country) {
-      const citiesForCountry = allCities.filter(c => c.country === hotel.country);
-      setFilteredCities(citiesForCountry);
-    }
-    
-    // Load locations for selected city
-    if (hotel.city) {
-      setLoadingLocations(true);
-      getSiteLocations(hotel.city)
-        .then(setLocations)
-        .catch(() => setLocations([]))
-        .finally(() => setLoadingLocations(false));
-    }
+    setEditing({
+      ...hotel,
+      countryId: hotel.countryId ? String(hotel.countryId) : '',
+      cityId: hotel.cityId ? String(hotel.cityId) : '',
+      touristPlaceId: hotel.touristPlaceId ? String(hotel.touristPlaceId) : '',
+      amenities: hotel.amenities || [],
+    });
+    loadCities(hotel.countryId);
+    loadPlaces(hotel.cityId);
   };
 
   const handleNewHotel = () => {
     setSaveError('');
     setSuccessMessage('');
     setEditing(emptyHotel());
-    setFilteredCities([]);
-    setLocations([]);
+    setCities([]);
+    setPlaces([]);
   };
 
   const handleSave = (event) => {
@@ -200,14 +205,14 @@ const AdminHotelManager = () => {
             <label>
               Ölkə *
               <select
-                value={editing.country}
+                value={editing.countryId}
                 onChange={(e) => handleCountryChange(e.target.value)}
                 required
               >
                 <option value="">Ölkə seçin</option>
                 {countries.map((country) => (
-                  <option key={country} value={country}>
-                    {country}
+                  <option key={country.id} value={country.id}>
+                    {country.name}
                   </option>
                 ))}
               </select>
@@ -215,33 +220,31 @@ const AdminHotelManager = () => {
             <label>
               Şəhər *
               <select
-                value={editing.city}
+                value={editing.cityId}
                 onChange={(e) => handleCityChange(e.target.value)}
                 required
-                disabled={!editing.country}
+                disabled={!editing.countryId || loadingCities}
               >
-                <option value="">Şəhər seçin</option>
-                {filteredCities.map((city) => (
-                  <option key={city.name} value={city.name}>
+                <option value="">{loadingCities ? 'Yüklənir...' : 'Şəhər seçin'}</option>
+                {cities.map((city) => (
+                  <option key={city.id} value={city.id}>
                     {city.name}
                   </option>
                 ))}
               </select>
             </label>
             <label>
-              Turistik məkan (Location) *
+              Turistik məkan *
               <select
-                value={editing.location}
-                onChange={(e) => setEditing({ ...editing, location: e.target.value })}
+                value={editing.touristPlaceId}
+                onChange={(e) => setEditing({ ...editing, touristPlaceId: e.target.value })}
                 required
-                disabled={!editing.city || loadingLocations}
+                disabled={!editing.cityId || loadingPlaces}
               >
-                <option value="">
-                  {loadingLocations ? 'Yüklənir...' : 'Məkan seçin'}
-                </option>
-                {locations.map((location) => (
-                  <option key={location} value={location}>
-                    {location}
+                <option value="">{loadingPlaces ? 'Yüklənir...' : 'Məkan seçin'}</option>
+                {places.map((place) => (
+                  <option key={place.id} value={place.id}>
+                    {place.name}
                   </option>
                 ))}
               </select>
@@ -351,10 +354,12 @@ const AdminHotelManager = () => {
     <div className="admin-page">
       <div className="page-header page-header-row">
         <div>
-          <h1 className="page-title">Otellər</h1>
-          <p className="page-subtitle">Otel adı, ünvan, təsvir, qiymət və şəkli idarə edin</p>
+          <h1 className="page-title">{isManager ? 'Mənim otelim' : 'Otellər'}</h1>
+          <p className="page-subtitle">
+            {isManager ? 'Otelinizin məlumatını, ünvanını, təsvirini və şəklini redaktə edin' : 'Otel adı, ünvan, təsvir, qiymət və şəkli idarə edin'}
+          </p>
         </div>
-        {!loading && !loadError && (
+        {!loading && !loadError && !isManager && (
           <button className="btn-admin-primary" onClick={handleNewHotel}>
             + Otel əlavə et
           </button>
@@ -420,9 +425,11 @@ const AdminHotelManager = () => {
                       <button onClick={() => handleEditHotel(hotel)}>
                         Redaktə
                       </button>
-                      <button className="danger" onClick={() => handleDelete(hotel)} disabled={deletingId === hotel.id}>
-                        {deletingId === hotel.id ? 'Silinir...' : <FaRegTrashAlt aria-label="Sil" />}
-                      </button>
+                      {!isManager && (
+                        <button className="danger" onClick={() => handleDelete(hotel)} disabled={deletingId === hotel.id}>
+                          {deletingId === hotel.id ? 'Silinir...' : <FaRegTrashAlt aria-label="Sil" />}
+                        </button>
+                      )}
                     </td>
                   </tr>
                   {editing?.id === hotel.id && (
@@ -434,7 +441,7 @@ const AdminHotelManager = () => {
                 ))}
                 {hotels.length === 0 && (
                   <tr>
-                    <td colSpan="5">Otel yoxdur</td>
+                    <td colSpan="5">{isManager ? 'Sizə təyin edilmiş otel tapılmadı' : 'Otel yoxdur'}</td>
                   </tr>
                 )}
               </tbody>
