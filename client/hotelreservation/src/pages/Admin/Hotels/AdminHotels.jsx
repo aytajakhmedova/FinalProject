@@ -1,3 +1,4 @@
+import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -105,7 +106,7 @@ const AdminHotels = () => {
           <div className="admin-form-grid">
             <label>
               Otel
-              <select
+              <Select searchable searchLabel="Otel axtar…"
                 value={editing.hotelId || ''}
                 onChange={(e) => setEditing({ ...editing, hotelId: Number(e.target.value) })}
                 required
@@ -114,7 +115,7 @@ const AdminHotels = () => {
                 {hotels.map((item) => (
                   <option key={item.id} value={item.id}>{item.title}</option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Ad
@@ -212,14 +213,14 @@ const AdminHotels = () => {
       {!loading && !loadError && (
         <>
           <div className="inventory-toolbar">
-            <select
+            <Select searchable searchLabel="Otel axtar…"
               value={selectedHotelId}
               onChange={(e) => setSelectedHotelId(Number(e.target.value))}
             >
               {hotels.map((item) => (
                 <option key={item.id} value={item.id}>{item.title}</option>
               ))}
-            </select>
+            </Select>
             <button
               className="btn-admin-primary"
               onClick={() => setEditing({

@@ -1,3 +1,4 @@
+import Select from '../../components/common/Select/Select';
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { FaUsers, FaBed, FaExpand, FaCheck, FaArrowLeft, FaCalendarAlt, FaInfoCircle } from 'react-icons/fa';
@@ -225,7 +226,7 @@ const RoomDetail = () => {
 
                 <div className="search-input-group">
                   <label>Qonaq sayı</label>
-                  <select 
+                  <Select 
                     value={guests}
                     onChange={(e) => setGuests(parseInt(e.target.value))}
                     className="guests-select"
@@ -235,7 +236,7 @@ const RoomDetail = () => {
                         {i + 1} nəfər
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
               </div>
 

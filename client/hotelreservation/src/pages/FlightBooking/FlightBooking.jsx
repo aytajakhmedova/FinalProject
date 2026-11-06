@@ -1,3 +1,4 @@
+import Select from '../../components/common/Select/Select';
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaPlane, FaInfoCircle, FaUserPlus, FaMinus, FaPlus } from 'react-icons/fa';
@@ -128,13 +129,63 @@ const FlightBooking = () => {
       return;
     }
 
+    // Validate lead passenger
     const lead = passengers[0] || {};
     const guestName = `${lead.firstName || ''} ${lead.lastName || ''}`.trim();
-    const digits = cardNumber.replace(/\D/g, '');
     if (!guestName) {
       setFormError('Sərnişinin adını yazın.');
       return;
     }
+    
+    // Validate all passengers have required info
+    for (let i = 0; i < passengers.length; i++) {
+      const p = passengers[i];
+      if (!p.firstName || !p.lastName) {
+        setFormError(`Sərnişin ${i + 1}: Ad və soyad tələb olunur.`);
+        return;
+      }
+      if (!p.dateOfBirth.date || !p.dateOfBirth.month || !p.dateOfBirth.year) {
+        setFormError(`Sərnişin ${i + 1}: Doğum tarixi tələb olunur.`);
+        return;
+      }
+      if (!p.nationality) {
+        setFormError(`Sərnişin ${i + 1}: Milliyyət tələb olunur.`);
+        return;
+      }
+      // Passport fields - NOTE: Backend may not support these yet
+      if (!p.passportNumber) {
+        setFormError(`Sərnişin ${i + 1}: Pasport nömrəsi tələb olunur.`);
+        return;
+      }
+      if (!p.passportCountry) {
+        setFormError(`Sərnişin ${i + 1}: Pasport ölkəsi tələb olunur.`);
+        return;
+      }
+      if (!p.passportExpiry) {
+        setFormError(`Sərnişin ${i + 1}: Pasportun bitmə tarixi tələb olunur.`);
+        return;
+      }
+      
+      // Validate passport not expired
+      const expiryDate = new Date(p.passportExpiry);
+      if (expiryDate < new Date()) {
+        setFormError(`Sərnişin ${i + 1}: Pasportun müddəti bitib.`);
+        return;
+      }
+    }
+    
+    // Validate contact info
+    if (!contactInfo.email || !/\S+@\S+\.\S+/.test(contactInfo.email)) {
+      setFormError('Düzgün email ünvanı yazın.');
+      return;
+    }
+    if (!contactInfo.mobile) {
+      setFormError('Mobil nömrə tələb olunur.');
+      return;
+    }
+
+    // Validate card details - demo payment
+    const digits = cardNumber.replace(/\D/g, '');
     if (digits.length < 16) {
       setFormError('Kart nömrəsi 16 rəqəm olmalıdır.');
       return;
@@ -147,8 +198,15 @@ const FlightBooking = () => {
       setFormError('Bitmə tarixini AA/İİ formatında yazın.');
       return;
     }
-    if (cvv.length < 3) {
+    // Demo payment - CVV optional but validate format if provided
+    if (cvv && cvv.length > 0 && cvv.length < 3) {
       setFormError('CVV 3 rəqəm olmalıdır.');
+      return;
+    }
+
+    // Check available seats
+    if (flight.seatsAvailable && passengers.length > flight.seatsAvailable) {
+      setFormError(`Yalnız ${flight.seatsAvailable} boş yer var.`);
       return;
     }
 
@@ -165,10 +223,21 @@ const FlightBooking = () => {
         cardNumber: digits,
         cardHolder: cardName.trim(),
         couponCode: appliedCode || undefined,
+        // NOTE: Backend may not support passenger details yet - sending for future compatibility
+        passengers: passengers.map(p => ({
+          title: p.title,
+          firstName: p.firstName,
+          lastName: p.lastName,
+          dateOfBirth: `${p.dateOfBirth.year}-${String(p.dateOfBirth.month).padStart(2, '0')}-${String(p.dateOfBirth.date).padStart(2, '0')}`,
+          nationality: p.nationality,
+          passportNumber: p.passportNumber,
+          passportCountry: p.passportCountry,
+          passportExpiry: p.passportExpiry
+        }))
       });
       navigate('/booking-success', { state: { booking } });
     } catch (error) {
-      setFormError(error.message || 'Ödəniş alınmadı.');
+      setFormError(error.message || 'Rezervasiya alınmadı.');
     } finally {
       setSubmitting(false);
     }
@@ -301,14 +370,14 @@ const FlightBooking = () => {
                     <div className="form-grid">
                       <div className="form-group">
                         <label>Başlıq</label>
-                        <select 
+                        <Select 
                           value={passenger.title}
                           onChange={(e) => updatePassenger(passenger.id, 'title', e.target.value)}
                           required
                         >
                           <option value="Mr">Kişi</option>
                           <option value="Mrs">Qadın</option>
-                        </select>
+                        </Select>
                       </div>
 
                       <div className="form-group span-2">
@@ -334,7 +403,7 @@ const FlightBooking = () => {
                       <div className="form-group span-2">
                         <label>Doğum Tarixi</label>
                         <div className="date-inputs">
-                          <select
+                          <Select
                             value={passenger.dateOfBirth.date}
                             onChange={(e) => updatePassengerDOB(passenger.id, 'date', e.target.value)}
                             required
@@ -343,8 +412,8 @@ const FlightBooking = () => {
                             {[...Array(31)].map((_, i) => (
                               <option key={i + 1} value={i + 1}>{i + 1}</option>
                             ))}
-                          </select>
-                          <select
+                          </Select>
+                          <Select
                             value={passenger.dateOfBirth.month}
                             onChange={(e) => updatePassengerDOB(passenger.id, 'month', e.target.value)}
                             required
@@ -353,8 +422,8 @@ const FlightBooking = () => {
                             {['Yan', 'Fev', 'Mar', 'Apr', 'May', 'İyn', 'İyl', 'Avq', 'Sen', 'Okt', 'Noy', 'Dek'].map((m, i) => (
                               <option key={i} value={i + 1}>{m}</option>
                             ))}
-                          </select>
-                          <select
+                          </Select>
+                          <Select
                             value={passenger.dateOfBirth.year}
                             onChange={(e) => updatePassengerDOB(passenger.id, 'year', e.target.value)}
                             required
@@ -364,13 +433,13 @@ const FlightBooking = () => {
                               const year = new Date().getFullYear() - i;
                               return <option key={year} value={year}>{year}</option>;
                             })}
-                          </select>
+                          </Select>
                         </div>
                       </div>
 
                       <div className="form-group span-2">
                         <label>Milliyyət</label>
-                        <select
+                        <Select
                           value={passenger.nationality}
                           onChange={(e) => updatePassenger(passenger.id, 'nationality', e.target.value)}
                           required
@@ -383,7 +452,7 @@ const FlightBooking = () => {
                           <option value="FR">Fransa</option>
                           <option value="DE">Almaniya</option>
                           <option value="RU">Rusiya</option>
-                        </select>
+                        </Select>
                       </div>
 
                       <div className="form-group">
@@ -399,7 +468,7 @@ const FlightBooking = () => {
 
                       <div className="form-group">
                         <label>Pasport Ölkəsi</label>
-                        <select
+                        <Select
                           value={passenger.passportCountry}
                           onChange={(e) => updatePassenger(passenger.id, 'passportCountry', e.target.value)}
                           required
@@ -408,7 +477,7 @@ const FlightBooking = () => {
                           <option value="AZ">Azərbaycan</option>
                           <option value="TR">Türkiyə</option>
                           <option value="US">ABŞ</option>
-                        </select>
+                        </Select>
                       </div>
 
                       <div className="form-group">

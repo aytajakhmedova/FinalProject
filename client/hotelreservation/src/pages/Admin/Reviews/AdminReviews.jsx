@@ -1,3 +1,4 @@
+import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import React, { useEffect, useMemo, useState } from 'react';
 import { approveReview, deleteReview, getAdminReviews } from '../../../api/client';
@@ -89,11 +90,11 @@ const AdminReviews = () => {
       {!loading && !loadError && (
         <>
           <div className="inventory-toolbar">
-            <select value={filter} onChange={(event) => setFilter(event.target.value)}>
+            <Select value={filter} onChange={(event) => setFilter(event.target.value)}>
               <option value="pending">Gözləyənlər ({pendingCount})</option>
               <option value="approved">Təsdiqlənənlər</option>
               <option value="all">Hamısı ({items.length})</option>
-            </select>
+            </Select>
           </div>
           {notice && <p className="page-subtitle">{notice}</p>}
           <div className="admin-table-wrap">

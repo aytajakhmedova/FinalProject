@@ -1,3 +1,4 @@
+import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -281,7 +282,7 @@ const AdminFlights = () => {
             </label>
             <label>
               Haradan ölkə *
-              <select
+              <Select
                 value={editing.originCountry}
                 onChange={(e) => handleOriginCountryChange(e.target.value)}
                 required
@@ -292,11 +293,11 @@ const AdminFlights = () => {
                     {country}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Haradan şəhər *
-              <select
+              <Select
                 value={editing.originCity}
                 onChange={(e) => setEditing({ ...editing, originCity: e.target.value })}
                 required
@@ -308,7 +309,7 @@ const AdminFlights = () => {
                     {city.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Haraya (kod)
@@ -321,7 +322,7 @@ const AdminFlights = () => {
             </label>
             <label>
               Haraya ölkə *
-              <select
+              <Select
                 value={editing.destinationCountry}
                 onChange={(e) => handleDestinationCountryChange(e.target.value)}
                 required
@@ -332,11 +333,11 @@ const AdminFlights = () => {
                     {country}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Haraya şəhər *
-              <select
+              <Select
                 value={editing.destinationCity}
                 onChange={(e) => setEditing({ ...editing, destinationCity: e.target.value })}
                 required
@@ -348,7 +349,7 @@ const AdminFlights = () => {
                     {city.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Gediş
@@ -399,14 +400,14 @@ const AdminFlights = () => {
             </label>
             <label>
               Sinif
-              <select
+              <Select
                 value={editing.cabinClass}
                 onChange={(e) => setEditing({ ...editing, cabinClass: e.target.value })}
               >
                 {Object.entries(CABIN_LABELS).map(([value, label]) => (
                   <option key={value} value={value}>{label}</option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Mövcud yer
@@ -470,18 +471,18 @@ const AdminFlights = () => {
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Nömrə, aviaşirkət və ya şəhər axtar"
             />
-            <select value={originFilter} onChange={(e) => setOriginFilter(e.target.value)}>
+            <Select value={originFilter} onChange={(e) => setOriginFilter(e.target.value)}>
               <option value="all">Bütün istiqamətlər</option>
               {origins.map(([code, label]) => (
                 <option key={code} value={code}>{label}</option>
               ))}
-            </select>
-            <select value={cabinFilter} onChange={(e) => setCabinFilter(e.target.value)}>
+            </Select>
+            <Select value={cabinFilter} onChange={(e) => setCabinFilter(e.target.value)}>
               <option value="all">Bütün siniflər</option>
               {Object.entries(CABIN_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}

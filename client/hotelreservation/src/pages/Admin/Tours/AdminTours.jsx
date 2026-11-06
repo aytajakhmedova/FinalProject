@@ -1,3 +1,4 @@
+import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -479,18 +480,18 @@ const AdminTours = () => {
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Ad, istiqamət və ya tarix axtar"
             />
-            <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
+            <Select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
               <option value="all">Bütün kateqoriyalar</option>
               {categories.map((category) => (
                 <option key={category} value={category}>{category}</option>
               ))}
-            </select>
-            <select value={difficultyFilter} onChange={(e) => setDifficultyFilter(e.target.value)}>
+            </Select>
+            <Select value={difficultyFilter} onChange={(e) => setDifficultyFilter(e.target.value)}>
               <option value="all">Bütün çətinliklər</option>
               {difficulties.map((difficulty) => (
                 <option key={difficulty} value={difficulty}>{difficulty}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {successMessage && !editing && <p className="page-subtitle">{successMessage}</p>}

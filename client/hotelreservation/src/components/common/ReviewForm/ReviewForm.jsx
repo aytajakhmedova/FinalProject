@@ -1,3 +1,4 @@
+import Select from '../Select/Select';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RatingStars from '../RatingStars/RatingStars';
@@ -120,7 +121,7 @@ const ReviewForm = ({ onSubmit, onCancel, stays = [] }) => {
           <label htmlFor="stay" className="form-label">
             Tamamlanmış qalma <span className="required">*</span>
           </label>
-          <select
+          <Select
             id="stay"
             className={`form-input ${errors.bookingId ? 'error' : ''}`}
             value={bookingId}
@@ -131,7 +132,7 @@ const ReviewForm = ({ onSubmit, onCancel, stays = [] }) => {
                 {stay.code || stay.confirmationNumber || stay.id} · {stay.roomName || stay.roomType || stay.room?.name || 'Otaq'} · {stay.checkIn} — {stay.checkOut}
               </option>
             ))}
-          </select>
+          </Select>
           {errors.bookingId && <span className="error-message">{errors.bookingId}</span>}
         </div>
 

@@ -1,3 +1,4 @@
+import Select from '../Select/Select';
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaCalendarAlt, FaUsers } from 'react-icons/fa';
@@ -116,7 +117,7 @@ const BookingCard = ({ hotel, room }) => {
             <FaUsers />
             <span>Qonaqlar</span>
           </label>
-          <select
+          <Select
             value={guests}
             onChange={(e) => setGuests(Number(e.target.value))}
             className="booking-input"
@@ -124,7 +125,7 @@ const BookingCard = ({ hotel, room }) => {
             {[1, 2, 3, 4, 5, 6].map(n => (
               <option key={n} value={n}>{n} nəfər</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         {nights > 0 && (

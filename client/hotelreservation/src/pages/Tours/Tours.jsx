@@ -1,3 +1,4 @@
+import Select from '../../components/common/Select/Select';
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FaStar, FaClock, FaMapMarkerAlt, FaUsers, FaSearch, FaFilter } from 'react-icons/fa';
@@ -106,7 +107,7 @@ const Tours = () => {
             <div className="filter-group">
               <div className="filter-item">
                 <FaFilter className="filter-icon" />
-                <select
+                <Select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="filter-select"
@@ -115,11 +116,11 @@ const Tours = () => {
                   {categories.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
                   ))}
-                </select>
+                </Select>
               </div>
 
               <div className="filter-item">
-                <select
+                <Select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
                   className="filter-select"
@@ -129,7 +130,7 @@ const Tours = () => {
                   <option value="price-high">{t('tours.priceHigh')}</option>
                   <option value="rating">{t('tours.rating')}</option>
                   <option value="duration">{t('tours.duration')}</option>
-                </select>
+                </Select>
               </div>
             </div>
           </div>
@@ -148,7 +149,7 @@ const Tours = () => {
               <div key={tour.id} className="tour-card">
                 <Link to={`/tours/${tour.id}`} className="tour-card-link">
                   <div className="tour-card-image">
-                    <img src={tour.image} alt={tour.name} />
+                    <img src={tour.image} alt={tour.name} loading="lazy" decoding="async" />
                     <div className="tour-category-badge">{tour.category}</div>
                     <div className={`tour-difficulty-badge difficulty-${(tour.difficulty || '').toLowerCase()}`}>
                       {tour.difficulty}

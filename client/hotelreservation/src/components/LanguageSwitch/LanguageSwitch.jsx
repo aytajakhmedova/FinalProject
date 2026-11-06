@@ -1,3 +1,4 @@
+import Select from '../common/Select/Select';
 import { LANGS } from '../../i18n/translations';
 import { useLanguage } from '../../context/LanguageContext';
 import './LanguageSwitch.css';
@@ -6,7 +7,7 @@ const LanguageSwitch = ({ className = '' }) => {
   const { lang, setLang, t } = useLanguage();
 
   return (
-    <select
+    <Select
       className={`language-select ${className}`.trim()}
       value={lang}
       onChange={(event) => setLang(event.target.value)}
@@ -17,7 +18,7 @@ const LanguageSwitch = ({ className = '' }) => {
           {item.label}
         </option>
       ))}
-    </select>
+    </Select>
   );
 };
 

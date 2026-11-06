@@ -31,11 +31,24 @@ async function request(path, options = {}) {
   if (response.status === 204) return null;
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
+    // Enhanced error handling with specific status codes
+    if (response.status === 400) {
+      throw new Error(data.message || "Daxil edilmiş məlumatlar düzgün deyil.");
+    }
     if (response.status === 401) {
       throw new Error(data.message || "Daxil olmaq lazımdır.");
     }
     if (response.status === 403) {
-      throw new Error(data.message || "Bu əməliyyat üçün admin hüququ lazımdır.");
+      throw new Error(data.message || "Bu əməliyyat üçün icazəniz yoxdur.");
+    }
+    if (response.status === 404) {
+      throw new Error(data.message || "Axtarılan məlumat tapılmadı.");
+    }
+    if (response.status === 409) {
+      throw new Error(data.message || "Bu əməliyyat mövcud məlumatlarla ziddiyyət təşkil edir.");
+    }
+    if (response.status === 500) {
+      throw new Error(data.message || "Server xətası baş verdi. Zəhmət olmasa dəstək ilə əlaqə saxlayın.");
     }
     throw new Error(data.message || `Sorğu alınmadı (${response.status})`);
   }
@@ -268,3 +281,17 @@ export const getTripSuggestionsByCountry = ({ country, guests = 1 }) =>
       flights: (result.flights || []).map(mapFlight),
       tours: uniqueListImages((result.tours || []).map(mapTour)),
     }));
+
+export const getCustomers = () => request("/api/customers");
+export const getCustomerBookings = (id) => request(`/api/customers/${encodeURIComponent(id)}/bookings`);
+export const getStaff = () => request("/api/staff");
+export const createStaff = (member) => request("/api/staff", { method: "POST", body: JSON.stringify(member) });
+export const updateStaff = (id, member) => request(`/api/staff/${encodeURIComponent(id)}`, { method: "PUT", body: JSON.stringify(member) });
+export const deleteStaff = (id) => request(`/api/staff/${encodeURIComponent(id)}`, { method: "DELETE" });
+export const getReport = (from, to) => {
+  const query = new URLSearchParams();
+  if (from) query.set("from", from);
+  if (to) query.set("to", to);
+  const suffix = query.toString();
+  return request(`/api/reports${suffix ? `?${suffix}` : ""}`);
+};

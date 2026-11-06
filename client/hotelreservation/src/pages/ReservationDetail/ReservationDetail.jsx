@@ -1,3 +1,4 @@
+import Select from '../../components/common/Select/Select';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link, useSearchParams, Navigate } from 'react-router-dom';
 import { FaArrowLeft, FaCalendarAlt, FaUsers, FaHotel, FaBed, FaEdit, FaTrash, FaCheckCircle, FaTimesCircle, FaExclamationTriangle } from 'react-icons/fa';
@@ -242,7 +243,7 @@ const ReservationDetail = () => {
 
                       <div className="form-group">
                         <label>Qonaq sayı</label>
-                        <select
+                        <Select
                           value={editGuests}
                           onChange={(e) => setEditGuests(parseInt(e.target.value))}
                           className="edit-select"
@@ -252,7 +253,7 @@ const ReservationDetail = () => {
                               {i + 1} nəfər
                             </option>
                           ))}
-                        </select>
+                        </Select>
                       </div>
                     </div>
 

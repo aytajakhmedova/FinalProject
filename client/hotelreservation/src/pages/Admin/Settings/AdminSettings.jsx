@@ -1,3 +1,4 @@
+import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useState } from 'react';
@@ -113,20 +114,20 @@ const AdminSettings = () => {
             <label>Ad<input value={editingMenu.label} onChange={(e) => setEditingMenu({ ...editingMenu, label: e.target.value })} required /></label>
             <label>URL<input value={editingMenu.url} onChange={(e) => setEditingMenu({ ...editingMenu, url: e.target.value })} required /></label>
             <label>Yer
-              <select value={editingMenu.placement} onChange={(e) => setEditingMenu({ ...editingMenu, placement: e.target.value })}>
+              <Select value={editingMenu.placement} onChange={(e) => setEditingMenu({ ...editingMenu, placement: e.target.value })}>
                 <option value="discover">discover</option>
                 <option value="pages">pages</option>
                 <option value="quick">quick</option>
                 <option value="footer">footer</option>
-              </select>
+              </Select>
             </label>
             <label>İkon<input value={editingMenu.iconKey} onChange={(e) => setEditingMenu({ ...editingMenu, iconKey: e.target.value })} placeholder="hotel, plane, car" /></label>
             <label>Sıra<input type="number" value={editingMenu.sortOrder} onChange={(e) => setEditingMenu({ ...editingMenu, sortOrder: Number(e.target.value) })} /></label>
             <label>Aktiv
-              <select value={String(editingMenu.isActive)} onChange={(e) => setEditingMenu({ ...editingMenu, isActive: e.target.value === 'true' })}>
+              <Select value={String(editingMenu.isActive)} onChange={(e) => setEditingMenu({ ...editingMenu, isActive: e.target.value === 'true' })}>
                 <option value="true">Bəli</option>
                 <option value="false">Xeyr</option>
-              </select>
+              </Select>
             </label>
           </div>
           <div className="admin-form-actions">
@@ -151,10 +152,10 @@ const AdminSettings = () => {
             <label>Başlıq<input value={editingSlide.title} onChange={(e) => setEditingSlide({ ...editingSlide, title: e.target.value })} /></label>
             <label>Sıra<input type="number" value={editingSlide.sortOrder} onChange={(e) => setEditingSlide({ ...editingSlide, sortOrder: Number(e.target.value) })} /></label>
             <label>Aktiv
-              <select value={String(editingSlide.isActive)} onChange={(e) => setEditingSlide({ ...editingSlide, isActive: e.target.value === 'true' })}>
+              <Select value={String(editingSlide.isActive)} onChange={(e) => setEditingSlide({ ...editingSlide, isActive: e.target.value === 'true' })}>
                 <option value="true">Bəli</option>
                 <option value="false">Xeyr</option>
-              </select>
+              </Select>
             </label>
           </div>
           <div className="admin-form-actions">

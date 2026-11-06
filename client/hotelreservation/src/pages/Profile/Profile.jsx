@@ -1,29 +1,43 @@
-import React, { useState } from 'react';
-import { FaUser, FaEnvelope, FaPhone, FaLock, FaEdit, FaCamera, FaCheckCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaUser, FaEnvelope, FaPhone, FaLock, FaEdit, FaCamera, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { useLanguage } from '../../context/LanguageContext';
+import { getAuthUser, clearAuthSession } from '../../api/auth';
+import { useNavigate } from 'react-router-dom';
 import './Profile.css';
 
 const Profile = () => {
   const { t, locale } = useLanguage();
-  // Mock user data from localStorage
+  const navigate = useNavigate();
+  
+  // Get user from JWT token, not localStorage directly
   const [user, setUser] = useState(() => {
-    const savedUser = localStorage.getItem('user');
-    return savedUser ? JSON.parse(savedUser) : {
-      id: 1,
-      name: 'Aynur Məmmədova',
-      email: 'aynur@example.com',
-      phone: '+994 50 123 45 67',
-      avatar: null,
-      memberSince: '2023-01-15',
+    const authUser = getAuthUser();
+    if (!authUser) {
+      return null;
+    }
+    
+    // User-specific profile data from localStorage
+    const profileKey = authUser.email ? `userProfile_${authUser.email}` : 'userProfile_guest';
+    const savedProfile = localStorage.getItem(profileKey);
+    const profile = savedProfile ? JSON.parse(savedProfile) : {};
+    
+    return {
+      id: authUser.id || Date.now(),
+      name: profile.name || authUser.name || authUser.email?.split('@')[0] || 'İstifadəçi',
+      email: authUser.email || 'email@example.com',
+      phone: profile.phone || '',
+      avatar: profile.avatar || null,
+      memberSince: profile.memberSince || new Date().toISOString(),
       verified: true,
+      roles: authUser.roles || []
     };
   });
 
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
   });
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -33,6 +47,32 @@ const Profile = () => {
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState('');
+  const [warningMessage, setWarningMessage] = useState('');
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
+  // Sync with auth changes
+  useEffect(() => {
+    const handleAuthChange = () => {
+      const authUser = getAuthUser();
+      if (!authUser) {
+        setUser(null);
+        navigate('/login');
+      }
+    };
+    
+    window.addEventListener('storage', handleAuthChange);
+    return () => window.removeEventListener('storage', handleAuthChange);
+  }, [navigate]);
+
+  if (!user) {
+    return null;
+  }
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
@@ -63,8 +103,8 @@ const Profile = () => {
       newErrors.email = t('auth.emailBad');
     }
 
-    if (!editForm.phone) {
-      newErrors.phone = t('profile.phoneReq');
+    if (editForm.phone && !/^[\d\s\+\-\(\)]+$/.test(editForm.phone)) {
+      newErrors.phone = 'Telefon nömrəsi düzgün deyil';
     }
 
     setErrors(newErrors);
@@ -99,14 +139,28 @@ const Profile = () => {
     
     if (!validateEdit()) return;
 
-    // Mock save
+    // Save to localStorage (backend endpoint does not exist)
+    const authUser = getAuthUser();
+    const profileKey = authUser?.email ? `userProfile_${authUser.email}` : 'userProfile_guest';
+    
+    const updatedProfile = {
+      name: editForm.name,
+      phone: editForm.phone,
+      avatar: user.avatar,
+      memberSince: user.memberSince
+    };
+    
     const updatedUser = { ...user, ...editForm };
     setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    window.dispatchEvent(new Event('user-updated'));
+    localStorage.setItem(profileKey, JSON.stringify(updatedProfile));
+    
     setIsEditing(false);
     setSuccessMessage(t('profile.saved'));
-    setTimeout(() => setSuccessMessage(''), 3000);
+    setWarningMessage('Qeyd: Email dəyişikliyi backend tərəfindən dəstəklənmir.');
+    setTimeout(() => {
+      setSuccessMessage('');
+      setWarningMessage('');
+    }, 5000);
   };
 
   const handleChangePassword = (e) => {
@@ -114,32 +168,46 @@ const Profile = () => {
     
     if (!validatePassword()) return;
 
-    // Mock password change
-    setPasswordForm({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    });
-    setShowPasswordForm(false);
-    setSuccessMessage(t('profile.passSaved'));
-    setTimeout(() => setSuccessMessage(''), 3000);
+    // Backend endpoint does not exist
+    setErrors({ currentPassword: 'Backend-də parol dəyişdirmə endpoint-i mövcud deyil. Bu funksiya hazırda işləmir.' });
   };
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      // Mock avatar upload
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const updatedUser = { ...user, avatar: reader.result };
-        setUser(updatedUser);
-        localStorage.setItem('user', JSON.stringify(updatedUser));
-        window.dispatchEvent(new Event('user-updated'));
-        setSuccessMessage(t('profile.avatarSaved'));
-        setTimeout(() => setSuccessMessage(''), 3000);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErrors({ avatar: 'Yalnız şəkil faylları yükləyə bilərsiniz.' });
+      return;
     }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setErrors({ avatar: 'Şəkil ölçüsü maksimum 2MB ola bilər.' });
+      return;
+    }
+
+    // Save to localStorage (backend upload endpoint for profile avatar does not exist)
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const updatedUser = { ...user, avatar: reader.result };
+      setUser(updatedUser);
+      
+      const authUser = getAuthUser();
+      const profileKey = authUser?.email ? `userProfile_${authUser.email}` : 'userProfile_guest';
+      const profile = JSON.parse(localStorage.getItem(profileKey) || '{}');
+      profile.avatar = reader.result;
+      localStorage.setItem(profileKey, JSON.stringify(profile));
+      
+      setSuccessMessage(t('profile.avatarSaved'));
+      setWarningMessage('Qeyd: Avatar yalnız bu brauzerdə saxlanılır.');
+      setTimeout(() => {
+        setSuccessMessage('');
+        setWarningMessage('');
+      }, 5000);
+    };
+    reader.readAsDataURL(file);
   };
 
   const formatDate = (dateString) => {
@@ -169,6 +237,14 @@ const Profile = () => {
           <div className="success-banner">
             <FaCheckCircle />
             <span>{successMessage}</span>
+          </div>
+        )}
+
+        {/* Warning Message */}
+        {warningMessage && (
+          <div className="warning-banner">
+            <FaExclamationTriangle />
+            <span>{warningMessage}</span>
           </div>
         )}
 
@@ -260,9 +336,14 @@ const Profile = () => {
                         onChange={handleEditChange}
                         className="form-input"
                         placeholder="Email"
+                        disabled
+                        title="Email dəyişikliyi backend tərəfindən dəstəklənmir"
                       />
                     </div>
                     {errors.email && <span className="error-message">{errors.email}</span>}
+                    <small style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                      Email dəyişikliyi backend tərəfindən dəstəklənmir
+                    </small>
                   </div>
                 </div>
 
@@ -333,7 +414,7 @@ const Profile = () => {
                   </div>
                   <div className="info-content">
                     <span className="info-label">{t('profile.phone')}</span>
-                    <span className="info-value">{user.phone}</span>
+                    <span className="info-value">{user.phone || 'Qeyd edilməyib'}</span>
                   </div>
                 </div>
               </div>
@@ -357,6 +438,11 @@ const Profile = () => {
 
             {showPasswordForm ? (
               <form onSubmit={handleChangePassword} className="profile-form">
+                <div className="warning-banner" style={{ marginBottom: '1rem' }}>
+                  <FaExclamationTriangle />
+                  <span>Backend-də parol dəyişdirmə endpoint-i mövcud deyil. Bu funksiya hazırda işləmir.</span>
+                </div>
+
                 <div className="form-row">
                   <div className="form-group">
                     <label className="form-label">{t('profile.currentPass')}</label>
@@ -369,6 +455,7 @@ const Profile = () => {
                         onChange={handlePasswordChange}
                         className="form-input"
                         placeholder="••••••••"
+                        disabled
                       />
                     </div>
                     {errors.currentPassword && <span className="error-message">{errors.currentPassword}</span>}
@@ -387,6 +474,7 @@ const Profile = () => {
                         onChange={handlePasswordChange}
                         className="form-input"
                         placeholder="••••••••"
+                        disabled
                       />
                     </div>
                     {errors.newPassword && <span className="error-message">{errors.newPassword}</span>}
@@ -405,6 +493,7 @@ const Profile = () => {
                         onChange={handlePasswordChange}
                         className="form-input"
                         placeholder="••••••••"
+                        disabled
                       />
                     </div>
                     {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
@@ -412,9 +501,6 @@ const Profile = () => {
                 </div>
 
                 <div className="form-actions">
-                  <button type="submit" className="btn-save">
-                    {t('profile.updatePass')}
-                  </button>
                   <button 
                     type="button" 
                     className="btn-cancel"

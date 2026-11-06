@@ -1,3 +1,5 @@
+import Combobox from '../../common/Select/Combobox';
+import Select from '../../common/Select/Select';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaUsers, FaSearch, FaMapMarkerAlt } from 'react-icons/fa';
@@ -15,7 +17,6 @@ const Hero = () => {
     rooms: 1
   });
 
-  const [showLocationDropdown, setShowLocationDropdown] = useState(false);
 
   const popularLocations = [
     { id: 1, name: 'Bakı', country: 'Azərbaycan' },
@@ -42,12 +43,7 @@ const Hero = () => {
     });
   };
 
-  const handleLocationSelect = (location) => {
-    setFormData({ ...formData, location: `${location.name}, ${location.country}` });
-    setShowLocationDropdown(false);
-  };
-
-  const handleSubmit = (e) => {
+const handleSubmit = (e) => {
     e.preventDefault();
     navigate('/otaqlar', { state: formData });
   };
@@ -78,40 +74,11 @@ const Hero = () => {
                 <span>Məkan</span>
               </label>
               <div className="location-input-wrapper">
-                <input
-                  type="text"
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  onFocus={() => setShowLocationDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowLocationDropdown(false), 200)}
-                  placeholder="Şəhər və ya ölkə seçin"
-                  required
-                />
-                {showLocationDropdown && (
-                  <div className="location-dropdown">
-                    {popularLocations
-                      .filter(loc => 
-                        loc.name.toLowerCase().includes(formData.location.toLowerCase()) ||
-                        loc.country.toLowerCase().includes(formData.location.toLowerCase()) ||
-                        formData.location === ''
-                      )
-                      .map(location => (
-                        <button
-                          key={location.id}
-                          type="button"
-                          className="location-item"
-                          onMouseDown={() => handleLocationSelect(location)}
-                        >
-                          <FaMapMarkerAlt />
-                          <div>
-                            <div className="location-name">{location.name}</div>
-                            <div className="location-country">{location.country}</div>
-                          </div>
-                        </button>
-                      ))
-                    }
-                  </div>
-                )}
+                <Combobox inputMode label="Məkan" value={formData.location} placeholder="Şəhər və ya ölkə seçin"
+                  inputProps={{ required: true }}
+                  options={popularLocations.map((item) => ({ value: item.name + ', ' + item.country, label: item.name, description: item.country, searchText: item.name + ' ' + item.country }))}
+                  onInputChange={(location) => setFormData({ ...formData, location })}
+                  onChange={(location) => setFormData({ ...formData, location })} />
               </div>
             </div>
 
@@ -152,22 +119,22 @@ const Hero = () => {
                 <span>Qonaqlar</span>
               </label>
               <div className="guests-input">
-                <select
+                <Select
                   value={formData.adults}
                   onChange={(e) => setFormData({ ...formData, adults: parseInt(e.target.value) })}
                 >
                   {[1, 2, 3, 4, 5, 6].map(n => (
                     <option key={n} value={n}>{n} Böyük</option>
                   ))}
-                </select>
-                <select
+                </Select>
+                <Select
                   value={formData.children}
                   onChange={(e) => setFormData({ ...formData, children: parseInt(e.target.value) })}
                 >
                   {[0, 1, 2, 3, 4].map(n => (
                     <option key={n} value={n}>{n} Uşaq</option>
                   ))}
-                </select>
+                </Select>
               </div>
             </div>
 
@@ -175,14 +142,14 @@ const Hero = () => {
               <label>
                 <span>Otaq Sayı</span>
               </label>
-              <select
+              <Select
                 value={formData.rooms}
                 onChange={(e) => setFormData({ ...formData, rooms: parseInt(e.target.value) })}
               >
                 {[1, 2, 3, 4, 5].map(n => (
                   <option key={n} value={n}>{n} Otaq</option>
                 ))}
-              </select>
+              </Select>
             </div>
 
             <button type="submit" className="btn-search">

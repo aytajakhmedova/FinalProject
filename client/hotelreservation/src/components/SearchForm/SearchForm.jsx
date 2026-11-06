@@ -1,3 +1,4 @@
+import Combobox from '../common/Select/Combobox';
 import { useState, useEffect, useRef } from 'react';
 import {
   FaCalendarAlt,
@@ -32,7 +33,6 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState({ adults: 2, children: 0, rooms: 1 });
   const [showGuests, setShowGuests] = useState(false);
-  const [showCities, setShowCities] = useState(false);
   const [error, setError] = useState('');
   const [cities, setCities] = useState([]);
   const wrapRef = useRef(null);
@@ -44,11 +44,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
     { id: 'tour', label: t('search.tour'), icon: <FaRoute /> },
   ];
 
-  const filteredCities = cities.filter((c) =>
-    `${c.name} ${c.country}`.toLowerCase().includes(location.toLowerCase())
-  );
-
-  useEffect(() => {
+useEffect(() => {
     getSiteCities()
       .then(setCities)
       .catch(() => setCities([]));
@@ -58,7 +54,6 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
     const close = (e) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) {
         setShowGuests(false);
-        setShowCities(false);
       }
     };
     document.addEventListener('mousedown', close);
@@ -135,37 +130,11 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
           </span>
           <div className="field-content">
             <label>{serviceType === 'flight' ? t('search.fromTo') : t('search.place')}</label>
-            <input
-              type="text"
-              placeholder={t('search.cityPh')}
-              value={location}
-              onChange={(e) => {
-                setLocation(e.target.value);
-                setShowCities(true);
-              }}
-              onFocus={() => setShowCities(true)}
-              autoComplete="off"
-            />
+            <Combobox inputMode label={serviceType === 'flight' ? t('search.fromTo') : t('search.place')}
+              placeholder={t('search.cityPh')} value={location}
+              options={cities.map((city) => ({ value: city.name, label: city.name, description: city.country, searchText: city.name + ' ' + city.country }))}
+              onInputChange={setLocation} onChange={setLocation} />
           </div>
-          {showCities && filteredCities.length > 0 && (
-            <ul className="suggest-list">
-              {filteredCities.slice(0, 6).map((city) => (
-                <li
-                  key={city.name}
-                  onClick={() => {
-                    setLocation(city.name);
-                    setShowCities(false);
-                  }}
-                >
-                  <LocationPin />
-                  <span>
-                    {city.name}
-                    <small>{city.country}</small>
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
 
         <div className="form-divider"></div>

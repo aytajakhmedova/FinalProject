@@ -1,0 +1,171 @@
+/* Shared bits for the Customers, Staff, Payments and Reports pages. The tables, badges and cards come from AdminHotels.css. */
+.status-badge.status-paid,
+.status-badge.status-active {
+  color: #7ddc9a;
+  background: rgba(74, 222, 128, 0.12);
+}
+
+.status-badge.status-failed,
+.status-badge.status-passive {
+  color: #f08a8a;
+  background: rgba(248, 113, 113, 0.13);
+}
+
+.status-badge.status-refunded {
+  color: #b79af0;
+  background: rgba(167, 139, 250, 0.14);
+}
+
+.manage-toolbar {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.manage-toolbar .grow {
+  flex: 1 1 240px;
+}
+
+.manage-toolbar input,
+.manage-toolbar select {
+  padding: 0.7rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(139, 90, 60, 0.25);
+  background: rgba(0, 0, 0, 0.18);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.manage-toolbar .date-field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.manage-toolbar .presets {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.manage-toolbar .presets button {
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(139, 90, 60, 0.25);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.manage-toolbar .presets button:hover {
+  background: rgba(139, 90, 60, 0.18);
+}
+
+.manage-message {
+  margin: 0 0 1rem;
+  color: var(--text-secondary);
+}
+
+.manage-message.error {
+  color: #f08a8a;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.history-table th,
+.history-table td {
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+  color: var(--text-secondary);
+}
+
+.history-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.row-clickable {
+  cursor: pointer;
+}
+
+.an-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.an-table th,
+.an-table td {
+  padding: 0.6rem 0.5rem;
+  text-align: left;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+.an-table th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.an-table td:first-child {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.an-table .num {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.an-grid .span-all {
+  grid-column: 1 / -1;
+}
+
+.status-select {
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: none;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #e3c071;
+  background: rgba(227, 192, 113, 0.14);
+}
+
+.status-select option {
+  background: #2a1f1a;
+  color: var(--text-primary);
+}
+
+.status-select.status-paid {
+  color: #7ddc9a;
+  background: rgba(74, 222, 128, 0.12);
+}
+
+.status-select.status-failed,
+.status-select.status-cancelled {
+  color: #f08a8a;
+  background: rgba(248, 113, 113, 0.13);
+}
+
+.status-select.status-refunded {
+  color: #b79af0;
+  background: rgba(167, 139, 250, 0.14);
+}

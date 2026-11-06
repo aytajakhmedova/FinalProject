@@ -1,3 +1,4 @@
+import Select from '../../components/common/Select/Select';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
@@ -61,16 +62,49 @@ const TourDetail = () => {
 
   const handleBooking = (event) => {
     event.preventDefault();
+    setBookingError('');
+    
     if (!getAuthToken()) {
       navigate('/login', { state: { from: `/tours/${id}` } });
       return;
     }
+    
+    // Get user from auth session (not raw localStorage)
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const digits = cardNumber.replace(/\D/g, '');
     if (!user.email) {
-      setBookingError('Hesabda email yoxdur. Profilə email yazın.');
+      setBookingError('Hesabda email yoxdur. Zəhmət olmasa giriş edin.');
       return;
     }
+    
+    // Validate tour date selected
+    if (!selectedDate) {
+      setBookingError('Tur tarixini seçin.');
+      return;
+    }
+    
+    // Check if date is in the past
+    const tourDate = new Date(selectedDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (tourDate < today) {
+      setBookingError('Keçmiş tarixli tur seçə bilməzsiniz.');
+      return;
+    }
+    
+    // Validate guest count within limits
+    if (guestCount < tour.minGuests || guestCount > tour.maxGuests) {
+      setBookingError(`İştirakçı sayı ${tour.minGuests} ilə ${tour.maxGuests} arasında olmalıdır.`);
+      return;
+    }
+    
+    // Check available capacity (if backend provides this info)
+    if (tour.capacity && guestCount > tour.capacity) {
+      setBookingError(`Bu tur üçün yalnız ${tour.capacity} yer qalıb.`);
+      return;
+    }
+
+    // Validate card details - demo payment
+    const digits = cardNumber.replace(/\D/g, '');
     if (digits.length < 16) {
       setBookingError('Kart nömrəsi 16 rəqəm olmalıdır.');
       return;
@@ -83,10 +117,12 @@ const TourDetail = () => {
       setBookingError('Bitmə tarixini AA/İİ formatında yazın.');
       return;
     }
-    if (cvv.length < 3) {
+    // Demo payment - CVV optional but validate format if provided
+    if (cvv && cvv.length > 0 && cvv.length < 3) {
       setBookingError('CVV 3 rəqəm olmalıdır.');
       return;
     }
+    
     setBooking(true);
     setBookingError('');
     createBooking({
@@ -101,6 +137,7 @@ const TourDetail = () => {
       cardHolder: cardName.trim(),
     })
       .then((created) => {
+        // Only navigate to success if backend confirms booking
         navigate('/booking-success', { state: { booking: created } });
       })
       .catch((error) => {
@@ -259,7 +296,7 @@ const TourDetail = () => {
                     <FaCalendarAlt />
                     Tarix seçin
                   </label>
-                  <select
+                  <Select
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
                     className="form-select"
@@ -275,7 +312,7 @@ const TourDetail = () => {
                         </option>
                       );
                     })}
-                  </select>
+                  </Select>
                 </div>
 
                 {/* Guest Count */}
@@ -284,7 +321,7 @@ const TourDetail = () => {
                     <FaUsers />
                     İştirakçılar
                   </label>
-                  <select
+                  <Select
                     value={guestCount}
                     onChange={(e) => setGuestCount(Number(e.target.value))}
                     className="form-select"
@@ -295,7 +332,7 @@ const TourDetail = () => {
                     ).map(num => (
                       <option key={num} value={num}>{num} nəfər</option>
                     ))}
-                  </select>
+                  </Select>
                 </div>
 
                 {/* Price Summary */}

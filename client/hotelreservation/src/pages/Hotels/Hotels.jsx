@@ -1,3 +1,4 @@
+import Select from '../../components/common/Select/Select';
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FaSearch, FaFilter, FaSort } from 'react-icons/fa';
@@ -158,7 +159,7 @@ const Hotels = () => {
                 updateStayParams({ checkOut: e.target.value });
               }}
             />
-            <select
+            <Select
               className="stay-guests-input"
               value={guests}
               onChange={(e) => {
@@ -169,7 +170,7 @@ const Hotels = () => {
               {[1, 2, 3, 4, 5, 6].map((n) => (
                 <option key={n} value={n}>{t('hotels.guestsN', { n })}</option>
               ))}
-            </select>
+            </Select>
             <button 
               className="filter-toggle-btn"
               onClick={() => setShowFilters(!showFilters)}
@@ -308,7 +309,7 @@ const Hotels = () => {
             <div className="hotels-sort-bar">
               <div className="sort-group">
                 <FaSort />
-                <select 
+                <Select 
                   value={sortBy} 
                   onChange={(e) => setSortBy(e.target.value)}
                   className="sort-select"
@@ -317,7 +318,7 @@ const Hotels = () => {
                   <option value="price-low">{t('hotels.priceLow')}</option>
                   <option value="price-high">{t('hotels.priceHigh')}</option>
                   <option value="rating">{t('hotels.rating')}</option>
-                </select>
+                </Select>
               </div>
             </div>
 

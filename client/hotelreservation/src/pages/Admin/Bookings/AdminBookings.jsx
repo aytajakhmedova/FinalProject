@@ -1,3 +1,4 @@
+import Select from '../../../components/common/Select/Select';
 import React, { useEffect, useMemo, useState } from 'react';
 import { getBookings, updateBookingStatus } from '../../../api/client';
 import { NEXT_STATUSES, STATUS_LABELS } from '../../../utils/bookingsStore';
@@ -141,18 +142,18 @@ const AdminBookings = () => {
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Kod, müştəri və ya xidmət axtar"
             />
-            <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+            <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
               <option value="all">Bütün xidmətlər</option>
               {Object.entries(TYPE_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
-            </select>
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            </Select>
+            <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
               <option value="all">Bütün statuslar</option>
               {Object.entries(STATUS_LABELS).map(([value, label]) => (
                 <option key={value} value={value}>{label}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {successMessage && <p className="page-subtitle">{successMessage}</p>}

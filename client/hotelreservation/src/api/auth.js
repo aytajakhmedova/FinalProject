@@ -20,13 +20,32 @@ export function getAuthToken() {
 }
 
 export function getAuthUser() {
-  if (!getAuthToken()) {
+  const token = getAuthToken();
+  if (!token) {
     return null;
   }
 
   try {
+    // UI hints come from the JWT, never the editable cached user.roles value.
+    // Signature validation and current database permissions remain server-side.
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const bytes = Uint8Array.from(atob(payload.padEnd(Math.ceil(payload.length / 4) * 4, '=')), (c) => c.charCodeAt(0));
+    const claims = JSON.parse(new TextDecoder().decode(bytes));
+    if (!Number.isFinite(claims.exp) || claims.exp * 1000 <= Date.now()) return null;
+    if (claims.nbf && claims.nbf * 1000 > Date.now()) return null;
+    const roles = claims['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ?? claims.role ?? [];
     const raw = localStorage.getItem(USER_KEY);
-    return raw ? JSON.parse(raw) : null;
+    let cached = {};
+    try { cached = raw ? JSON.parse(raw) : {}; } catch { /* Ignore corrupt display metadata. */ }
+    return {
+      ...cached,
+      id: claims.sub || claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'],
+      email: claims.email || claims['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] || '',
+      roles: (Array.isArray(roles) ? roles : [roles]).filter((role) => typeof role === 'string'),
+      assignedHotelId: Number(claims.assignedHotelId) || null,
+    };
   } catch {
     return null;
   }
@@ -42,6 +61,12 @@ export function isAdminSession() {
 export function hasRole(...allowed) {
   const roles = getAuthUser()?.roles;
   return Array.isArray(roles) && roles.some((role) => allowed.includes(role));
+}
+
+export function canManageUser(target) {
+  if (!target || !hasRole('SuperAdmin', 'Admin')) return false;
+  const roles = Array.isArray(target.roles) ? target.roles : [target.role];
+  return hasRole('SuperAdmin') || !roles.includes('SuperAdmin');
 }
 
 export function getPostLoginPath(roles) {
@@ -72,6 +97,9 @@ export function clearAuthSession() {
   localStorage.removeItem(USER_KEY);
   localStorage.removeItem("isAuthenticated");
   localStorage.removeItem("rememberMe");
+  
+  // Notify App.jsx to reload favorites for guest
+  window.dispatchEvent(new Event("authChange"));
 }
 
 export function saveAuthSession(auth, { rememberMe = false } = {}) {
@@ -103,6 +131,8 @@ export function saveAuthSession(auth, { rememberMe = false } = {}) {
   }
 
   window.dispatchEvent(new Event("user-updated"));
+  // Notify App.jsx to reload favorites for logged-in user
+  window.dispatchEvent(new Event("authChange"));
 }
 
 async function postAuth(path, body) {

@@ -1,3 +1,4 @@
+import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -150,14 +151,14 @@ const AdminDiscounts = () => {
             </label>
             <label>
               Kombinasiya
-              <select
+              <Select
                 value={editing.combo}
                 onChange={(e) => setEditing({ ...editing, combo: e.target.value, code: e.target.value === 'coupon' ? editing.code : '' })}
               >
                 {COMBO_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>{option.label}</option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Kupon kodu
@@ -207,13 +208,13 @@ const AdminDiscounts = () => {
             </label>
             <label>
               Status
-              <select
+              <Select
                 value={editing.isActive ? '1' : '0'}
                 onChange={(e) => setEditing({ ...editing, isActive: e.target.value === '1' })}
               >
                 <option value="1">Aktiv</option>
                 <option value="0">Deaktiv</option>
-              </select>
+              </Select>
             </label>
           </div>
           <div className="admin-form-actions">

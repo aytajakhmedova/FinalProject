@@ -60,6 +60,10 @@ const Login = () => {
     try {
       const auth = await loginRequest(formData.email, formData.password);
       saveAuthSession(auth, { rememberMe: formData.rememberMe });
+      
+      // Clean up any pending booking data (not used anywhere)
+      localStorage.removeItem('pendingBooking');
+      
       const nextPath = getSafeAdminPath(new URLSearchParams(location.search).get('next'));
       const roles = Array.isArray(auth.roles) ? auth.roles : [];
       if (nextPath && !roles.some((role) => ['Admin', 'SuperAdmin', 'HotelManager', 'Receptionist'].includes(role))) {

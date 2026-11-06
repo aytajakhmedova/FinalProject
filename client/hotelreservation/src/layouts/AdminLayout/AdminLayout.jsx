@@ -16,7 +16,11 @@ import {
   FaMapMarkedAlt,
   FaPercentage,
   FaBell,
-  FaStar
+  FaStar,
+  FaUserFriends,
+  FaUserTie,
+  FaCreditCard,
+  FaFileAlt
 } from 'react-icons/fa';
 import logoImage from '../../assets/images/AE_HOTEL_transparent_logo.png';
 import './AdminLayout.css';
@@ -35,6 +39,10 @@ const ALL_MENU = [
   { path: '/admin/paketler', icon: <FaPercentage />, label: 'Paketlər və Endirimlər', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/reyler', icon: <FaStar />, label: 'Rəylər', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
   { path: '/admin/users', icon: <FaUsers />, labelKey: 'admin.users', roles: ['SuperAdmin', 'Admin'] },
+  { path: '/admin/musteriler', icon: <FaUserFriends />, label: 'Müştərilər', roles: ['SuperAdmin', 'Admin'] },
+  { path: '/admin/isciler', icon: <FaUserTie />, label: 'İşçilər', roles: ['SuperAdmin', 'Admin'] },
+  { path: '/admin/odenisler', icon: <FaCreditCard />, label: 'Ödənişlər', roles: ['SuperAdmin', 'Admin'] },
+  { path: '/admin/hesabatlar', icon: <FaFileAlt />, label: 'Hesabatlar', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/analytics', icon: <FaChartBar />, labelKey: 'admin.analytics', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
   { path: '/admin/settings', icon: <FaCog />, labelKey: 'admin.settings', roles: ['SuperAdmin', 'Admin'] },
 ];

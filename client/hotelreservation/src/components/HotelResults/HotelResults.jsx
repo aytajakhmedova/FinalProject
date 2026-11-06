@@ -1,3 +1,4 @@
+import Select from '../common/Select/Select';
 import { useMemo, useState } from 'react';
 import { FaHeart, FaMapMarkerAlt, FaPlay, FaStar, FaWifi, FaRegHeart } from 'react-icons/fa';
 import { formatPrice } from '../../data/travelData';
@@ -55,11 +56,11 @@ const HotelResults = ({ hotels, query, currency, favorites, onToggleFavorite, on
           >
             <FaHeart /> Seçilmişlər
           </button>
-          <select value={sort} onChange={(e) => setSort(e.target.value)}>
+          <Select value={sort} onChange={(e) => setSort(e.target.value)}>
             <option value="rating">Reytinq</option>
             <option value="price-asc">Ucuzdan bahaya</option>
             <option value="price-desc">Bahadan ucuza</option>
-          </select>
+          </Select>
         </div>
       </div>
 

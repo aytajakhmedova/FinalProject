@@ -59,9 +59,24 @@ const AdminDashboard = () => {
   const stats = useMemo(() => {
     const active = bookings.filter((booking) => booking.status === 'confirmed' || booking.status === 'checked-in');
     const guests = new Set(bookings.map((booking) => booking.guestEmail).filter(Boolean));
+    
+    // Calculate actual revenue based on deposit amounts and payment status
+    // For bookings with deposits (hotel payment method), only depositAmount is paid upfront
+    // Backend should track payment status, but for now we calculate based on depositAmount
     const revenue = bookings
       .filter((booking) => booking.status !== 'cancelled')
-      .reduce((sum, booking) => sum + (Number(booking.totalPrice) || 0), 0);
+      .reduce((sum, booking) => {
+        const totalPrice = Number(booking.totalPrice) || 0;
+        const depositAmount = Number(booking.depositAmount) || 0;
+        const depositPercent = Number(booking.depositPercent) || 0;
+        
+        // If deposit is partial (< 100%), use depositAmount as actual revenue
+        // Otherwise use totalPrice (full payment)
+        if (depositPercent > 0 && depositPercent < 100 && depositAmount > 0) {
+          return sum + depositAmount;
+        }
+        return sum + totalPrice;
+      }, 0);
 
     return [
       isManager
@@ -69,7 +84,7 @@ const AdminDashboard = () => {
         : { icon: <FaHotel />, label: 'Otellər', value: String(hotels.length), color: '#8B5A3C' },
       { icon: <FaCalendarCheck />, label: 'Aktiv rezervasiyalar', value: String(active.length), color: '#22c55e' },
       { icon: <FaUsers />, label: 'Qonaqlar', value: String(guests.size), color: '#f59e0b' },
-      { icon: <FaMoneyBillWave />, label: 'Ümumi gəlir', value: `₼${money(revenue)}`, color: '#8B5A3C' },
+      { icon: <FaMoneyBillWave />, label: 'Ödənilmiş gəlir', value: `₼${money(revenue)}`, color: '#8B5A3C' },
     ];
   }, [bookings, hotels, isManager]);
 

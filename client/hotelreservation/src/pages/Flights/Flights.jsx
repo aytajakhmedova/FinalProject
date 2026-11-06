@@ -1,4 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import Combobox from '../../components/common/Select/Combobox';
+import Select from '../../components/common/Select/Select';
+import React, { useState } from 'react';
 import { FaExchangeAlt, FaCalendarAlt, FaPlane, FaGlobeAmericas, FaMapMarkerAlt, FaLock } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import istanbulImage from '../../assets/images/istanbul.jpg';
@@ -21,14 +23,6 @@ const Flights = () => {
     travelers: '1',
     flightClass: 'economy',
   });
-  const [showFromDropdown, setShowFromDropdown] = useState(false);
-  const [showToDropdown, setShowToDropdown] = useState(false);
-  const [filteredFromLocations, setFilteredFromLocations] = useState([]);
-  const [filteredToLocations, setFilteredToLocations] = useState([]);
-  
-  const fromRef = useRef(null);
-  const toRef = useRef(null);
-
   const locations = [
     { code: 'GYD', city: 'Bakı', country: 'Azərbaycan', airport: 'Heydər Əliyev Hava Limanı' },
     { code: 'IST', city: 'İstanbul', country: 'Türkiyə', airport: 'İstanbul Hava Limanı' },
@@ -46,66 +40,6 @@ const Flights = () => {
     { code: 'VIE', city: 'Vyana', country: 'Avstriya', airport: 'Vyana Beynəlxalq Hava Limanı' },
     { code: 'PRG', city: 'Praqa', country: 'Çexiya', airport: 'Václav Havel Hava Limanı' },
   ];
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (fromRef.current && !fromRef.current.contains(event.target)) {
-        setShowFromDropdown(false);
-      }
-      if (toRef.current && !toRef.current.contains(event.target)) {
-        setShowToDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleFromChange = (e) => {
-    const value = e.target.value;
-    setFormData(prev => ({ ...prev, from: value }));
-    
-    if (value.length > 0) {
-      const filtered = locations.filter(loc => 
-        loc.city.toLowerCase().includes(value.toLowerCase()) ||
-        loc.country.toLowerCase().includes(value.toLowerCase()) ||
-        loc.code.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredFromLocations(filtered);
-      setShowFromDropdown(true);
-    } else {
-      setFilteredFromLocations(locations);
-      setShowFromDropdown(true);
-    }
-  };
-
-  const handleToChange = (e) => {
-    const value = e.target.value;
-    setFormData(prev => ({ ...prev, to: value }));
-    
-    if (value.length > 0) {
-      const filtered = locations.filter(loc => 
-        loc.city.toLowerCase().includes(value.toLowerCase()) ||
-        loc.country.toLowerCase().includes(value.toLowerCase()) ||
-        loc.code.toLowerCase().includes(value.toLowerCase())
-      );
-      setFilteredToLocations(filtered);
-      setShowToDropdown(true);
-    } else {
-      setFilteredToLocations(locations);
-      setShowToDropdown(true);
-    }
-  };
-
-  const selectFromLocation = (location) => {
-    setFormData(prev => ({ ...prev, from: `${location.city} (${location.code})` }));
-    setShowFromDropdown(false);
-  };
-
-  const selectToLocation = (location) => {
-    setFormData(prev => ({ ...prev, to: `${location.city} (${location.code})` }));
-    setShowToDropdown(false);
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -136,16 +70,6 @@ const Flights = () => {
       from: prev.to,
       to: prev.from
     }));
-  };
-
-  const handleFromFocus = () => {
-    setFilteredFromLocations(locations);
-    setShowFromDropdown(true);
-  };
-
-  const handleToFocus = () => {
-    setFilteredToLocations(locations);
-    setShowToDropdown(true);
   };
 
   const specialOffers = [
@@ -267,7 +191,7 @@ const Flights = () => {
                 </button>
 
                 <div className="trip-selects">
-                  <select 
+                  <Select 
                     name="flightClass" 
                     value={formData.flightClass}
                     onChange={handleChange}
@@ -276,9 +200,9 @@ const Flights = () => {
                     <option value="economy">Ekonom</option>
                     <option value="business">Biznes</option>
                     <option value="first">Birinci sinif</option>
-                  </select>
+                  </Select>
 
-                  <select 
+                  <Select 
                     name="travelers" 
                     value={formData.travelers}
                     onChange={handleChange}
@@ -289,52 +213,28 @@ const Flights = () => {
                     <option value="3">3 Sərnişin</option>
                     <option value="4">4 Sərnişin</option>
                     <option value="5">5+ Sərnişin</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 
               {/* Search Inputs */}
               <form onSubmit={handleSubmit} className="flights-search-form">
                 <div className={`flight-inputs-row ${tripType === 'round-trip' ? 'with-return' : ''}`}>
-                  <div className="flight-input-group" ref={fromRef}>
+                  <div className="flight-input-group">
                     <label className="flight-label">
                       <FaPlane className="flight-icon" />
                       Haradan
                     </label>
-                    <input
-                      type="text"
-                      name="from"
-                      value={formData.from}
-                      onChange={handleFromChange}
-                      onFocus={handleFromFocus}
-                      placeholder="Şəhər və ya hava limanı"
-                      className="flight-input"
-                      autoComplete="off"
-                      required
-                    />
-                    {showFromDropdown && (
-                      <div className="location-dropdown">
-                        {filteredFromLocations.length > 0 ? (
-                          filteredFromLocations.map(location => (
-                            <div 
-                              key={location.code}
-                              className="location-item"
-                              onClick={() => selectFromLocation(location)}
-                            >
-                              <div className="location-code">{location.code}</div>
-                              <div className="location-info">
-                                <div className="location-city">{location.city}</div>
-                                <div className="location-details">
-                                  {location.airport} • {location.country}
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="location-empty">Nəticə tapılmadı</div>
-                        )}
-                      </div>
-                    )}
+                    <Combobox inputMode label="Haradan" className="flight-input"
+                      value={formData.from} placeholder="Şəhər və ya hava limanı"
+                      inputProps={{ name: 'from', required: true }}
+                      options={locations.map((item) => ({
+                        value: item.city + ' (' + item.code + ')', label: item.city + ' (' + item.code + ')',
+                        description: item.airport + ' • ' + item.country,
+                        searchText: [item.city, item.code, item.country, item.airport].join(' '),
+                      }))}
+                      onInputChange={(value) => setFormData((previous) => ({ ...previous, from: value }))}
+                      onChange={(value) => setFormData((previous) => ({ ...previous, from: value }))} />
                   </div>
 
                   <button 
@@ -346,45 +246,21 @@ const Flights = () => {
                     <FaExchangeAlt />
                   </button>
 
-                  <div className="flight-input-group" ref={toRef}>
+                  <div className="flight-input-group">
                     <label className="flight-label">
                       <FaPlane className="flight-icon rotated" />
                       Hara
                     </label>
-                    <input
-                      type="text"
-                      name="to"
-                      value={formData.to}
-                      onChange={handleToChange}
-                      onFocus={handleToFocus}
-                      placeholder="Şəhər və ya hava limanı"
-                      className="flight-input"
-                      autoComplete="off"
-                      required
-                    />
-                    {showToDropdown && (
-                      <div className="location-dropdown">
-                        {filteredToLocations.length > 0 ? (
-                          filteredToLocations.map(location => (
-                            <div 
-                              key={location.code}
-                              className="location-item"
-                              onClick={() => selectToLocation(location)}
-                            >
-                              <div className="location-code">{location.code}</div>
-                              <div className="location-info">
-                                <div className="location-city">{location.city}</div>
-                                <div className="location-details">
-                                  {location.airport} • {location.country}
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="location-empty">Nəticə tapılmadı</div>
-                        )}
-                      </div>
-                    )}
+                    <Combobox inputMode label="Hara" className="flight-input"
+                      value={formData.to} placeholder="Şəhər və ya hava limanı"
+                      inputProps={{ name: 'to', required: true }}
+                      options={locations.map((item) => ({
+                        value: item.city + ' (' + item.code + ')', label: item.city + ' (' + item.code + ')',
+                        description: item.airport + ' • ' + item.country,
+                        searchText: [item.city, item.code, item.country, item.airport].join(' '),
+                      }))}
+                      onInputChange={(value) => setFormData((previous) => ({ ...previous, to: value }))}
+                      onChange={(value) => setFormData((previous) => ({ ...previous, to: value }))} />
                   </div>
 
                   <div className="flight-input-group">

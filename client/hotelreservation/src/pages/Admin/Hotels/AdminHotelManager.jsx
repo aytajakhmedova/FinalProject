@@ -1,3 +1,4 @@
+import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useState } from 'react';
@@ -204,7 +205,7 @@ const AdminHotelManager = () => {
             </label>
             <label>
               Ölkə *
-              <select
+              <Select
                 value={editing.countryId}
                 onChange={(e) => handleCountryChange(e.target.value)}
                 required
@@ -215,11 +216,11 @@ const AdminHotelManager = () => {
                     {country.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Şəhər *
-              <select
+              <Select
                 value={editing.cityId}
                 onChange={(e) => handleCityChange(e.target.value)}
                 required
@@ -231,11 +232,11 @@ const AdminHotelManager = () => {
                     {city.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Turistik məkan *
-              <select
+              <Select
                 value={editing.touristPlaceId}
                 onChange={(e) => setEditing({ ...editing, touristPlaceId: e.target.value })}
                 required
@@ -247,7 +248,7 @@ const AdminHotelManager = () => {
                     {place.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Ünvan
@@ -259,14 +260,14 @@ const AdminHotelManager = () => {
             </label>
             <label>
               Ulduz
-              <select
+              <Select
                 value={editing.stars}
                 onChange={(e) => setEditing({ ...editing, stars: Number(e.target.value) })}
               >
                 {[1, 2, 3, 4, 5].map((star) => (
                   <option key={star} value={star}>{star}</option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Otel tipi

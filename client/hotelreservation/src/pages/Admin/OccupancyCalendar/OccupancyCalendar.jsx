@@ -1,3 +1,4 @@
+import Select from '../../../components/common/Select/Select';
 import React, { useEffect, useMemo, useState } from 'react';
 import { FaChevronLeft, FaChevronRight, FaCalendarAlt, FaBed, FaCheckCircle } from 'react-icons/fa';
 import { getBookings, getHotels, getReservations } from '../../../api/client';
@@ -94,7 +95,15 @@ const OccupancyCalendar = () => {
 
   const loadData = () => {
     setLoading(true);
-    return Promise.all([getHotels(), getBookings(), getReservations().catch(() => [])])
+    return Promise.all([
+      getHotels(),
+      getBookings(),
+      getReservations().catch((error) => {
+        // Reservations endpoint may not exist - log warning but continue with bookings only
+        console.warn('Reservations endpoint error:', error.message);
+        return [];
+      })
+    ])
       .then(([hotelItems, bookingItems, reservationItems]) => {
         setHotels(hotelItems);
         setBookings(bookingItems);
@@ -181,13 +190,13 @@ const OccupancyCalendar = () => {
         </div>
         <p className="header-subtitle">Cari və gələcək rezervasiyaların otaq üzrə görünüşü</p>
         {!loading && !loadError && hotels.length > 0 && (
-          <select
+          <Select searchable searchLabel="Otel axtar…"
             className="occupancy-hotel-select"
             value={hotelId}
             onChange={(e) => setHotelId(Number(e.target.value))}
           >
             {hotelSelect}
-          </select>
+          </Select>
         )}
       </div>
 

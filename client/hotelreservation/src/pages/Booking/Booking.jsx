@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import Combobox from '../../components/common/Select/Combobox';
+import Select from '../../components/common/Select/Select';
+import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaCheck, FaChevronDown, FaCompass, FaCreditCard, FaGlobeEurope, FaHotel, FaInfoCircle, FaLock, FaPlane, FaRulerCombined, FaShieldAlt, FaUserFriends } from 'react-icons/fa';
-import CountryFlag from '../../components/common/CountryFlag/CountryFlag';
+import { FaArrowLeft, FaCheck, FaCompass, FaCreditCard, FaGlobeEurope, FaHotel, FaInfoCircle, FaLock, FaPlane, FaRulerCombined, FaShieldAlt, FaUserFriends } from 'react-icons/fa';
 import { formatDate } from '../../data/roomsData';
 import { applyCouponCode, createBooking, getActiveDiscounts, getTripCountries, getTripSuggestionsByCountry, quoteRoom } from '../../api/client';
 import roomPhoto from '../../assets/images/otaq2.jpg';
@@ -83,8 +84,6 @@ const Booking = () => {
   const [travelCountry, setTravelCountry] = useState('');
   const [offersLoading, setOffersLoading] = useState(false);
   const [offersError, setOffersError] = useState('');
-  const [countryOpen, setCountryOpen] = useState(false);
-  const countryRef = useRef(null);
   const [discounts, setDiscounts] = useState([]);
   const [selectedFlightId, setSelectedFlightId] = useState(null);
   const [selectedTourId, setSelectedTourId] = useState(null);
@@ -158,23 +157,7 @@ const Booking = () => {
     };
   }, [travelCountry, guests]);
 
-  useEffect(() => {
-    if (!countryOpen) return undefined;
-    const onPointer = (event) => {
-      if (countryRef.current && !countryRef.current.contains(event.target)) setCountryOpen(false);
-    };
-    const onKey = (event) => {
-      if (event.key === 'Escape') setCountryOpen(false);
-    };
-    document.addEventListener('mousedown', onPointer);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onPointer);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [countryOpen]);
-
-  useEffect(() => {
+useEffect(() => {
     let active = true;
     getActiveDiscounts()
       .then((items) => {
@@ -280,32 +263,52 @@ const Booking = () => {
     e.preventDefault();
     setFormError('');
 
+    // Check dates validity
+    if (!checkIn || !checkOut) {
+      setFormError('Giriş və çıxış tarixləri tələb olunur');
+      return;
+    }
+    
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+    if (checkOutDate <= checkInDate) {
+      setFormError('Çıxış tarixi giriş tarixindən sonra olmalıdır');
+      return;
+    }
+
     if (!agreedToTerms) {
       setFormError('Zəhmət olmasa şərtləri qəbul edin');
       return;
     }
 
-    if (paymentMethod === 'hotel' && !DEPOSIT_PERCENTS.includes(depositPercent)) {
+    // Validate payment method
+    const normalizedPaymentMethod = paymentMethod === 'hotel' ? 'hotel' : paymentMethod === 'cash' ? 'cash' : 'card';
+    
+    if (normalizedPaymentMethod === 'hotel' && !DEPOSIT_PERCENTS.includes(depositPercent)) {
       setFormError('Oteldə ödəniş üçün 20%, 30% və ya 40% avans seçin');
       return;
     }
 
-    const digits = cardNumber.replace(/\s/g, '');
-    if (digits.length < 16) {
-      setFormError('Kart nömrəsi 16 rəqəm olmalıdır');
-      return;
-    }
-    if (!cardName.trim()) {
-      setFormError('Kart sahibinin adını yazın');
-      return;
-    }
-    if (!/^\d{2}\/\d{2}$/.test(expiry)) {
-      setFormError('Bitmə tarixini AA/İİ formatında yazın');
-      return;
-    }
-    if (cvv.length < 3) {
-      setFormError('CVV 3 rəqəm olmalıdır');
-      return;
+    // Only validate card details if payment method requires card
+    if (normalizedPaymentMethod === 'card' || normalizedPaymentMethod === 'hotel') {
+      const digits = cardNumber.replace(/\s/g, '');
+      if (digits.length < 16) {
+        setFormError('Kart nömrəsi 16 rəqəm olmalıdır');
+        return;
+      }
+      if (!cardName.trim()) {
+        setFormError('Kart sahibinin adını yazın');
+        return;
+      }
+      if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+        setFormError('Bitmə tarixini AA/İİ formatında yazın');
+        return;
+      }
+      // Demo payment - CVV not strictly required but keep format check
+      if (cvv && cvv.length > 0 && cvv.length < 3) {
+        setFormError('CVV 3 rəqəm olmalıdır');
+        return;
+      }
     }
 
     let couponForBooking = appliedCoupon;
@@ -328,10 +331,10 @@ const Booking = () => {
         guestEmail,
         guestPhone,
         guests,
-        paymentMethod,
-        cardNumber,
-        cardHolder: cardName,
-        depositPercent: paymentMethod === 'hotel' ? depositPercent : 100,
+        paymentMethod: normalizedPaymentMethod,
+        cardNumber: (normalizedPaymentMethod === 'card' || normalizedPaymentMethod === 'hotel') ? cardNumber : undefined,
+        cardHolder: (normalizedPaymentMethod === 'card' || normalizedPaymentMethod === 'hotel') ? cardName : undefined,
+        depositPercent: normalizedPaymentMethod === 'hotel' ? depositPercent : 100,
       };
       const booking = await createBooking({
         bookingType: 'hotel',
@@ -492,10 +495,10 @@ const Booking = () => {
               <div className="pay-card-grid">
                 <label className="glass-field">
                   <span>{t('pay.method')}</span>
-                  <select value={cardBrand} onChange={(e) => setCardBrand(e.target.value)}>
+                  <Select value={cardBrand} onChange={(e) => setCardBrand(e.target.value)}>
                     <option value="mastercard">Mastercard</option>
                     <option value="visa">Visa</option>
-                  </select>
+                  </Select>
                 </label>
                 <label className="glass-field">
                   <span>{t('pay.cardNumber')}</span>
@@ -544,12 +547,12 @@ const Booking = () => {
                 </div>
                 <label className="glass-field">
                   <span>{t('pay.country')}</span>
-                  <select value={country} onChange={(e) => setCountry(e.target.value)}>
+                  <Select value={country} onChange={(e) => setCountry(e.target.value)}>
                     <option value="AZ">Azərbaycan</option>
                     <option value="TR">Türkiyə</option>
                     <option value="GB">Böyük Britaniya</option>
                     <option value="US">ABŞ</option>
-                  </select>
+                  </Select>
                 </label>
               </div>
             )}
@@ -584,39 +587,10 @@ const Booking = () => {
                 <span className="country-label">
                   <FaGlobeEurope /> Səyahət ölkəsi:
                 </span>
-                <div className="country-select" ref={countryRef}>
-                  <button
-                    type="button"
-                    className={`country-trigger ${countryOpen ? 'open' : ''}`}
-                    aria-haspopup="listbox"
-                    aria-expanded={countryOpen}
-                    onClick={() => setCountryOpen((open) => !open)}
-                  >
-                    <CountryFlag name={travelCountry} isoCode={countries.find((item) => item.name === travelCountry)?.isoCode} className="country-flag" />
-                    <span className="country-name">{travelCountry || 'Ölkə seçin'}</span>
-                    <FaChevronDown className="country-chevron" />
-                  </button>
-                  {countryOpen && (
-                    <ul className="country-menu" role="listbox">
-                      {countries.length === 0 && <li className="country-none">Ölkə siyahısı boşdur</li>}
-                      {countries.map(({ name: item, isoCode }) => (
-                        <li key={item} role="option" aria-selected={item === travelCountry}>
-                          <button
-                            type="button"
-                            className={item === travelCountry ? 'selected' : ''}
-                            onClick={() => {
-                              handleCountryChange(item);
-                              setCountryOpen(false);
-                            }}
-                          >
-                            <CountryFlag name={item} isoCode={isoCode} className="country-flag" />
-                            <span>{item}</span>
-                            {item === travelCountry && <FaCheck />}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                <div className="country-select">
+                  <Combobox label="Səyahət ölkəsi" searchable value={travelCountry}
+                    options={countries.map((country) => ({ value: country.name, label: country.name }))}
+                    onChange={handleCountryChange} placeholder="Ölkə seçin" searchLabel="Ölkə axtar…" />
                 </div>
               </div>
               <p className="enrich-hint">
@@ -723,7 +697,7 @@ const Booking = () => {
                     return (
                       <article key={tour.id} className={`offer-card tour-card ${active ? 'active' : ''}`}>
                         <div className="tour-media">
-                          <img src={tour.image} alt={tour.name} />
+                          <img src={tour.image} alt={tour.name} loading="lazy" decoding="async" />
                           <span className={`pick-dot ${active ? 'on' : ''}`} aria-hidden="true">
                             {active && <FaCheck />}
                           </span>

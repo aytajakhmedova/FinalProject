@@ -32,6 +32,10 @@ import AdminHotelManager from './pages/Admin/Hotels/AdminHotelManager';
 import AdminBookings from './pages/Admin/Bookings/AdminBookings';
 import AdminUsers from './pages/Admin/Users/AdminUsers';
 import AdminAnalytics from './pages/Admin/Analytics/AdminAnalytics';
+import AdminCustomers from './pages/Admin/Customers/AdminCustomers';
+import AdminStaff from './pages/Admin/Staff/AdminStaff';
+import AdminPayments from './pages/Admin/Payments/AdminPayments';
+import AdminReports from './pages/Admin/Reports/AdminReports';
 import AdminSettings from './pages/Admin/Settings/AdminSettings';
 import AdminFlights from './pages/Admin/Flights/AdminFlights';
 import AdminTours from './pages/Admin/Tours/AdminTours';
@@ -55,12 +59,35 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const [toast, setToast] = useState('');
 
+  // Load user-specific favorites when user changes (login/logout)
+  const loadFavorites = () => {
+    const user = JSON.parse(localStorage.getItem('user') || 'null');
+    const favKey = user ? `favorites_${user.email}` : 'favorites_guest';
+    const savedFavs = localStorage.getItem(favKey);
+    setFavorites(savedFavs ? JSON.parse(savedFavs) : []);
+  };
+
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    const savedFavs = localStorage.getItem('favorites');
     if (savedTheme) setDarkMode(savedTheme === 'dark');
-    if (savedFavs) setFavorites(JSON.parse(savedFavs));
+    loadFavorites();
     localStorage.removeItem('currency');
+
+    // Listen for user auth changes (login/logout)
+    const handleStorageChange = (e) => {
+      if (e.key === 'user' || e.key === 'authToken') {
+        loadFavorites();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    // Custom event for same-window auth changes
+    window.addEventListener('authChange', loadFavorites);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('authChange', loadFavorites);
+    };
   }, []);
 
   useEffect(() => {
@@ -78,7 +105,10 @@ function App() {
   const toggleFavorite = (id) => {
     setFavorites((prev) => {
       const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-      localStorage.setItem('favorites', JSON.stringify(next));
+      // Save favorites per user
+      const user = JSON.parse(localStorage.getItem('user') || 'null');
+      const favKey = user ? `favorites_${user.email}` : 'favorites_guest';
+      localStorage.setItem(favKey, JSON.stringify(next));
       return next;
     });
   };
@@ -257,6 +287,10 @@ function App() {
             <Route path="bookings" element={<AdminBookings />} />
             <Route path="rezervasiyalar" element={<AdminBookings />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="musteriler" element={<AdminCustomers />} />
+            <Route path="isciler" element={<AdminStaff />} />
+            <Route path="odenisler" element={<AdminPayments />} />
+            <Route path="hesabatlar" element={<AdminReports />} />
             <Route path="analytics" element={<AdminAnalytics />} />
             <Route path="occupancy" element={<OccupancyCalendar />} />
             <Route path="teqvim" element={<OccupancyCalendar />} />
