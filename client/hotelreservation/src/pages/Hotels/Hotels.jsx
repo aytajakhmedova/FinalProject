@@ -12,7 +12,6 @@ const Hotels = () => {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState({
-    search: searchParams.get('location') || '',
     priceRange: [0, 2000],
     stars: [],
     amenities: [],
@@ -28,7 +27,9 @@ const Hotels = () => {
 
   useEffect(() => {
     let active = true;
-    getHotels({ city: searchParams.get('location'), checkIn, checkOut, guests })
+    getHotels({ city: searchParams.get('country') ? undefined : searchParams.get('location'),
+      country: searchParams.get('country'), checkIn, checkOut, guests: searchParams.get('guests'),
+      adults: searchParams.get('adults'), children: searchParams.get('children'), rooms: searchParams.get('rooms') })
       .then((data) => {
         if (!active) return;
         setLoadError('');
@@ -73,17 +74,14 @@ const Hotels = () => {
   ];
 
   const filteredHotels = hotels.filter(hotel => {
-    const matchesSearch = hotel.title.toLowerCase().includes(filters.search.toLowerCase()) ||
-                         hotel.city.toLowerCase().includes(filters.search.toLowerCase());
     const matchesPrice = hotel.pricePerNight >= filters.priceRange[0] && 
                         hotel.pricePerNight <= filters.priceRange[1];
     const matchesStars = filters.stars.length === 0 || filters.stars.includes(hotel.stars);
     const matchesAmenities = filters.amenities.length === 0 || 
                             filters.amenities.every(a => hotel.amenities.includes(a));
     const matchesType = filters.hotelType.length === 0 || filters.hotelType.includes(hotel.hotelType);
-    const matchesStay = !checkIn || !checkOut || hotel.rooms.some((room) => room.isAvailable);
     
-    return matchesSearch && matchesPrice && matchesStars && matchesAmenities && matchesType && matchesStay;
+    return matchesPrice && matchesStars && matchesAmenities && matchesType;
   });
 
   const sortedHotels = [...filteredHotels].sort((a, b) => {
@@ -135,8 +133,8 @@ const Hotels = () => {
               <input
                 type="text"
                 placeholder={t('hotels.searchPh')}
-                value={filters.search}
-                onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+                value={searchParams.get('location') || ''}
+                onChange={(e) => updateStayParams({ location: e.target.value, country: '' })}
                 className="search-input"
               />
             </div>
@@ -164,10 +162,11 @@ const Hotels = () => {
               value={guests}
               onChange={(e) => {
                 setGuests(e.target.value);
-                updateStayParams({ guests: e.target.value });
+                const kids = Math.min(Number(searchParams.get('children') || 0), Number(e.target.value) - 1);
+                updateStayParams({ guests: e.target.value, adults: String(Number(e.target.value) - kids), children: String(kids) });
               }}
             >
-              {[1, 2, 3, 4, 5, 6].map((n) => (
+              {[...new Set([1, 2, 3, 4, 5, 6, guestCount])].sort((a, b) => a - b).map((n) => (
                 <option key={n} value={n}>{t('hotels.guestsN', { n })}</option>
               ))}
             </Select>
@@ -291,13 +290,10 @@ const Hotels = () => {
 
             <button 
               className="reset-filters-btn"
-              onClick={() => setFilters({
-                search: '',
-                priceRange: [0, 2000],
-                stars: [],
-                amenities: [],
-                hotelType: []
-              })}
+              onClick={() => {
+                setFilters({ priceRange: [0, 2000], stars: [], amenities: [], hotelType: [] });
+                updateStayParams({ location: '', country: '' });
+              }}
             >
               {t('hotels.reset')}
             </button>

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { FaUsers, FaBed, FaExpand, FaCheck, FaArrowLeft, FaCalendarAlt, FaInfoCircle } from 'react-icons/fa';
 import { getHotel, quoteRoom } from '../../api/client';
+import { getAuthToken } from '../../api/auth';
 import { calculateNights, formatDate, getMinCheckInDate, getMinCheckOutDate } from '../../data/roomsData';
 import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
 import './RoomDetail.css';
@@ -12,6 +13,10 @@ const RoomDetail = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const hotelId = searchParams.get('hotel');
+  const multiRoom = Number(searchParams.get('rooms')) > 1;
+  const hotelParams = new URLSearchParams(searchParams);
+  hotelParams.delete('hotel');
+  const hotelUrl = `/hotels/${hotelId}?${hotelParams.toString()}#rooms`;
   
   const [checkIn, setCheckIn] = useState(searchParams.get('checkIn') || '');
   const [checkOut, setCheckOut] = useState(searchParams.get('checkOut') || '');
@@ -45,10 +50,10 @@ const RoomDetail = () => {
   const room = hotel?.rooms.find(r => r.id === parseInt(id));
 
   useEffect(() => {
-    if (room && guests > room.capacity) {
+    if (!multiRoom && room && guests > room.capacity) {
       setGuests(room.capacity);
     }
-  }, [room, guests]);
+  }, [room, guests, multiRoom]);
 
   const handleCheckInChange = (e) => {
     const newCheckIn = e.target.value;
@@ -61,7 +66,7 @@ const RoomDetail = () => {
   };
 
   useEffect(() => {
-    if (!checkIn || !checkOut || !room) return undefined;
+    if (multiRoom || !checkIn || !checkOut || !room) return undefined;
     let active = true;
     quoteRoom(room.id, { checkIn, checkOut, guests })
       .then((quote) => {
@@ -86,7 +91,7 @@ const RoomDetail = () => {
     return () => {
       active = false;
     };
-  }, [checkIn, checkOut, guests, room]);
+  }, [checkIn, checkOut, guests, room, multiRoom]);
 
   if (loading) {
     return (
@@ -109,33 +114,10 @@ const RoomDetail = () => {
 
   const handleReserveNow = () => {
     if (!isAvailable || !priceBreakdown) return;
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-    
-    if (!isAuthenticated) {
-      // Save booking data for after login
-      const bookingData = {
-        hotelId: hotel.id,
-        roomId: room.id,
-        checkIn,
-        checkOut,
-        guests,
-        priceBreakdown
-      };
-      localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
-      navigate('/login', { state: { from: `/rooms/${room.id}?hotel=${hotel.id}` } });
-    } else {
-      // Navigate to booking page with data
-      navigate('/booking', {
-        state: {
-          hotel,
-          room,
-          checkIn,
-          checkOut,
-          guests,
-          priceBreakdown
-        }
-      });
-    }
+    const children = Math.min(Number(searchParams.get('children') || 0), guests - 1);
+    const state = { hotel, room, checkIn, checkOut, guests, rooms: 1, adults: guests - children, children, priceBreakdown };
+    if (getAuthToken()) navigate('/booking', { state });
+    else navigate('/login', { state: { hotelCheckout: state } });
   };
 
   return (
@@ -195,7 +177,7 @@ const RoomDetail = () => {
             </div>
 
             {/* Availability Search */}
-            <section className="room-section">
+            {!multiRoom && <section className="room-section">
               <h2 className="room-section-title">
                 <FaCalendarAlt /> Mövcudluq Yoxla
               </h2>
@@ -301,7 +283,7 @@ const RoomDetail = () => {
                   </div>
                 </div>
               )}
-            </section>
+            </section>}
 
             {/* Description */}
             <section className="room-section">
@@ -336,7 +318,9 @@ const RoomDetail = () => {
                 </div>
               )}
 
-              {priceBreakdown && priceBreakdown.nights > 0 ? (
+              {multiRoom ? (
+                <Link to={hotelUrl} className="btn-reserve-now">Otaqları seç</Link>
+              ) : priceBreakdown && priceBreakdown.nights > 0 ? (
                 <>
                   <div className="booking-summary-box">
                     <h3>Rezervasiya Xülasəsi</h3>
@@ -393,7 +377,7 @@ const RoomDetail = () => {
             <div className="hotel-link-card">
               <div className="hotel-link-title">Bu otaq yerləşir:</div>
               <div className="hotel-link-name">{hotel.title}</div>
-              <Link to={`/hotels/${hotel.id}`} className="btn-view-hotel">
+              <Link to={hotelUrl} className="btn-view-hotel">
                 Oteli göstər
               </Link>
             </div>

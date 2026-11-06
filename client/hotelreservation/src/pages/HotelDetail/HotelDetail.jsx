@@ -5,7 +5,8 @@ import RatingStars from '../../components/common/RatingStars/RatingStars';
 import RoomCard from '../../components/common/RoomCard/RoomCard';
 import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
 import ReviewsSection from '../../components/common/ReviewsSection/ReviewsSection';
-import { getHotel } from '../../api/client';
+import { getAuthToken } from '../../api/auth';
+import { getHotel, quoteHotelStay } from '../../api/client';
 import './HotelDetail.css';
 
 const HotelDetail = () => {
@@ -14,7 +15,14 @@ const HotelDetail = () => {
   const [searchParams] = useSearchParams();
   const checkIn = searchParams.get('checkIn') || '';
   const checkOut = searchParams.get('checkOut') || '';
-  const guests = parseInt(searchParams.get('guests') || '0', 10);
+  const legacyGuests = Number(searchParams.get('guests') || 0);
+  const roomCount = Number(searchParams.get('rooms') || 1);
+  const children = Number(searchParams.get('children') || 0);
+  const adults = Number(searchParams.get('adults') ?? (legacyGuests ? legacyGuests - children : 1));
+  const guests = searchParams.has('adults') || searchParams.has('children') ? adults + children : legacyGuests;
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [quoteError, setQuoteError] = useState('');
+  const [quoting, setQuoting] = useState(false);
   const queryString = searchParams.toString() ? `?${searchParams.toString()}` : '';
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,7 +30,10 @@ const HotelDetail = () => {
   useEffect(() => {
     let active = true;
     setLoading(true);
-    getHotel(id, { checkIn, checkOut, guests: guests || undefined })
+    setSelectedIds([]);
+    setQuoteError('');
+    getHotel(id, { checkIn, checkOut, guests: guests || undefined,
+      ...(guests || roomCount > 1 ? { adults, children, rooms: roomCount } : {}) })
       .then((data) => {
         if (!active) return;
         const hotelId = Number(data.id);
@@ -40,7 +51,7 @@ const HotelDetail = () => {
     return () => {
       active = false;
     };
-  }, [id, checkIn, checkOut, guests]);
+  }, [id, checkIn, checkOut, guests, adults, children, roomCount]);
 
   const handleScrollToRooms = () => {
     const roomsSection = document.getElementById('rooms');
@@ -69,10 +80,28 @@ const HotelDetail = () => {
   const hotelRooms = hotel.rooms || [];
   const visibleRooms = hotelRooms.filter((room) => {
     if (room.available === false) return false;
-    if (guests && room.capacity < guests) return false;
+    if (roomCount === 1 && guests && room.capacity < guests) return false;
     if (checkIn && checkOut && room.isAvailable === false) return false;
     return true;
   });
+
+  const selectedRooms = visibleRooms.filter((room) => selectedIds.includes(room.id));
+  const capacity = selectedRooms.reduce((sum, room) => sum + room.capacity, 0);
+  async function continueBooking() {
+    setQuoting(true);
+    setQuoteError('');
+    try {
+      const stay = { roomIds: selectedIds, rooms: roomCount, adults, children, guests: adults + children, checkIn, checkOut };
+      const quote = await quoteHotelStay(hotel.id, stay);
+      const state = { hotel, room: selectedRooms[0], selectedRooms, ...stay, priceBreakdown: quote };
+      if (getAuthToken()) navigate('/booking', { state });
+      else navigate('/login', { state: { hotelCheckout: state } });
+    } catch (error) {
+      setQuoteError(error.message);
+    } finally {
+      setQuoting(false);
+    }
+  }
 
   const amenityIcons = {
     'Wi-Fi': <FaWifi />,
@@ -190,9 +219,21 @@ const HotelDetail = () => {
                 <>
                   <div className="rooms-grid">
                     {visibleRooms.map((room) => (
-                      <RoomCard key={room.id} room={room} hotelId={hotel.id} queryString={queryString} />
+                      <RoomCard key={room.id} room={room} hotelId={hotel.id} queryString={queryString}
+                        selected={selectedIds.includes(room.id)} selectionFull={selectedIds.length >= roomCount}
+                        onSelect={roomCount > 1 ? () => {
+                          setQuoteError('');
+                          setSelectedIds((ids) => ids.includes(room.id)
+                            ? ids.filter((id) => id !== room.id) : ids.length < roomCount ? [...ids, room.id] : ids);
+                        } : undefined} />
                     ))}
                   </div>
+                  {roomCount > 1 && visibleRooms.length > 0 && <div>
+                    <p aria-live="polite">{selectedIds.length} / {roomCount} otaq seçilib · {capacity} / {guests} yer</p>
+                    <button className="btn-room-book" disabled={quoting || selectedIds.length !== roomCount || capacity < guests || !checkIn || !checkOut}
+                      onClick={continueBooking}>Rezervasiyaya davam et</button>
+                    {quoteError && <p role="alert">{quoteError}</p>}
+                  </div>}
                   {visibleRooms.length === 0 && (
                     <p className="section-subtitle">Bu tarix və qonaq sayı üçün boş otaq yoxdur.</p>
                   )}

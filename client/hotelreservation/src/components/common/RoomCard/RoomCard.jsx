@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaUsers, FaBed, FaExpand } from 'react-icons/fa';
 import './RoomCard.css';
 
-const RoomCard = ({ room, hotelId, queryString = '' }) => {
+const RoomCard = ({ room, hotelId, queryString = '', onSelect, selected, selectionFull }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
 
@@ -76,7 +76,11 @@ const RoomCard = ({ room, hotelId, queryString = '' }) => {
               >
                 Ətraflı
               </Link>
-              {room.available !== false ? (
+              {onSelect ? (
+                <button type="button" className="btn-room-book" aria-pressed={selected} disabled={!selected && selectionFull} onClick={onSelect}>
+                  {selected ? 'Seçimi ləğv et' : 'Otağı seç'}
+                </button>
+              ) : room.available !== false ? (
                 <Link 
                   to={`/rooms/${room.id}?hotel=${hotelId}${queryString ? `&${queryString.replace(/^\?/, '')}` : ''}#book`} 
                   className="btn-room-book"

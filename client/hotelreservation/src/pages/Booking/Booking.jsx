@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaCheck, FaCompass, FaCreditCard, FaGlobeEurope, FaHotel, FaInfoCircle, FaLock, FaPlane, FaRulerCombined, FaShieldAlt, FaUserFriends } from 'react-icons/fa';
 import { formatDate } from '../../data/roomsData';
-import { applyCouponCode, createBooking, getActiveDiscounts, getTripCountries, getTripSuggestionsByCountry, quoteRoom } from '../../api/client';
+import { applyCouponCode, createBooking, getActiveDiscounts, getTripCountries, getTripSuggestionsByCountry } from '../../api/client';
 import roomPhoto from '../../assets/images/otaq2.jpg';
 import { useLanguage } from '../../context/LanguageContext';
 import './Booking.css';
@@ -94,6 +94,7 @@ const Booking = () => {
 
   const hotel = bookingData?.hotel;
   const room = bookingData?.room;
+  const selectedRooms = bookingData?.selectedRooms || (room ? [room] : []);
   const checkIn = bookingData?.checkIn;
   const checkOut = bookingData?.checkOut;
   const guests = bookingData?.guests;
@@ -320,11 +321,8 @@ useEffect(() => {
 
     try {
       setSubmitting(true);
-      const quote = await quoteRoom(room.id, { checkIn, checkOut, guests });
-      if (!quote?.available) {
-        setFormError(quote?.message || 'Otaq seçilmiş tarixlərdə boş deyil. Zəhmət olmasa tarixləri dəyişin.');
-        return;
-      }
+      const stay = { roomIds: selectedRooms.map((item) => item.id), rooms: selectedRooms.length,
+        adults: bookingData.adults ?? guests, children: bookingData.children ?? 0, checkIn, checkOut, guests };
 
       const guest = {
         guestName,
@@ -339,9 +337,8 @@ useEffect(() => {
       const booking = await createBooking({
         bookingType: 'hotel',
         hotelId: hotel.id,
-        roomId: room.id,
-        checkIn,
-        checkOut,
+        expectedStayTotal: priceBreakdown.total,
+        ...stay,
         specialRequests,
         bundleCombo: combo || undefined,
         couponCode: couponForBooking?.code || undefined,
@@ -736,10 +733,10 @@ useEffect(() => {
           <div className="co-photo">
             <img src={coverImage} alt={room.name} />
           </div>
-          <h3>{room.name}</h3>
+          <h3>{selectedRooms.map((item) => item.name).join(', ')}</h3>
           <p className="co-meta">
             <span><FaUserFriends /> {guests} qonaq</span>
-            {room.size && <span><FaRulerCombined /> {room.size}</span>}
+            {selectedRooms.length === 1 && room.size && <span><FaRulerCombined /> {room.size}</span>}
             <span><FaHotel /> {hotel.title || hotel.name}</span>
           </p>
 

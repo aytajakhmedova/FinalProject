@@ -10,7 +10,7 @@ import {
   FaMinus,
   FaPlus,
 } from 'react-icons/fa';
-import { getSiteCities } from '../../api/client';
+import { getSiteCities, getSiteCountries } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import './SearchForm.css';
 
@@ -35,6 +35,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
   const [showGuests, setShowGuests] = useState(false);
   const [error, setError] = useState('');
   const [cities, setCities] = useState([]);
+  const [countries, setCountries] = useState([]);
   const wrapRef = useRef(null);
   const { t } = useLanguage();
 
@@ -44,7 +45,8 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
     { id: 'tour', label: t('search.tour'), icon: <FaRoute /> },
   ];
 
-useEffect(() => {
+  useEffect(() => {
+    getSiteCountries().then(setCountries).catch(() => setCountries([]));
     getSiteCities()
       .then(setCities)
       .catch(() => setCities([]));
@@ -92,6 +94,7 @@ useEffect(() => {
     onSearch?.({
       type: serviceType,
       location: location.trim(),
+      country: serviceType === 'hotel' && countries.includes(location.trim()) ? location.trim() : undefined,
       checkIn,
       checkOut,
       guests,
@@ -132,7 +135,10 @@ useEffect(() => {
             <label>{serviceType === 'flight' ? t('search.fromTo') : t('search.place')}</label>
             <Combobox inputMode label={serviceType === 'flight' ? t('search.fromTo') : t('search.place')}
               placeholder={t('search.cityPh')} value={location}
-              options={cities.map((city) => ({ value: city.name, label: city.name, description: city.country, searchText: city.name + ' ' + city.country }))}
+              options={[
+                ...cities.map((city) => ({ value: city.name, label: city.name, description: city.country, searchText: city.name + ' ' + city.country })),
+                ...(serviceType === 'hotel' ? countries.filter((name) => !cities.some((city) => city.name === name)).map((name) => ({ value: name, label: name })) : []),
+              ]}
               onInputChange={setLocation} onChange={setLocation} />
           </div>
         </div>

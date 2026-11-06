@@ -42,6 +42,8 @@ import AdminTours from './pages/Admin/Tours/AdminTours';
 import AdminDiscounts from './pages/Admin/Discounts/AdminDiscounts';
 import ReceptionDesk from './pages/Reception/ReceptionDesk';
 import AdminReviews from './pages/Admin/Reviews/AdminReviews';
+import AdminCountries from './pages/Admin/Countries/AdminCountries';
+import AdminCities from './pages/Admin/Cities/AdminCities';
 import { hasRole } from './api/auth';
 import './App.css';
 
@@ -300,6 +302,8 @@ function App() {
             <Route path="tours" element={<AdminTours />} />
             <Route path="paketler" element={<AdminDiscounts />} />
             <Route path="reyler" element={<AdminReviews />} />
+            <Route path="olkeler" element={<AdminCountries />} />
+            <Route path="seherler" element={<AdminCities />} />
             <Route path="settings" element={<AdminSettings />} />
           </Route>
         </Routes>

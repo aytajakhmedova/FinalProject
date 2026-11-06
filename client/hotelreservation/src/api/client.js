@@ -159,6 +159,9 @@ function withQuery(path, params) {
 }
 
 export const getHotels = (params) => request(withQuery("/api/hotels", params)).then((items) => items.map(mapHotel));
+export const quoteHotelStay = (id, stay) => request(`/api/hotels/${id}/quote`, {
+  method: "POST", body: JSON.stringify(stay),
+});
 export const getHotel = (id, params) => request(withQuery(`/api/hotels/${id}`, params)).then(mapHotel);
 export const createHotel = (hotel) => request("/api/hotels", { method: "POST", body: JSON.stringify(hotel) }).then(mapHotel);
 export const updateHotel = (id, hotel) => request(`/api/hotels/${id}`, { method: "PUT", body: JSON.stringify(hotel) }).then(mapHotel);
@@ -294,4 +297,37 @@ export const getReport = (from, to) => {
   if (to) query.set("to", to);
   const suffix = query.toString();
   return request(`/api/reports${suffix ? `?${suffix}` : ""}`);
+};
+
+// City and Country Management
+export const getAllCountries = () => request("/api/locations/countries");
+export const getAllCities = () => request("/api/locations/cities");
+export const getCitiesByCountry = (countryId) => request(`/api/locations/countries/${countryId}/cities`);
+export const createCountry = (country) => request("/api/locations/countries", { method: "POST", body: JSON.stringify(country) });
+export const updateCountry = (id, country) => request(`/api/locations/countries/${id}`, { method: "PUT", body: JSON.stringify(country) });
+export const deleteCountry = (id) => {
+  console.log('API deleteCountry called with id:', id);
+  return request(`/api/locations/countries/${id}`, { method: "DELETE" })
+    .then(result => {
+      console.log('API deleteCountry success:', result);
+      return result;
+    })
+    .catch(error => {
+      console.error('API deleteCountry error:', error);
+      throw error;
+    });
+};
+export const createCity = (city) => request("/api/locations/cities", { method: "POST", body: JSON.stringify(city) });
+export const updateCity = (id, city) => request(`/api/locations/cities/${id}`, { method: "PUT", body: JSON.stringify(city) });
+export const deleteCity = (id) => {
+  console.log('API deleteCity called with id:', id);
+  return request(`/api/locations/cities/${id}`, { method: "DELETE" })
+    .then(result => {
+      console.log('API deleteCity success:', result);
+      return result;
+    })
+    .catch(error => {
+      console.error('API deleteCity error:', error);
+      throw error;
+    });
 };

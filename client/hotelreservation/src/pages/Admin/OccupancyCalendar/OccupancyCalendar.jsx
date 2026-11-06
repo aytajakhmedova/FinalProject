@@ -37,17 +37,18 @@ const collectStays = (bookings, reservations) => {
     if (!occupiesRoom(booking.status)) return;
     if ((booking.bookingType || 'hotel') !== 'hotel') return;
     if (!booking.roomId || !booking.checkIn || !booking.checkOut) return;
-    items.push({
-      roomId: Number(booking.roomId),
+    const rooms = booking.rooms?.length ? booking.rooms : [{ roomId: booking.roomId, roomName: booking.roomName }];
+    rooms.forEach((room) => items.push({
+      roomId: Number(room.roomId),
       hotelId: Number(booking.hotelId) || null,
       hotelName: booking.hotelName || booking.location || '',
-      roomName: booking.roomName || booking.roomType || booking.itemName || '',
+      roomName: room.roomName || booking.roomType || booking.itemName || '',
       status: booking.status === 'checked-in' ? 'checked-in' : 'confirmed',
       code: booking.code || booking.confirmationNumber || '',
       guestName: booking.guestName || '',
       checkIn: toISODate(booking.checkIn),
       checkOut: toISODate(booking.checkOut),
-    });
+    }));
   });
 
   reservations.forEach((reservation) => {

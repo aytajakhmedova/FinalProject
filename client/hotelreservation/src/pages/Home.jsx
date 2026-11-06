@@ -31,9 +31,13 @@ const Home = ({ currency, favorites, onToggleFavorite }) => {
       return;
     }
     if (nextQuery.location) params.set('location', nextQuery.location);
+    if (nextQuery.country) params.set('country', nextQuery.country);
     if (nextQuery.checkIn) params.set('checkIn', nextQuery.checkIn);
     if (nextQuery.checkOut) params.set('checkOut', nextQuery.checkOut);
     if (guests) params.set('guests', String(guests));
+    params.set('adults', String(nextQuery.guests.adults));
+    params.set('children', String(nextQuery.guests.children));
+    params.set('rooms', String(nextQuery.guests.rooms));
     navigate(`/hotels?${params.toString()}`);
   };
 

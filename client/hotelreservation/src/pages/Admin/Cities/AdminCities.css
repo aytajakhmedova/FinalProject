@@ -1,0 +1,23 @@
+.country-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.country-flag {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.um-picker-wrapper {
+  position: relative;
+}
+
+.um-picker-wrapper .um-options {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 220px;
+  max-height: 400px;
+  z-index: 100;
+}
