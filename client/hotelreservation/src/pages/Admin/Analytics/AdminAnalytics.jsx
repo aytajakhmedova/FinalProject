@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getBookings, getHotels } from '../../../api/client';
-import { STATUS_LABELS } from '../../../utils/bookingsStore';
+import { STATUS_LABELS } from '../../../utils/bookingStatus';
 import { hasRole } from '../../../api/auth';
 import '../Hotels/AdminHotels.css';
 import './AdminAnalytics.css';

@@ -440,6 +440,26 @@
   background: rgba(17, 12, 8, .3);
   overflow: visible;
 }
+.cinematic-hero .search-form.flight-mode {
+  grid-template-columns: minmax(150px, 1.2fr) minmax(150px, 1.2fr) minmax(130px, 1fr) minmax(130px, 1fr) minmax(150px, 1.1fr) 120px;
+}
+.cinematic-hero .search-form.tour-mode {
+  grid-template-columns: minmax(170px, 1.4fr) minmax(170px, 1.2fr) minmax(160px, 1.15fr) 120px;
+}
+.cinematic-hero .field-content select {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #f9ebd8;
+  font: inherit;
+  font-size: .85rem;
+  line-height: 1.6;
+  cursor: pointer;
+}
+.cinematic-hero .field-content select option { background: #2a1d12; color: #f9ebd8; }
 .cinematic-hero .form-divider { display: none; }
 .cinematic-hero .form-field {
   position: relative;

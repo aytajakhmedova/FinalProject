@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaHotel, FaCalendarCheck, FaUsers, FaMoneyBillWave } from 'react-icons/fa';
 import { getHotels, getBookings } from '../../../api/client';
-import { STATUS_LABELS } from '../../../utils/bookingsStore';
+import { STATUS_LABELS } from '../../../utils/bookingStatus';
 import { hasRole } from '../../../api/auth';
 import './AdminDashboard.css';
 

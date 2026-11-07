@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaHeart, FaPlay, FaRegHeart, FaStar } from 'react-icons/fa';
+import { FaArrowRight, FaChevronLeft, FaChevronRight, FaHeart, FaPlay, FaRegHeart, FaStar } from 'react-icons/fa';
 import { formatPrice } from '../../data/travelData';
 import { getHotels } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
@@ -116,6 +116,12 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
           <div className="main-display">
             <div
               className="main-image"
+              role="group"
+              tabIndex={0}
+              aria-label={hotel.title}
+              onKeyDown={(event) => {
+                if (event.target === event.currentTarget && event.key === 'Enter') handleHotelClick(hotel.id);
+              }}
               onClick={() => handleHotelClick(hotel.id)}
               style={{ cursor: 'pointer' }}
             >
@@ -157,6 +163,7 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
                   onClick={handleDiscoverClick}
                 >
                   {t('feat.discover')}
+                  <FaArrowRight aria-hidden="true" />
                 </button>
               </div>
             </div>

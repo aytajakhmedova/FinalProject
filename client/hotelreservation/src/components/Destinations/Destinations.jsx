@@ -1,13 +1,70 @@
-import { useState } from 'react';
-import { DESTINATIONS } from '../../data/travelData';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { IMAGE_PLACEHOLDER, getHotels, getSeasonalPrices } from '../../api/client';
+import { countryImages } from '../../data/travelData';
+import { MONTH_NAMES, formatPriceRange } from '../../data/seasonalPrices';
 import { useLanguage } from '../../context/LanguageContext';
 import './Destinations.css';
 
-const Destinations = ({ onPickCity }) => {
+const Destinations = () => {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState(DESTINATIONS[0].country);
+  const navigate = useNavigate();
+  const [prices, setPrices] = useState([]);
+  const [hotels, setHotels] = useState([]);
+  const [activeTab, setActiveTab] = useState('');
 
-  const activeDestination = DESTINATIONS.find((d) => d.country === activeTab);
+  useEffect(() => {
+    let active = true;
+    getSeasonalPrices()
+      .then((items) => {
+        if (active) setPrices(items);
+      })
+      .catch(() => {
+        if (active) setPrices([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    getHotels()
+      .then((items) => {
+        if (active) setHotels(items);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const images = useMemo(() => countryImages(hotels), [hotels]);
+
+  // [{ country, months: [{ id, month, minPrice, maxPrice, currency }] }] in the order the server sent them
+  const countries = useMemo(() => {
+    const grouped = new Map();
+    prices.forEach((price) => {
+      if (!grouped.has(price.country)) grouped.set(price.country, []);
+      grouped.get(price.country).push(price);
+    });
+    return [...grouped.entries()].map(([country, months]) => ({
+      country,
+      months: [...months].sort((a, b) => a.month - b.month),
+    }));
+  }, [prices]);
+
+  const selected = countries.find((item) => item.country === activeTab) || countries[0];
+  if (!selected) return null;
+
+  const openHotels = (price) => {
+    navigate(`/hotels?${new URLSearchParams({
+      country: selected.country,
+      minPrice: String(price.minPrice),
+      maxPrice: String(price.maxPrice),
+      currency: price.currency,
+    })}`);
+  };
 
   return (
     <section className="destinations-section" id="destinations">
@@ -18,31 +75,27 @@ const Destinations = ({ onPickCity }) => {
         </h2>
 
         <div className="destinations-tabs">
-          {DESTINATIONS.map((dest) => (
+          {countries.map((item) => (
             <button
-              key={dest.country}
-              className={`tab-btn ${activeTab === dest.country ? 'active' : ''}`}
-              onClick={() => setActiveTab(dest.country)}
+              key={item.country}
+              className={`tab-btn ${selected.country === item.country ? 'active' : ''}`}
+              onClick={() => setActiveTab(item.country)}
             >
-              {dest.country}
+              {item.country}
             </button>
           ))}
         </div>
 
-        <div className="destinations-content" key={activeTab}>
+        <div className="destinations-content" key={selected.country}>
           <div className="destination-image">
-            <img src={activeDestination.image} alt={activeDestination.country} />
+            <img src={images[selected.country] || IMAGE_PLACEHOLDER} alt={selected.country} />
           </div>
 
           <div className="destination-prices">
-            {activeDestination.months.map((month) => (
-              <button
-                key={month.name}
-                className="price-row"
-                onClick={() => onPickCity?.(activeDestination.country)}
-              >
-                <span className="month-name">{month.name}</span>
-                <span className="price-range">{month.priceRange}</span>
+            {selected.months.map((price) => (
+              <button key={price.id} className="price-row" onClick={() => openHotels(price)}>
+                <span className="month-name">{MONTH_NAMES[price.month - 1]}</span>
+                <span className="price-range">{formatPriceRange(price)}</span>
                 <span className="arrow">›</span>
               </button>
             ))}

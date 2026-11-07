@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { getReport } from '../../../api/client';
-import { STATUS_LABELS } from '../../../utils/bookingsStore';
+import { STATUS_LABELS } from '../../../utils/bookingStatus';
 import '../Hotels/AdminHotels.css';
 import '../Analytics/AdminAnalytics.css';
 import '../Manage/AdminManage.css';

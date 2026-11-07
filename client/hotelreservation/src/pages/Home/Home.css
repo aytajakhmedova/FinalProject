@@ -2,3 +2,328 @@
   width: 100%;
   overflow-x: hidden;
 }
+
+/* The reference treatment is limited to the active home page. */
+.App .home-redesign {
+  --text-primary: #f1dfc4;
+  --text-secondary: #d7c1a5;
+  --text-muted: #bda17c;
+  --bg-card: #2b1e15;
+  --border-color: #ba7c3829;
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  background:
+    radial-gradient(ellipse at 0 35%, #8a481f38, transparent 32%),
+    radial-gradient(ellipse at 100% 57%, #9c55222b, transparent 30%),
+    #190f09;
+  color: var(--text-primary);
+}
+
+.App .home-redesign > section { position: relative; }
+.App .home-redesign :is(#about, #destinations, #featured, #gallery, #search) { scroll-margin-top: 90px; }
+.App:has(.home-redesign) > .header { height: 64px; }
+.App:has(.home-redesign) > .header-spacer { height: 0; }
+.App:has(.home-redesign) .header-container { max-width: none; padding-inline: clamp(32px, 7vw, 130px); }
+/* The admin sidebar's .nav-item style (padding, margin) also hit the header menu and pushed its items apart. */
+.App:has(.home-redesign) > .header .nav-item,
+.App:has(.home-redesign) > .header .nav-item:hover {
+  padding: 0;
+  margin: 0;
+  gap: 0;
+  background: none;
+  border-radius: 0;
+}
+.App:has(.home-redesign) > .header .header-left { gap: 1rem; }
+.App:has(.home-redesign) > .header .main-nav { gap: .25rem; }
+/* The logo is as tall as the header was, so it was cut at the top and bottom: size it by height and centre it. */
+.App:has(.home-redesign) .logo-image,
+.App:has(.home-redesign) .header.scrolled .logo-image { width: auto; height: 56px; }
+.App:has(.home-redesign) .nav-trigger { font-size: 1.1rem; }
+.App:has(.home-redesign) .quick-nav-btn { font-size: 1.1rem; }
+/* Translucent header over the hero picture, with a thin gold line under it. */
+.App.dark-mode:has(.home-redesign) > .header {
+  background: rgba(26, 16, 11, .4);
+  backdrop-filter: blur(14px) saturate(150%);
+  border-bottom: 1px solid rgba(218, 182, 131, .4);
+  box-shadow: none;
+}
+.App.dark-mode:has(.home-redesign) > .header.scrolled { background: rgba(26, 16, 11, .88); }
+.App:has(.home-redesign) .login-btn {
+  background: linear-gradient(120deg, #ecd0a0, #d5a56b);
+  color: #2b1c10;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(12, 7, 3, .25);
+}
+
+.App .home-redesign .hero-section.cinematic-hero {
+  /* The hero fills one screen and runs under the translucent header (64px). */
+  min-height: 100svh;
+  padding: 94px 28px 0;
+  margin-bottom: 0;
+  background: transparent;
+}
+.App .home-redesign .cinematic-hero-scenery { bottom: -45px; }
+.App .home-redesign .cinematic-hero-background { background-position: center 54%; animation: none; }
+.App .home-redesign .cinematic-hero-scenery::after {
+  background: linear-gradient(180deg, #1c0f142b, #190f090d 45%, #190f094f 70%, #190f09 100%);
+}
+.App .home-redesign .hero-section.cinematic-hero .hero-container { max-width: 1280px; gap: 30px; }
+.App .home-redesign .hero-section.cinematic-hero .hero-text { max-width: 840px; width: 100%; }
+/* Centre the headline block in the space between the header and the search form. */
+.App .home-redesign .hero-section.cinematic-hero .hero-content { flex: 1; display: flex; align-items: center; }
+.App .home-redesign .hero-section.cinematic-hero .hero-kicker { margin-bottom: 16px; font-size: .78rem; }
+.App .home-redesign .hero-section.cinematic-hero .hero-title { font-size: clamp(38px, 4.8vw, 64px); line-height: 1.1; }
+.App .home-redesign .hero-section.cinematic-hero .hero-description { max-width: 620px; margin-top: 20px; font-size: 1.05rem; }
+.App .home-redesign .discover-buttons { flex-direction: row; margin-top: 16px; gap: 12px; }
+.App .home-redesign .cinematic-hero .discover-btn { width: auto; padding: 11px 22px; font-size: .9rem; }
+.App .home-redesign .hero-section.cinematic-hero .hero-support { margin-top: 10px; font-size: .8rem; }
+
+.App .home-redesign .search-form-container {
+  padding: 18px 24px 20px;
+  border-radius: 28px;
+  border-color: #cc914956;
+  background: linear-gradient(115deg, #57351ee8, #21170fef 65%);
+  box-shadow: 0 18px 50px #10080344, inset 0 1px 0 #ffda9c24;
+}
+.App .home-redesign .search-form-top { gap: 12px; margin-bottom: 10px; }
+.App .home-redesign .form-title { font-family: inherit; font-size: 1.25rem; }
+.App .home-redesign .search-tabs { padding: 2px; border: 0; background: #180f0840; }
+.App .home-redesign .search-tab { padding: 9px 16px; border-radius: 12px; font-size: .95rem; }
+.App .home-redesign .search-tab.active { background: linear-gradient(120deg, #ffe0a2, #e5a54e); }
+.App .home-redesign .search-form {
+  grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 1fr)) minmax(0, 1.1fr) 108px;
+  gap: 0;
+  padding: 4px;
+  border: 0;
+  border-radius: 14px;
+}
+.App .home-redesign .search-form.flight-mode { grid-template-columns: repeat(5, minmax(0, 1fr)) 100px; }
+.App .home-redesign .search-form.tour-mode { grid-template-columns: 1.35fr 1fr 1.1fr 108px; }
+.App .home-redesign .form-field,
+.App .home-redesign .form-field:first-child { min-height: 58px; padding: 6px 12px; border-bottom: 0; gap: 9px; }
+.App .home-redesign .field-content label { margin-bottom: 3px; font-size: .8rem; }
+.App .home-redesign .field-content input,
+.App .home-redesign .guest-trigger { font-size: .95rem; }
+.App .home-redesign .search-button {
+  grid-column: auto;
+  min-height: 54px;
+  font-size: 1rem;
+  margin: 0;
+  border-radius: 13px;
+  background: linear-gradient(120deg, #ffe2aa, #e3a04a);
+}
+
+.App .home-redesign .holiday-section { padding: 55px 28px 45px; background: transparent; }
+.App .home-redesign .holiday-section::before,
+.App .home-redesign .destinations-section::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 64%;
+  height: 260px;
+  border-radius: 50%;
+  border-top: 1px solid #c7863970;
+  box-shadow: 0 -12px 30px -25px #ffb850;
+  pointer-events: none;
+}
+.App .home-redesign .holiday-section::before { left: -34%; top: 110px; transform: rotate(25deg); }
+.App .home-redesign .destinations-section::before { right: -30%; top: -65px; transform: rotate(-23deg); }
+.App .home-redesign .holiday-container {
+  max-width: 1200px;
+  padding: 0;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 54px;
+}
+.App .home-redesign .holiday-image-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 14% 25px 7% -28px;
+  border: 1px solid #ca8c43;
+  border-radius: 34px;
+  background: linear-gradient(120deg, #95551f59, transparent 65%);
+  z-index: -1;
+}
+.App .home-redesign .holiday-image { aspect-ratio: .86; border-radius: 30px; border: 1px solid #e0a9548c; box-shadow: 0 14px 40px #0005; }
+.App .home-redesign .holiday-image img { display: block; }
+.App .home-redesign .star-decoration { display: none; }
+.App .home-redesign .rating-badge { bottom: 16px; left: 20px; border-radius: 16px; padding: 12px 16px; gap: 10px; }
+.App .home-redesign .avatar-chip { width: 34px; height: 34px; font-size: .8rem; border-width: 2px; margin-left: -7px; }
+.App .home-redesign .rating-label { font-size: .75rem; }
+.App .home-redesign .rating-text { margin: 0; font-size: .95rem; color: #9b612a; }
+.App .home-redesign .rating-stars { font-size: 1rem; }
+.App .home-redesign .holiday-title {
+  max-width: 520px;
+  margin-bottom: 15px;
+  font-size: clamp(32px, 3.6vw, 48px);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -.025em;
+  color: #edc385;
+}
+.App .home-redesign .holiday-description { margin-bottom: 24px; font-size: 1rem; color: var(--text-secondary); }
+.App .home-redesign .features-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.App .home-redesign .feature-card { gap: 14px; padding: 18px 14px; border: 1px solid #bc7a3226; border-radius: 16px; background: linear-gradient(130deg, #51352155, #2c1d1340); }
+.App .home-redesign .feature-icon { width: 46px; height: 46px; font-size: 1.5rem; background: #9e5b222d !important; color: #f3af4c !important; }
+.App .home-redesign .feature-title { font-size: 1rem; margin-bottom: 6px; font-weight: 600; }
+.App .home-redesign .feature-description { font-size: .9rem; line-height: 1.6; font-weight: 400; }
+
+.App .home-redesign .destinations-section { padding: 20px 28px 18px; background: transparent; }
+.App .home-redesign .destinations-container { max-width: 1160px; padding: 0; }
+.App .home-redesign .eyebrow { display: flex; align-items: center; justify-content: center; gap: 22px; font-size: .85rem; color: #d89a43; }
+.App .home-redesign .eyebrow::before,
+.App .home-redesign .eyebrow::after { content: ''; width: 48px; height: 1px; background: linear-gradient(90deg, transparent, #be7c31); }
+.App .home-redesign .eyebrow::after { transform: rotate(180deg); }
+.App .home-redesign .destinations-title { font-size: 1.85rem; margin-bottom: 18px; font-weight: 600; }
+.App .home-redesign .destinations-tabs { margin-bottom: 16px; border-bottom-width: 1px; gap: 10px; }
+.App .home-redesign .tab-btn { padding: 14px 24px; font-size: .95rem; border-bottom-width: 2px; bottom: -1px; }
+.App .home-redesign .tab-btn.active { color: #f1b355; border-color: #d6973c; }
+.App .home-redesign .destinations-content { grid-template-columns: 36% 1fr; min-height: 340px; border-radius: 20px; background: linear-gradient(110deg, #352216, #2d2017d9); }
+.App .home-redesign .destination-image { position: relative; min-height: 340px; border-radius: 19px; }
+.App .home-redesign .destination-image img { position: absolute; inset: 0; }
+.App .home-redesign .destination-prices { padding: 16px 20px 18px 28px; }
+.App .home-redesign .price-row { position: relative; flex-direction: row; align-items: center; gap: 8px; min-height: 54px; padding: 11px 16px; }
+.App .home-redesign .month-name { min-width: 70px; font-size: 1.15rem; font-weight: 500; }
+.App .home-redesign .price-range { font-size: 1.1rem; font-weight: 400; text-align: right; }
+.App .home-redesign .price-row .arrow { position: static; color: #d7a25b; font-size: 1.3rem; }
+.App .home-redesign .price-row:hover,
+.App .home-redesign .price-row:focus-visible { background: linear-gradient(90deg, #9b5c296b, #6b3c1d4d); box-shadow: inset 2px 0 #efb45e; transform: none; }
+.App .home-redesign .price-note { font-size: 1rem; margin-top: 16px; padding-inline: 14px; }
+
+.App .home-redesign .featured-hotels-section {
+  padding: 42px 28px 48px;
+  background:
+    url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201600%20700%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22gold%22%3E%3Cstop%20stop-color%3D%22%23b66a27%22%20stop-opacity%3D%22.35%22%2F%3E%3Cstop%20offset%3D%22.12%22%20stop-color%3D%22%23ffca79%22%2F%3E%3Cstop%20offset%3D%22.3%22%20stop-color%3D%22%2390501f%22%20stop-opacity%3D%22.2%22%2F%3E%3Cstop%20offset%3D%22.53%22%20stop-color%3D%22%23b77a38%22%20stop-opacity%3D%22.45%22%2F%3E%3Cstop%20offset%3D%22.73%22%20stop-color%3D%22%23f8bc63%22%2F%3E%3Cstop%20offset%3D%22.86%22%20stop-color%3D%22%239c5a21%22%20stop-opacity%3D%22.35%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23ffce82%22%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%22silk%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23ae682a%22%20stop-opacity%3D%22.14%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%232a180e%22%20stop-opacity%3D%220%22%2F%3E%3C%2FlinearGradient%3E%3Cfilter%20id%3D%22glow%22%20x%3D%22-20%25%22%20y%3D%22-80%25%22%20width%3D%22140%25%22%20height%3D%22260%25%22%3E%3CfeGaussianBlur%20stdDeviation%3D%226%22%2F%3E%3C%2Ffilter%3E%3Cpath%20id%3D%22lower%22%20d%3D%22M-40%20590%20C170%20605%20280%20704%20520%20672%20S790%20613%201010%20654%20S1310%20671%201640%20571%22%2F%3E%3Cpath%20id%3D%22upper%22%20d%3D%22M970%20298%20C1200%20280%201400%20210%201640%2065%22%2F%3E%3C%2Fdefs%3E%3Cpath%20d%3D%22M0%2080%20Q85%2016%20255%200%20H0Z%22%20fill%3D%22url(%23silk)%22%2F%3E%3Cpath%20d%3D%22M-40%20590%20C170%20605%20280%20704%20520%20672%20S790%20613%201010%20654%20S1310%20671%201640%20571%20L1640%20700%20H-40Z%22%20fill%3D%22url(%23silk)%22%2F%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22url(%23gold)%22%20stroke-width%3D%2212%22%20opacity%3D%22.55%22%20filter%3D%22url(%23glow)%22%3E%3Cuse%20href%3D%22%23lower%22%2F%3E%3Cuse%20href%3D%22%23upper%22%2F%3E%3C%2Fg%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22url(%23gold)%22%20stroke-width%3D%221.6%22%3E%3Cuse%20href%3D%22%23lower%22%2F%3E%3Cuse%20href%3D%22%23upper%22%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%22M0%20550%20C230%20730%20435%20711%20695%20656%20S1105%20735%201360%20637%20S1540%20586%201600%20565%22%20fill%3D%22none%22%20stroke%3D%22url(%23gold)%22%20stroke-width%3D%221%22%20opacity%3D%22.3%22%2F%3E%3C%2Fsvg%3E") center / 100% 100% no-repeat,
+    radial-gradient(ellipse at 94% 30%, #97512326, transparent 53%),
+    radial-gradient(ellipse at 8% 88%, #8b4d2421, transparent 46%),
+    linear-gradient(180deg, #190f0900, #1c120c 18%, #1c120c 82%, #190f0900);
+}
+.App.light-mode .home-redesign .featured-hotels-section { background-color: #faf4eb; background-blend-mode: normal, normal, normal, soft-light; }
+.App .home-redesign .featured-hotels-container { max-width: 1360px; padding: 0; }
+.App .home-redesign .featured-hotels-section .eyebrow { font-size: .95rem; margin-bottom: 12px; }
+.App .home-redesign .section-title { display: block; font-size: clamp(28px, 2.5vw, 36px); margin-bottom: 28px; font-weight: 600; text-align: center; }
+.App .home-redesign .hotels-slider-wrapper { gap: 18px; align-items: center; justify-content: center; }
+.App .home-redesign .thumbnails-left,
+.App .home-redesign .thumbnails-right { display: flex; flex-direction: column; flex: none; gap: 12px; }
+.App .home-redesign .thumbnail { flex: none; width: clamp(90px, 7vw, 115px); height: clamp(130px, 10vw, 155px); border-radius: 14px; opacity: .85; }
+.App .home-redesign .thumbnail:hover,
+.App .home-redesign .thumbnail.active { border-color: #d59a4e; transform: translateY(-3px); }
+.App .home-redesign .main-display { flex: 1; min-width: 0; max-width: 920px; margin: 0 auto; position: relative; }
+.App .home-redesign .main-image { height: clamp(440px, 33vw, 520px); border-radius: 22px; overflow: hidden; border: 1px solid #d59a4e70; }
+.App .home-redesign .main-image > img { border-radius: 0; animation: none; }
+.App .home-redesign .featured-play { top: 20px; right: 20px; padding: 12px 18px; font-size: .95rem; }
+.App .home-redesign .info-card {
+  top: auto;
+  bottom: 24px;
+  left: 24px;
+  right: auto;
+  width: min(500px, calc(100% - 48px));
+  max-width: none;
+  padding: 24px 26px;
+  transform: none;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  animation: none;
+  background: rgba(28, 16, 9, 0.62);
+  text-align: left;
+  border-radius: 22px;
+}
+.App .home-redesign .info-card .hotel-title { font-size: clamp(24px, 2vw, 30px); line-height: 1.2; margin-bottom: 10px; }
+.App .home-redesign .info-card .hotel-description { font-size: 1rem; line-height: 1.5; margin-bottom: 16px; }
+.App .home-redesign .info-card .info-meta { font-size: 1.1rem; gap: 0; }
+.App .home-redesign .info-card .year-badge { font-size: .8rem; margin-bottom: 0; }
+.App .home-redesign .info-card .discover-btn { display: flex; justify-content: center; width: 100%; padding: 14px 26px; font-size: 1rem; }
+.App .home-redesign .nav-btn { width: 42px; height: 42px; font-size: 1rem; }
+.App .home-redesign .image-gallery-section { padding: 8px 0 34px; background: transparent; }
+.App .home-redesign .gallery-title { color: var(--text-primary); font-family: inherit; font-size: 1.6rem; font-weight: 500; line-height: 1.4; margin-bottom: 20px; }
+.App .home-redesign .gallery-item { width: 220px; height: 150px; border-radius: 12px; }
+.App .home-redesign .gallery-track { gap: 18px; }
+
+.App:has(.home-redesign) > .footer { padding-top: 32px; }
+.App.dark-mode:has(.home-redesign) > .footer { background: radial-gradient(ellipse at 10% 0, #4f2d1855, transparent 60%), #1b110b; border-top-color: #ae6b323d; }
+.App:has(.home-redesign) .footer-container { max-width: 1360px; padding-inline: 28px; }
+.App:has(.home-redesign) .footer-grid { gap: 36px; grid-template-columns: 1.65fr .65fr 1fr 1.3fr; padding-bottom: 28px; }
+.App:has(.home-redesign) .footer-col { gap: 14px; }
+.App:has(.home-redesign) .footer-logo { margin-bottom: 0; }
+.App:has(.home-redesign) .footer-logo img { width: 55px; }
+.App:has(.home-redesign) .footer-heading { font-size: 1.05rem; margin-bottom: 0; }
+.App:has(.home-redesign) :is(.footer-description, .footer-links a, .footer-hours li, .footer-contact li) { font-size: .9rem; }
+.App:has(.home-redesign) .social-icon { width: 36px; height: 36px; font-size: .95rem; }
+.App:has(.home-redesign) .footer-bottom { padding-block: 22px; font-size: .85rem; }
+
+.light-mode .home-redesign { --text-primary: #392517; --text-secondary: #634a35; --text-muted: #806247; --bg-card: #fbf2e6; background: radial-gradient(ellipse at 0 35%, #e6c39255, transparent 50%), #faf4eb; }
+.light-mode .home-redesign .cinematic-hero-scenery::after { background: linear-gradient(180deg, #1c0f142b, #190f090d 50%, #faf4eb 100%); }
+.light-mode .home-redesign .holiday-title { color: #8d581e; }
+.light-mode .home-redesign .feature-card { background: #f2e4d377; }
+.light-mode .home-redesign .destinations-content { background: #f4e7d8; }
+.light-mode .home-redesign .hero-section.cinematic-hero .hero-support { color: #704e2e; }
+
+@media (min-width: 761px) and (max-width: 1100px) {
+  .App .home-redesign .search-form,
+  .App .home-redesign .search-form.flight-mode,
+  .App .home-redesign .search-form.tour-mode { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .App .home-redesign .search-form .form-field { min-height: 64px; border-right: 0; }
+  .App .home-redesign .search-form .search-button { grid-column: 1 / -1; }
+}
+@media (max-width: 1000px) {
+  .App .home-redesign .thumbnails-left,
+  .App .home-redesign .thumbnails-right { display: none; }
+  .App .home-redesign .hotels-slider-wrapper { gap: 14px; }
+  .App .home-redesign .holiday-container { gap: 32px; }
+  .App .home-redesign .feature-card { gap: 9px; padding: 12px 10px; }
+  .App .home-redesign .feature-icon { width: 36px; height: 38px; font-size: 1.2rem; }
+  .App .home-redesign .search-form.flight-mode { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .App .home-redesign .search-form.flight-mode .form-field { border: 0; }
+  .App .home-redesign .search-form.flight-mode .search-button { grid-column: auto; }
+  .App:has(.home-redesign) .footer-grid { gap: 24px; }
+}
+@media (max-width: 760px) {
+  .App .home-redesign .hero-section.cinematic-hero { padding: 36px 18px 0; }
+  .App .home-redesign .hero-section.cinematic-hero .hero-title { font-size: clamp(34px, 6vw, 46px); }
+  .App .home-redesign .search-form-container { padding: 14px; border-radius: 22px; }
+  .App .home-redesign .search-form,
+  .App .home-redesign .search-form.flight-mode,
+  .App .home-redesign .search-form.tour-mode { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .App .home-redesign .form-field,
+  .App .home-redesign .form-field:first-child { min-height: 62px; border: 0; padding: 7px; }
+  .App .home-redesign .search-form .search-button { grid-column: 1 / -1; }
+  .App .home-redesign .field-content input,
+  .App .home-redesign .guest-trigger { font-size: 16px; }
+  .App .home-redesign .holiday-section { padding: 42px 24px 32px; }
+  .App .home-redesign .holiday-container { grid-template-columns: 1fr; max-width: 540px; gap: 30px; }
+  .App .home-redesign .holiday-left { width: 94%; margin-inline: auto; }
+  .App .home-redesign .holiday-image { aspect-ratio: 1.1; }
+  .App .home-redesign .holiday-title { font-size: 34px; }
+  .App .home-redesign .destinations-section { padding-inline: 20px; }
+  .App .home-redesign .destinations-title { font-size: 1.5rem; }
+  .App .home-redesign .destinations-tabs { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; gap: 0; }
+  .App .home-redesign .tab-btn { flex-shrink: 0; padding-inline: 16px; }
+  .App .home-redesign .destinations-content { grid-template-columns: 1fr; }
+  .App .home-redesign .destination-image { height: 260px; min-height: 0; border-radius: 18px 18px 0 0; }
+  .App .home-redesign .destination-prices { padding: 12px; }
+  .App .home-redesign .featured-hotels-section { padding: 36px 18px; }
+  .App .home-redesign .featured-hotels-section .eyebrow { font-size: .8rem; gap: 12px; }
+  .App .home-redesign .section-title { margin-bottom: 24px; }
+  .App .home-redesign .hotels-slider-wrapper { display: block; }
+  .App .home-redesign .main-image { height: auto; padding-top: 250px; }
+  .App .home-redesign .main-image > img { height: 250px; }
+  .App .home-redesign .nav-btn { position: absolute; top: 105px; width: 40px; height: 40px; }
+  .App .home-redesign .nav-prev { left: 10px; }
+  .App .home-redesign .nav-next { right: 10px; }
+  .App .home-redesign .featured-play { top: 16px; right: 16px; font-size: .85rem; }
+  .App .home-redesign .info-card { position: relative; inset: auto; width: 100%; padding: 22px 20px; transform: none; border-radius: 0; }
+  .App .home-redesign .info-card .info-meta { font-size: 1rem; }
+  .App:has(.home-redesign) .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 420px) {
+  .App .home-redesign .search-form-top { align-items: stretch; }
+  .App .home-redesign .field-content input { font-size: 16px; }
+  .App .home-redesign .search-form .form-field { grid-column: 1 / -1; }
+  .App .home-redesign .feature-card { flex-direction: column; }
+  .App .home-redesign .holiday-title { font-size: 30px; }
+  .App:has(.home-redesign) .footer-grid { gap: 24px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .App .home-redesign *, .home-redesign *::before, .home-redesign *::after { animation: none; transition: none; }
+}

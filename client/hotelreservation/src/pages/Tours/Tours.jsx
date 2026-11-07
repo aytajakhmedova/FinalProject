@@ -2,13 +2,15 @@ import Select from '../../components/common/Select/Select';
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FaStar, FaClock, FaMapMarkerAlt, FaUsers, FaSearch, FaFilter } from 'react-icons/fa';
-import { getTours } from '../../api/client';
+import { getTours, resolveImage } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
-import { MEDIA } from '../../data/localMedia';
+import { useSiteContent } from '../../context/SiteContentContext';
 import './Tours.css';
 
 const Tours = () => {
   const { t } = useLanguage();
+  const { content: siteContent } = useSiteContent();
+  const heroVideo = resolveImage(siteContent?.settings?.toursPageVideoUrl);
   const [searchParams] = useSearchParams();
   const [searchTerm, setSearchTerm] = useState(searchParams.get('destination') || '');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -71,15 +73,16 @@ const Tours = () => {
     <div className="tours-page">
       {/* Hero Section with Video */}
       <section className="tours-hero">
-        <video 
-          className="tours-hero-video"
-          autoPlay 
-          loop 
-          muted 
-          playsInline
-        >
-          <source src={MEDIA.tourVideo} type="video/mp4" />
-        </video>
+        {heroVideo && (
+          <video
+            className="tours-hero-video"
+            src={heroVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        )}
         <div className="tours-hero-overlay"></div>
         <div className="tours-hero-content">
           <h1 className="tours-hero-title">{t('tours.title')}</h1>

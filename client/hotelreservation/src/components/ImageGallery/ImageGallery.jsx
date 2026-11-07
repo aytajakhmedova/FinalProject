@@ -2,7 +2,6 @@ import React from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { resolveImage } from '../../api/client';
-import { GALLERY_EXTRAS } from '../../data/localMedia';
 import './ImageGallery.css';
 
 const ImageGallery = () => {
@@ -13,7 +12,7 @@ const ImageGallery = () => {
   const images = [...(content?.slides || []).map((slide) => ({
     src: resolveImage(slide.imageUrl),
     alt: slide.title || slide.description,
-  })), ...GALLERY_EXTRAS].filter((item) => {
+  }))].filter((item) => {
     if (!item.src || seen.has(item.src)) return false;
     seen.add(item.src);
     return true;

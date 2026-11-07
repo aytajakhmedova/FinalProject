@@ -3,16 +3,20 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FaSearch, FaFilter, FaSort } from 'react-icons/fa';
 import HotelCard from '../../components/common/HotelCard/HotelCard';
-import { getHotels } from '../../api/client';
+import { getHotels, resolveImage } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
-import { MEDIA } from '../../data/localMedia';
+import { useSiteContent } from '../../context/SiteContentContext';
 import './Hotels.css';
 
 const Hotels = () => {
   const { t } = useLanguage();
+  const { content: siteContent } = useSiteContent();
+  const heroVideo = resolveImage(siteContent?.settings?.hotelsPageVideoUrl);
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState({
-    priceRange: [0, 2000],
+    // A price range picked on the home page is already applied by the server, so keep the
+    // local slider wide enough not to hide those hotels.
+    priceRange: [0, searchParams.get('maxPrice') ? 100000 : 2000],
     stars: [],
     amenities: [],
     hotelType: []
@@ -29,7 +33,8 @@ const Hotels = () => {
     let active = true;
     getHotels({ city: searchParams.get('country') ? undefined : searchParams.get('location'),
       country: searchParams.get('country'), checkIn, checkOut, guests: searchParams.get('guests'),
-      adults: searchParams.get('adults'), children: searchParams.get('children'), rooms: searchParams.get('rooms') })
+      adults: searchParams.get('adults'), children: searchParams.get('children'), rooms: searchParams.get('rooms'),
+      minPrice: searchParams.get('minPrice'), maxPrice: searchParams.get('maxPrice'), currency: searchParams.get('currency') })
       .then((data) => {
         if (!active) return;
         setLoadError('');
@@ -106,15 +111,16 @@ const Hotels = () => {
     <div className="hotels-page">
       {/* Hero Section with Video */}
       <section className="hotels-hero">
-        <video 
-          className="hotels-hero-video"
-          autoPlay 
-          loop 
-          muted 
-          playsInline
-        >
-          <source src={MEDIA.hotelVideo} type="video/mp4" />
-        </video>
+        {heroVideo && (
+          <video
+            className="hotels-hero-video"
+            src={heroVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        )}
         <div className="hotels-hero-overlay"></div>
         <div className="hotels-hero-content">
           <h1 className="hotels-hero-title">{t('hotels.title')}</h1>

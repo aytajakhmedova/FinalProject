@@ -1,5 +1,12 @@
 import { getAuthToken } from "./auth";
-import { hotelGallery, uniqueListImages, uniqueTourImage } from "../data/localMedia";
+
+// Shown only when the server has no picture for an item, so an <img> is never left broken.
+export const IMAGE_PLACEHOLDER =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="100%" height="100%" fill="#2a1d12"/>' +
+      '<text x="50%" y="50%" fill="#c9ac89" font-family="sans-serif" font-size="28" text-anchor="middle">AE Hotel</text></svg>',
+  );
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5080";
 
@@ -68,9 +75,10 @@ export function mapRoom(room) {
 }
 
 export function mapHotel(hotel) {
-  // The gallery comes from the backend; hotelGallery only supplies one photo for a hotel that has none saved.
+  // Every picture comes from the server: the saved gallery, or else the hotel's main image.
   const saved = (hotel.galleryImages || []).map(resolveImage).filter(Boolean);
-  const images = saved.length ? [...new Set(saved)] : hotelGallery(hotel, resolveImage(hotel.imageFile), 1);
+  const main = resolveImage(hotel.imageFile);
+  const images = saved.length ? [...new Set(saved)] : [main || IMAGE_PLACEHOLDER];
   const image = images[0];
   return {
     ...hotel,
@@ -85,9 +93,7 @@ export function mapHotel(hotel) {
 }
 
 export function mapTour(tour) {
-  const mapped = resolveImage(tour.imageFile);
-  const usesHotelStock = /hotelimg\d+\.(jfif|jpe?g|png)$/i.test(tour.imageFile || "");
-  const image = mapped && !usesHotelStock ? mapped : uniqueTourImage(tour.id);
+  const image = resolveImage(tour.imageFile) || IMAGE_PLACEHOLDER;
   return {
     ...tour,
     reviews: tour.reviewCount,
@@ -179,7 +185,7 @@ export const listFlights = (params) => request(withQuery("/api/flights", params)
 export const createFlight = (flight) => request("/api/flights", { method: "POST", body: JSON.stringify(flight) });
 export const updateFlight = (id, flight) => request(`/api/flights/${id}`, { method: "PUT", body: JSON.stringify(flight) });
 export const deleteFlight = (id) => request(`/api/flights/${id}`, { method: "DELETE" });
-export const getTours = (params) => request(withQuery("/api/tours", params)).then((items) => uniqueListImages(items.map(mapTour)));
+export const getTours = (params) => request(withQuery("/api/tours", params)).then((items) => items.map(mapTour));
 export const getTour = (id) => request(`/api/tours/${id}`).then(mapTour);
 export const listTours = () => request("/api/tours");
 export const createTour = (tour) => request("/api/tours", { method: "POST", body: JSON.stringify(tour) });
@@ -236,6 +242,11 @@ export const createSiteAdvantage = (item) => request("/api/site/advantages", { m
 export const updateSiteAdvantage = (id, item) => request(`/api/site/advantages/${id}`, { method: "PUT", body: JSON.stringify(item) });
 export const deleteSiteAdvantage = (id) => request(`/api/site/advantages/${id}`, { method: "DELETE" });
 
+export const getSeasonalPrices = () => request("/api/seasonal-prices");
+export const createSeasonalPrice = (item) => request("/api/seasonal-prices", { method: "POST", body: JSON.stringify(item) });
+export const updateSeasonalPrice = (id, item) => request(`/api/seasonal-prices/${id}`, { method: "PUT", body: JSON.stringify(item) });
+export const deleteSeasonalPrice = (id) => request(`/api/seasonal-prices/${id}`, { method: "DELETE" });
+
 export async function uploadMedia(file) {
   const token = getAuthToken();
   const body = new FormData();
@@ -282,7 +293,7 @@ export const getTripSuggestionsByCountry = ({ country, guests = 1 }) =>
     )
     .then((result) => ({
       flights: (result.flights || []).map(mapFlight),
-      tours: uniqueListImages((result.tours || []).map(mapTour)),
+      tours: (result.tours || []).map(mapTour),
     }));
 
 export const getCustomers = () => request("/api/customers");

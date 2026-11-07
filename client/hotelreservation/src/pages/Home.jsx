@@ -6,6 +6,7 @@ import Destinations from '../components/Destinations/Destinations';
 import FeaturedHotels from '../components/FeaturedHotels/FeaturedHotels';
 import HotelVideoModal from '../components/HotelVideoModal/HotelVideoModal';
 import ImageGallery from '../components/ImageGallery/ImageGallery';
+import './Home/Home.css';
 
 const Home = ({ currency, favorites, onToggleFavorite }) => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const Home = ({ currency, favorites, onToggleFavorite }) => {
     const guests = (nextQuery.guests?.adults || 0) + (nextQuery.guests?.children || 0);
     if (nextQuery.type === 'flight') {
       if (nextQuery.location) params.set('origin', nextQuery.location);
+      if (nextQuery.destination) params.set('destination', nextQuery.destination);
       if (nextQuery.checkIn) params.set('date', nextQuery.checkIn);
       if (guests) params.set('passengers', String(guests));
       navigate(`/flight-results?${params.toString()}`);
@@ -42,7 +44,7 @@ const Home = ({ currency, favorites, onToggleFavorite }) => {
   };
 
   return (
-    <>
+    <main className="home-page home-redesign">
       <Hero
         onSearch={handleSearch}
         serviceType={serviceType}
@@ -60,7 +62,7 @@ const Home = ({ currency, favorites, onToggleFavorite }) => {
       {videoHotel && (
         <HotelVideoModal hotel={videoHotel} onClose={() => setVideoHotel(null)} />
       )}
-    </>
+    </main>
   );
 };
 

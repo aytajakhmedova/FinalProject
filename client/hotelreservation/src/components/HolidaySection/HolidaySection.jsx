@@ -3,7 +3,6 @@ import { FaUtensils, FaBolt, FaShieldAlt, FaClock, FaStar } from 'react-icons/fa
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { resolveImage } from '../../api/client';
-import { MEDIA } from '../../data/localMedia';
 import './HolidaySection.css';
 
 const ICONS = {
@@ -31,7 +30,7 @@ const HolidaySection = () => {
   const { t } = useLanguage();
   const { content, loading, error } = useSiteContent();
   const settings = content?.settings;
-  const image = MEDIA.aeHotel || resolveImage(settings?.advantagesImageUrl);
+  const image = resolveImage(settings?.advantagesImageUrl);
   const features = content?.advantages?.length ? content.advantages : DEFAULT_FEATURES;
 
   if (error && !settings) {

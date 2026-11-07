@@ -10,7 +10,7 @@ import {
   FaMinus,
   FaPlus,
 } from 'react-icons/fa';
-import { getSiteCities, getSiteCountries } from '../../api/client';
+import { getSiteCities, getSiteCountries, listTours } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import './SearchForm.css';
 
@@ -29,6 +29,7 @@ const plusDaysISO = (days) => {
 
 const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
   const [location, setLocation] = useState('');
+  const [destination, setDestination] = useState('');
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState({ adults: 2, children: 0, rooms: 1 });
@@ -36,6 +37,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
   const [error, setError] = useState('');
   const [cities, setCities] = useState([]);
   const [countries, setCountries] = useState([]);
+  const [tours, setTours] = useState([]);
   const wrapRef = useRef(null);
   const { t } = useLanguage();
 
@@ -50,7 +52,17 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
     getSiteCities()
       .then(setCities)
       .catch(() => setCities([]));
+    listTours().then(setTours).catch(() => setTours([]));
   }, []);
+
+  // A tour only runs on fixed dates: offer just the upcoming ones of the tours matching the place.
+  const tourDates = [...new Set(
+    tours
+      .filter((tour) => !location.trim()
+        || `${tour.destination} ${tour.name}`.toLowerCase().includes(location.trim().toLowerCase()))
+      .flatMap((tour) => (Array.isArray(tour.availableDates) ? tour.availableDates : []))
+      .filter((date) => date >= todayISO()),
+  )].sort();
 
   useEffect(() => {
     const close = (e) => {
@@ -94,8 +106,9 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
     onSearch?.({
       type: serviceType,
       location: location.trim(),
+      destination: serviceType === 'flight' ? destination.trim() : undefined,
       country: serviceType === 'hotel' && countries.includes(location.trim()) ? location.trim() : undefined,
-      checkIn,
+      checkIn: serviceType === 'tour' && !tourDates.includes(checkIn) ? '' : checkIn,
       checkOut,
       guests,
     });
@@ -126,14 +139,14 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
         </div>
       </div>
 
-      <form className="search-form" onSubmit={handleSubmit}>
+      <form className={`search-form${serviceType === 'flight' ? ' flight-mode' : ''}${serviceType === 'tour' ? ' tour-mode' : ''}`} onSubmit={handleSubmit}>
         <div className="form-field location-field">
           <span className="field-icon" aria-hidden="true">
             <LocationPin />
           </span>
           <div className="field-content">
-            <label>{serviceType === 'flight' ? t('search.fromTo') : t('search.place')}</label>
-            <Combobox inputMode label={serviceType === 'flight' ? t('search.fromTo') : t('search.place')}
+            <label>{serviceType === 'flight' ? t('search.from') : t('search.place')}</label>
+            <Combobox inputMode label={serviceType === 'flight' ? t('search.from') : t('search.place')}
               placeholder={t('search.cityPh')} value={location}
               options={[
                 ...cities.map((city) => ({ value: city.name, label: city.name, description: city.country, searchText: city.name + ' ' + city.country })),
@@ -143,6 +156,21 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
           </div>
         </div>
 
+        {serviceType === 'flight' && (
+          <div className="form-field location-field">
+            <span className="field-icon" aria-hidden="true">
+              <LocationPin />
+            </span>
+            <div className="field-content">
+              <label>{t('search.to')}</label>
+              <Combobox inputMode label={t('search.to')}
+                placeholder={t('search.cityPh')} value={destination}
+                options={cities.map((city) => ({ value: city.name, label: city.name, description: city.country, searchText: city.name + ' ' + city.country }))}
+                onInputChange={setDestination} onChange={setDestination} />
+            </div>
+          </div>
+        )}
+
         <div className="form-divider"></div>
 
         <div className="form-field date-field">
@@ -150,20 +178,27 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
             <FaCalendarAlt />
           </span>
           <div className="field-content">
-            <label>{t('search.checkIn')}</label>
-            <input
-              type="date"
-              value={checkIn}
-              min={todayISO()}
-              onChange={handleCheckInChange}
-              placeholder={t('search.checkIn')}
-              required
-            />
+            <label>{serviceType === 'flight' ? t('search.departure') : t('search.checkIn')}</label>
+            {serviceType === 'tour' ? (
+              <select value={tourDates.includes(checkIn) ? checkIn : ''} onChange={(e) => setCheckIn(e.target.value)}>
+                <option value="">{tourDates.length ? t('search.anyTourDate') : t('search.noTourDate')}</option>
+                {tourDates.map((date) => <option key={date} value={date}>{date}</option>)}
+              </select>
+            ) : (
+              <input
+                type="date"
+                value={checkIn}
+                min={todayISO()}
+                onChange={handleCheckInChange}
+                placeholder={t('search.checkIn')}
+                required
+              />
+            )}
           </div>
         </div>
 
-        <div className="form-divider"></div>
-        <div className="form-field date-field">
+        {serviceType !== 'tour' && <div className="form-divider"></div>}
+        {serviceType !== 'tour' && <div className="form-field date-field">
           <span className="field-icon" aria-hidden="true">
             <FaCalendarAlt />
           </span>
@@ -179,7 +214,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
               required
             />
           </div>
-        </div>
+        </div>}
 
         <div className="form-divider"></div>
 
@@ -194,7 +229,8 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
               className="guest-trigger"
               onClick={() => setShowGuests((v) => !v)}
             >
-              {t('search.guestLine', { adults: guests.adults, children: guests.children, rooms: guests.rooms })}
+              {t(serviceType === 'hotel' ? 'search.guestLine' : 'search.guestLineNoRooms',
+                { adults: guests.adults, children: guests.children, rooms: guests.rooms })}
             </button>
           </div>
           {showGuests && (
@@ -202,7 +238,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
               {[
                 { key: 'adults', label: t('search.adults') },
                 { key: 'children', label: t('search.children') },
-                { key: 'rooms', label: t('search.rooms') },
+                ...(serviceType === 'hotel' ? [{ key: 'rooms', label: t('search.rooms') }] : []),
               ].map((row) => (
                 <div className="guest-row" key={row.key}>
                   <span>{row.label}</span>

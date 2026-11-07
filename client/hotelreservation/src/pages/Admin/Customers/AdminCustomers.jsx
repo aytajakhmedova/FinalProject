@@ -1,7 +1,7 @@
 import Select from '../../../components/common/Select/Select';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { getCustomerBookings, getCustomers } from '../../../api/client';
-import { STATUS_LABELS } from '../../../utils/bookingsStore';
+import { STATUS_LABELS } from '../../../utils/bookingStatus';
 import '../Hotels/AdminHotels.css';
 import '../Analytics/AdminAnalytics.css';
 import '../Manage/AdminManage.css';

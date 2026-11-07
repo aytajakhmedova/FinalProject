@@ -3,7 +3,6 @@ import ImageGallery from '../../components/ImageGallery/ImageGallery';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { resolveImage } from '../../api/client';
-import { GALLERY_EXTRAS } from '../../data/localMedia';
 import '../contentPages.css';
 
 const Gallery = () => {
@@ -13,7 +12,7 @@ const Gallery = () => {
   const photos = [...(content?.slides || []).map((slide) => ({
     src: resolveImage(slide.imageUrl),
     caption: slide.title || slide.description,
-  })), ...GALLERY_EXTRAS.map((item) => ({ src: item.src, caption: item.alt }))].filter((photo) => {
+  }))].filter((photo) => {
     if (!photo.src || seen.has(photo.src)) return false;
     seen.add(photo.src);
     return true;

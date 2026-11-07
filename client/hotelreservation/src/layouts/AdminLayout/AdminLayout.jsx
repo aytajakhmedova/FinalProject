@@ -22,7 +22,8 @@ import {
   FaCreditCard,
   FaFileAlt,
   FaGlobe,
-  FaCity
+  FaCity,
+  FaChartLine
 } from 'react-icons/fa';
 import logoImage from '../../assets/images/AE_HOTEL_transparent_logo.png';
 import './AdminLayout.css';
@@ -45,6 +46,7 @@ const ALL_MENU = [
   { path: '/admin/isciler', icon: <FaUserTie />, label: 'İşçilər', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/olkeler', icon: <FaGlobe />, label: 'Ölkələr', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/seherler', icon: <FaCity />, label: 'Şəhərlər', roles: ['SuperAdmin', 'Admin'] },
+  { path: '/admin/movsum-qiymetleri', icon: <FaChartLine />, label: 'Mövsüm qiymətləri', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/odenisler', icon: <FaCreditCard />, label: 'Ödənişlər', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/hesabatlar', icon: <FaFileAlt />, label: 'Hesabatlar', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/analytics', icon: <FaChartBar />, labelKey: 'admin.analytics', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },

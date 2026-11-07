@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { FaPlane, FaExchangeAlt, FaFilter, FaTimesCircle } from 'react-icons/fa';
+import { FaFilter, FaTimesCircle } from 'react-icons/fa';
 import { getFlights } from '../../api/client';
 import './FlightResults.css';
 
@@ -85,54 +85,6 @@ const FlightResults = () => {
 
   return (
     <div className="flight-results-page">
-      {/* Search Summary Bar */}
-      <div className="search-summary-bar">
-        <div className="container">
-          <div className="summary-content">
-            <div className="summary-route">
-              <div className="summary-location">
-                <FaPlane className="summary-icon" />
-                <div>
-                  <span className="summary-label">Haradan</span>
-                  <span className="summary-value">{searchParams.from}</span>
-                </div>
-              </div>
-              
-              <FaExchangeAlt className="summary-swap" />
-              
-              <div className="summary-location">
-                <FaPlane className="summary-icon rotated" />
-                <div>
-                  <span className="summary-label">Hara</span>
-                  <span className="summary-value">{searchParams.to}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="summary-details">
-              <div className="summary-item">
-                <span className="summary-label">Tarix</span>
-                <span className="summary-value">{searchParams.departure}</span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Sərnişin</span>
-                <span className="summary-value">{searchParams.travelers}</span>
-              </div>
-              <div className="summary-item">
-                <span className="summary-label">Sinif</span>
-                <span className="summary-value">
-                  {searchParams.class === 'economy' ? 'Ekonom' : searchParams.class === 'business' ? 'Biznes' : 'Birinci'}
-                </span>
-              </div>
-            </div>
-
-            <button className="btn-modify-search" onClick={() => navigate('/flights')}>
-              Dəyişdir
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="flight-results-container">
         <div className="container">

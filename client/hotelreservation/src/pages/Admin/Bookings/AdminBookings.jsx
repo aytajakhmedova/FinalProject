@@ -1,7 +1,7 @@
 import Select from '../../../components/common/Select/Select';
 import React, { useEffect, useMemo, useState } from 'react';
 import { getBookings, updateBookingStatus } from '../../../api/client';
-import { NEXT_STATUSES, STATUS_LABELS } from '../../../utils/bookingsStore';
+import { NEXT_STATUSES, STATUS_LABELS } from '../../../utils/bookingStatus';
 import '../Hotels/AdminHotels.css';
 
 const TYPE_LABELS = {

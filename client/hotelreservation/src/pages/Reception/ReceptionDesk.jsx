@@ -13,7 +13,7 @@ import {
 } from 'react-icons/fa';
 import { emailBookingReceipt, getBookings, getHotels, updateBookingStatus } from '../../api/client';
 import { getAuthUser } from '../../api/auth';
-import { NEXT_STATUSES, STATUS_LABELS } from '../../utils/bookingsStore';
+import { NEXT_STATUSES, STATUS_LABELS } from '../../utils/bookingStatus';
 import './ReceptionDesk.css';
 
 const TYPE_LABELS = { hotel: 'Otel', flight: 'Uçuş', tour: 'Tur' };

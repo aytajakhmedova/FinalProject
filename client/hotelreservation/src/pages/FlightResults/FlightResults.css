@@ -4,6 +4,12 @@
 }
 
 /* Search Summary Bar */
+.flight-results-page .container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
 .search-summary-bar {
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);

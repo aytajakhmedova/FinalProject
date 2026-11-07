@@ -1,11 +1,9 @@
 import { useState } from 'react';
 import { FaGlobeAmericas, FaPlay, FaTimes } from 'react-icons/fa';
-import { MdHeadset } from 'react-icons/md';
 import SearchForm from '../SearchForm/SearchForm';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { resolveImage } from '../../api/client';
-import { MEDIA } from '../../data/localMedia';
 import heroBackground from '../../assets/images/hero-luxury-resort.png';
 import './Hero.css';
 
@@ -18,7 +16,7 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
   const { lang, t } = useLanguage();
   const { content, error } = useSiteContent();
   const settings = content?.settings;
-  const video = resolveImage(settings?.heroVideoUrl) || MEDIA.hotelPromo;
+  const video = resolveImage(settings?.heroVideoUrl);
 
   const goPrimary = () => {
     const target = settings?.heroPrimaryButtonUrl || '#featured';
@@ -60,10 +58,6 @@ const Hero = ({ onSearch, serviceType, onServiceChange }) => {
 
         <div className="hero-search">
           <SearchForm onSearch={onSearch} serviceType={serviceType} onServiceChange={onServiceChange} />
-          <p className="hero-support">
-            <MdHeadset aria-hidden="true" />
-            <span>{settings?.heroSupportBadge || '7/24'} {t('hero.support')}</span>
-          </p>
         </div>
       </div>
 

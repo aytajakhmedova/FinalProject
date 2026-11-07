@@ -260,14 +260,6 @@
 .light-mode .quick-nav-btn .icon {
   color: #8B5A3C;
 }
-  color: white;
-  cursor: pointer;
-  padding: 0.45rem 0.8rem;
-  border-radius: 10px;
-  transition: all 0.25s ease;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
 
 .light-mode .quick-nav-btn {
   color: #1a1410;

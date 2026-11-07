@@ -7,13 +7,16 @@ import istanbulImage from '../../assets/images/istanbul.jpg';
 import dubaiImage from '../../assets/images/dubai.jpg';
 import parisImage from '../../assets/images/paris.jpg';
 import londonImage from '../../assets/images/london.jpg';
-import { MEDIA } from '../../data/localMedia';
+import { resolveImage } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
+import { useSiteContent } from '../../context/SiteContentContext';
 import './Flights.css';
 
 const Flights = () => {
   const navigate = useNavigate();
   const { t } = useLanguage();
+  const { content: siteContent } = useSiteContent();
+  const heroVideo = resolveImage(siteContent?.settings?.flightsPageVideoUrl);
   const [tripType, setTripType] = useState('one-way');
   const [formData, setFormData] = useState({
     from: '',
@@ -158,15 +161,16 @@ const Flights = () => {
     <div className="flights-page">
       {/* Hero Section with Video */}
       <section className="flights-hero">
-        <video 
-          className="flights-hero-video"
-          autoPlay 
-          loop 
-          muted 
-          playsInline
-        >
-          <source src={MEDIA.flightVideo} type="video/mp4" />
-        </video>
+        {heroVideo && (
+          <video
+            className="flights-hero-video"
+            src={heroVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        )}
         <div className="flights-hero-overlay">
           <div className="flights-hero-content">
             <p className="flights-hero-kicker">AE Hotel Uçuşlar</p>
