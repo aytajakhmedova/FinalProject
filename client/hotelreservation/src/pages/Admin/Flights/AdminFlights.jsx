@@ -2,7 +2,7 @@ import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { createFlight, deleteFlight, getSiteCities, getSiteCountries, listFlights, updateFlight } from '../../../api/client';
+import { createFlight, deleteFlight, getAirlines, getSiteCities, getSiteCountries, listFlights, updateFlight } from '../../../api/client';
 import '../Hotels/AdminHotels.css';
 
 const CABIN_LABELS = {
@@ -24,9 +24,8 @@ const emptyFlight = () => ({
   arrivalAt: '',
   duration: '',
   stops: 0,
-  price: 0,
-  cabinClass: 'economy',
-  seatsAvailable: 0,
+  // Every flight sells one or more classes, each with its own price and seats.
+  cabins: [{ cabinClass: 'economy', price: 0, seatsAvailable: 0 }],
   refundable: false,
 });
 
@@ -71,9 +70,11 @@ const toFlightRequest = (flight) => ({
   arrivalAt: flight.arrivalAt ? new Date(flight.arrivalAt).toISOString() : flight.arrivalAt,
   duration: (flight.duration || '').trim(),
   stops: Number(flight.stops) || 0,
-  price: Number(flight.price) || 0,
-  cabinClass: (flight.cabinClass || 'economy').trim().toLowerCase(),
-  seatsAvailable: Number(flight.seatsAvailable) || 0,
+  cabins: (flight.cabins || []).map((cabin) => ({
+    cabinClass: cabin.cabinClass,
+    price: Number(cabin.price) || 0,
+    seatsAvailable: Number(cabin.seatsAvailable) || 0,
+  })),
   refundable: Boolean(flight.refundable),
 });
 
@@ -83,10 +84,8 @@ const toEditFlight = (flight) => ({
   departureAt: toDateTimeLocal(flight.departureAt),
   arrivalAt: toDateTimeLocal(flight.arrivalAt),
   stops: Number(flight.stops) || 0,
-  price: Number(flight.price) || 0,
-  seatsAvailable: Number(flight.seatsAvailable) || 0,
+  cabins: (flight.cabins && flight.cabins.length ? flight.cabins : emptyFlight().cabins).map((cabin) => ({ ...cabin })),
   refundable: Boolean(flight.refundable),
-  cabinClass: flight.cabinClass || 'economy',
 });
 
 const AdminFlights = () => {
@@ -105,6 +104,7 @@ const AdminFlights = () => {
   // Dropdown data
   const [countries, setCountries] = useState([]);
   const [allCities, setAllCities] = useState([]);
+  const [airlines, setAirlines] = useState([]);
   const [originCities, setOriginCities] = useState([]);
   const [destinationCities, setDestinationCities] = useState([]);
 
@@ -126,6 +126,9 @@ const AdminFlights = () => {
 
   useEffect(() => {
     loadFlights();
+    getAirlines()
+      .then(setAirlines)
+      .catch(() => setAirlines([]));
     // Load countries and cities
     getSiteCountries()
       .then(setCountries)
@@ -148,8 +151,8 @@ const AdminFlights = () => {
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
     return flights.filter((flight) => {
-      const cabin = (flight.cabinClass || 'economy').toLowerCase();
-      if (cabinFilter !== 'all' && cabin !== cabinFilter) return false;
+      const classes = (flight.cabins || []).map((cabin) => cabin.cabinClass);
+      if (cabinFilter !== 'all' && !classes.includes(cabinFilter)) return false;
       if (originFilter !== 'all' && String(flight.originCode || '').toUpperCase() !== originFilter) return false;
       if (!query) return true;
       const haystack = [
@@ -162,8 +165,8 @@ const AdminFlights = () => {
         flight.destinationCity,
         flight.destinationCountry,
         flight.duration,
-        CABIN_LABELS[cabin],
-        cabin,
+        ...classes.map((name) => CABIN_LABELS[name]),
+        ...classes,
       ]
         .filter(Boolean)
         .join(' ')
@@ -255,12 +258,16 @@ const AdminFlights = () => {
           <div className="admin-form-grid">
             <label>
               Aviaşirkət
-              <input
+              <Select
                 value={editing.airline}
                 onChange={(e) => setEditing({ ...editing, airline: e.target.value })}
-                maxLength={150}
                 required
-              />
+              >
+                <option value="">{airlines.length ? 'Aviaşirkət seçin' : 'Əvvəlcə Aviaşirkətlər bölməsində əlavə edin'}</option>
+                {airlines.map((airline) => (
+                  <option key={airline.id} value={airline.name}>{airline.name}</option>
+                ))}
+              </Select>
             </label>
             <label>
               Uçuş nömrəsi
@@ -380,44 +387,68 @@ const AdminFlights = () => {
             </label>
             <label>
               Dayanacaq
-              <input
-                type="number"
-                min="0"
-                value={editing.stops}
-                onChange={(e) => setEditing({ ...editing, stops: e.target.value })}
-              />
-            </label>
-            <label>
-              Qiymət
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={editing.price}
-                onChange={(e) => setEditing({ ...editing, price: e.target.value })}
-                required
-              />
-            </label>
-            <label>
-              Sinif
               <Select
-                value={editing.cabinClass}
-                onChange={(e) => setEditing({ ...editing, cabinClass: e.target.value })}
+                value={String(Number(editing.stops) || 0)}
+                onChange={(e) => setEditing({ ...editing, stops: Number(e.target.value) })}
               >
-                {Object.entries(CABIN_LABELS).map(([value, label]) => (
-                  <option key={value} value={value}>{label}</option>
+                {[...new Set([0, 1, 2, 3, Number(editing.stops) || 0])].sort((a, b) => a - b).map((count) => (
+                  <option key={count} value={count}>{stopLabel(count)}</option>
                 ))}
               </Select>
             </label>
-            <label>
-              Mövcud yer
-              <input
-                type="number"
-                min="0"
-                value={editing.seatsAvailable}
-                onChange={(e) => setEditing({ ...editing, seatsAvailable: e.target.value })}
-              />
-            </label>
+            <div className="full cabin-editor">
+              <strong>Biletlər və qiymətlər</strong>
+              <small className="muted">Hər sinfin öz qiyməti və yer sayı var. Müştəri bunlardan birini seçir.</small>
+              {Object.entries(CABIN_LABELS).map(([value, label]) => {
+                const row = (editing.cabins || []).find((cabin) => cabin.cabinClass === value);
+                const update = (patch) => setEditing({
+                  ...editing,
+                  cabins: editing.cabins.map((cabin) => (cabin.cabinClass === value ? { ...cabin, ...patch } : cabin)),
+                });
+                return (
+                  <div key={value} className="cabin-editor-row">
+                    <label className="checkbox-row">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(row)}
+                        onChange={(e) => setEditing({
+                          ...editing,
+                          cabins: e.target.checked
+                            ? [...(editing.cabins || []), { cabinClass: value, price: 0, seatsAvailable: 0 }]
+                            : (editing.cabins || []).filter((cabin) => cabin.cabinClass !== value),
+                        })}
+                      />
+                      {label}
+                    </label>
+                    {row && (
+                      <>
+                        <label>
+                          Qiymət (₼)
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={row.price}
+                            onChange={(e) => update({ price: e.target.value })}
+                            required
+                          />
+                        </label>
+                        <label>
+                          Mövcud yer
+                          <input
+                            type="number"
+                            min="0"
+                            value={row.seatsAvailable}
+                            onChange={(e) => update({ seatsAvailable: e.target.value })}
+                            required
+                          />
+                        </label>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
             <label className="checkbox-row">
               <input
                 type="checkbox"
@@ -523,10 +554,20 @@ const AdminFlights = () => {
                       {formatDateTime(flight.departureAt)}
                       <div className="muted">{flight.duration || stopLabel(flight.stops)}</div>
                     </td>
-                    <td>₼{Number(flight.price || 0).toLocaleString('az-AZ', { maximumFractionDigits: 0 })}</td>
                     <td>
-                      {CABIN_LABELS[flight.cabinClass] || flight.cabinClass || 'Ekonom'}
-                      <div className="muted">{flight.seatsAvailable} yer · {flight.refundable ? 'Geri qaytarılan' : 'Qaytarılmayan'}</div>
+                      {(flight.cabins || []).map((cabin) => (
+                        <div key={cabin.cabinClass}>
+                          {CABIN_LABELS[cabin.cabinClass] || cabin.cabinClass}: ₼{Number(cabin.price || 0).toLocaleString('az-AZ', { maximumFractionDigits: 0 })}
+                        </div>
+                      ))}
+                    </td>
+                    <td>
+                      {(flight.cabins || []).map((cabin) => (
+                        <div key={cabin.cabinClass}>
+                          {CABIN_LABELS[cabin.cabinClass] || cabin.cabinClass}: {cabin.seatsAvailable} yer
+                        </div>
+                      ))}
+                      <div className="muted">{flight.refundable ? 'Geri qaytarılan' : 'Qaytarılmayan'}</div>
                     </td>
                     <td className="table-actions">
                       <button onClick={() => handleEditFlight(flight)}>

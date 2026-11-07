@@ -7,7 +7,7 @@ import istanbulImage from '../../assets/images/istanbul.jpg';
 import dubaiImage from '../../assets/images/dubai.jpg';
 import parisImage from '../../assets/images/paris.jpg';
 import londonImage from '../../assets/images/london.jpg';
-import { getSiteCities, listFlights, resolveImage } from '../../api/client';
+import { getSiteCities, getPopularDestinations, listFlights, resolveImage } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import './Flights.css';
@@ -24,7 +24,7 @@ const Flights = () => {
     departure: '',
     returnDate: '',
     travelers: '1',
-    flightClass: 'economy',
+    flightClass: '',
   });
   const [dbFlights, setDbFlights] = useState([]);
   useEffect(() => {
@@ -97,48 +97,22 @@ const Flights = () => {
     navigate(`/flight-results?${params.toString()}`);
   };
 
-  const popularDestinations = [
-    {
-      id: 1,
-      name: 'İstanbul',
-      country: 'Türkiyə',
-      image: istanbulImage,
-      rating: 4.8,
-      info: 'Növbəti uçuş 15 Yanvar',
-      code: 'IST'
-    },
-    {
-      id: 2,
-      name: 'Dubai',
-      country: 'BƏƏ',
-      image: dubaiImage,
-      rating: 4.9,
-      info: 'Gündəlik 2 uçuş',
-      code: 'DXB'
-    },
-    {
-      id: 3,
-      name: 'Paris',
-      country: 'Fransa',
-      image: parisImage,
-      rating: 4.7,
-      info: 'Həftədə 5 uçuş',
-      code: 'CDG'
-    },
-    {
-      id: 4,
-      name: 'London',
-      country: 'Böyük Britaniya',
-      image: londonImage,
-      rating: 4.6,
-      info: 'Növbəti uçuş 12 Yanvar',
-      code: 'LHR'
-    },
-  ];
+  // Popular destinations: the cities with the most upcoming flights, calculated by the server.
+  const [popularDestinations, setPopularDestinations] = useState([]);
+  useEffect(() => {
+    let active = true;
+    getPopularDestinations(4)
+      .then((items) => active && setPopularDestinations(items || []))
+      .catch(() => active && setPopularDestinations([]));
+    return () => { active = false; };
+  }, []);
+  const destinationCount = new Set(dbFlights.map((f) => f.destinationCity)).size;
+  // City photos are local assets; a city without one is shown without a picture.
+  const cityImages = { 'İstanbul': istanbulImage, 'Dubai': dubaiImage, 'Paris': parisImage, 'London': londonImage };
 
   const handleDestinationClick = (destination) => {
     // Navigate to flight results with pre-filled destination
-    const params = new URLSearchParams({ origin: 'Bakı', destination: destination.name });
+    const params = new URLSearchParams({ destination: destination.city });
     navigate(`/flight-results?${params.toString()}`);
   };
 
@@ -160,7 +134,7 @@ const Flights = () => {
           <div className="flights-hero-content">
             <p className="flights-hero-kicker">AE Hotel Uçuşlar</p>
             <h1 className="flights-hero-title">{t('flights.title')}</h1>
-            <p className="flights-hero-subtitle">Ən sərfəli biletlər — 630+ istiqamət, bir axtarış</p>
+            <p className="flights-hero-subtitle">Ən sərfəli biletlər{destinationCount > 0 ? ` — ${destinationCount} istiqamət` : ''}, bir axtarış</p>
 
             {/* Search Form */}
             <div className="flights-search-card">
@@ -186,6 +160,7 @@ const Flights = () => {
                     onChange={handleChange}
                     className="trip-select"
                   >
+                    <option value="">Bütün siniflər</option>
                     <option value="economy">Ekonom</option>
                     <option value="business">Biznes</option>
                     <option value="first">Birinci sinif</option>
@@ -337,21 +312,23 @@ const Flights = () => {
           <div className="destinations-grid">
             {popularDestinations.map(destination => (
               <div 
-                key={destination.id} 
+                key={destination.city} 
                 className="destination-card"
                 onClick={() => handleDestinationClick(destination)}
                 style={{ cursor: 'pointer' }}
               >
                 <div className="flight-dest-photo">
-                  <img src={destination.image} alt={destination.name} />
+                  {cityImages[destination.city] && <img src={cityImages[destination.city]} alt={destination.city} />}
                   <div className="destination-rating">
-                    {destination.rating} ⭐
+                    {Math.round(destination.minPrice)} ₼-dan
                   </div>
                 </div>
                 <div className="destination-content">
-                  <h3 className="destination-name">{destination.name}</h3>
+                  <h3 className="destination-name">{destination.city}</h3>
                   <p className="destination-country">{destination.country}</p>
-                  <p className="destination-info">{destination.info}</p>
+                  <p className="destination-info">
+                    {destination.flightCount} uçuş · Növbəti: {new Date(destination.nextDeparture).toLocaleDateString('az-AZ', { day: 'numeric', month: 'long' })}
+                  </p>
                 </div>
               </div>
             ))}
@@ -366,7 +343,7 @@ const Flights = () => {
             <div className="why-item">
               <div className="why-icon"><FaGlobeAmericas /></div>
               <h3>Geniş Seçim</h3>
-              <p>630+ istiqamət ilə işləyirik</p>
+              <p>{destinationCount > 0 ? `${destinationCount} istiqamət ilə işləyirik` : 'Geniş istiqamət şəbəkəsi'}</p>
             </div>
             <div className="why-item">
               <div className="why-icon"><FaMapMarkerAlt /></div>

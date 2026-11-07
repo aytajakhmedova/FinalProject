@@ -107,12 +107,20 @@ export function mapTour(tour) {
   };
 }
 
+export const CABIN_LABELS = { economy: "Ekonom", business: "Biznes", first: "Birinci sinif" };
+
+// Price and seats of one class of a flight (the flight's own values when it has no class list).
+export function cabinOf(flight, cabinClass) {
+  const found = (flight.cabins || []).find((item) => item.cabinClass === cabinClass);
+  return found || { cabinClass: flight.cabinClass, price: Number(flight.price), seatsAvailable: flight.seatsAvailable };
+}
+
 export function mapFlight(flight) {
   const depart = new Date(flight.departureAt);
   const arrive = new Date(flight.arrivalAt);
   const time = (value) => value.toLocaleTimeString("az-AZ", { hour: "2-digit", minute: "2-digit" });
-  const stops = flight.stops <= 0 ? "Birbaşa" : flight.stops === 1 ? "1 dayanacaq" : "2+ dayanacaq";
-  const cabin = flight.cabinClass === "business" ? "Biznes" : flight.cabinClass === "first" ? "Birinci" : "Ekonom";
+  const stops = flight.stops <= 0 ? "Birbaşa" : `${flight.stops} dayanacaq`;
+  const cabin = CABIN_LABELS[flight.cabinClass] || "Ekonom";
   return {
     ...flight,
     logo: "✈️",
@@ -123,7 +131,13 @@ export function mapFlight(flight) {
     arriveLocation: flight.destinationCode,
     arriveCity: `${flight.destinationCity}, ${flight.destinationCountry}`,
     stops,
+    stopCount: Number(flight.stops) || 0,
     class: cabin,
+    cabins: (flight.cabins || []).map((item) => ({
+      ...item,
+      label: CABIN_LABELS[item.cabinClass] || item.cabinClass,
+      price: Number(item.price),
+    })),
     seatsLeft: flight.seatsAvailable,
     price: Number(flight.price),
   };
@@ -188,7 +202,12 @@ export const deleteFlight = (id) => request(`/api/flights/${id}`, { method: "DEL
 export const getTours = (params) => request(withQuery("/api/tours", params)).then((items) => items.map(mapTour));
 export const getFeaturedReviews = (limit = 6) => request(`/api/reviews/featured?limit=${limit}`);
 export const getReviewSummary = () => request("/api/reviews/summary");
-export const getFlightAirports = (params) => request(withQuery("/api/flights/airports", params));
+export const getPopularDestinations = (limit = 4) => request(`/api/flights/popular-destinations?limit=${limit}`);
+export const getFlightAirports =(params) => request(withQuery("/api/flights/airports", params));
+export const getTourCategoryList = () => request("/api/tour-categories");
+export const createTourCategory = (item) => request("/api/tour-categories", { method: "POST", body: JSON.stringify(item) });
+export const updateTourCategory = (id, item) => request(`/api/tour-categories/${id}`, { method: "PUT", body: JSON.stringify(item) });
+export const deleteTourCategory = (id) => request(`/api/tour-categories/${id}`, { method: "DELETE" });
 export const getTourCategories =() => request("/api/tours/categories");
 export const getTour = (id) => request(`/api/tours/${id}`).then(mapTour);
 export const listTours = () => request("/api/tours");
@@ -203,6 +222,7 @@ export const getBooking = (id) => request(`/api/bookings/${id}`).then(mapBooking
 export const deleteBooking = (id) => request(`/api/bookings/${id}`, { method: "DELETE" });
 export const createBooking = (booking) => request("/api/bookings", { method: "POST", body: JSON.stringify(booking) }).then(mapBooking);
 export const getTripSuggestions = (params) => request(withQuery("/api/trip-suggestions", params));
+export const getMyCoupons = () => request("/api/discounts/mine");
 export const getActiveDiscounts = () => request("/api/discounts/active");
 export const applyCouponCode = (code) => request(`/api/discounts/coupon/${encodeURIComponent(String(code || "").trim())}`);
 export const getDiscounts = () => request("/api/discounts");
@@ -246,7 +266,11 @@ export const createSiteAdvantage = (item) => request("/api/site/advantages", { m
 export const updateSiteAdvantage = (id, item) => request(`/api/site/advantages/${id}`, { method: "PUT", body: JSON.stringify(item) });
 export const deleteSiteAdvantage = (id) => request(`/api/site/advantages/${id}`, { method: "DELETE" });
 
-export const getSeasonalPrices = () => request("/api/seasonal-prices");
+export const getAirlines = () => request("/api/airlines");
+export const createAirline = (item) => request("/api/airlines", { method: "POST", body: JSON.stringify(item) });
+export const updateAirline = (id, item) => request(`/api/airlines/${id}`, { method: "PUT", body: JSON.stringify(item) });
+export const deleteAirline = (id) => request(`/api/airlines/${id}`, { method: "DELETE" });
+export const getSeasonalPrices =() => request("/api/seasonal-prices");
 export const createSeasonalPrice = (item) => request("/api/seasonal-prices", { method: "POST", body: JSON.stringify(item) });
 export const updateSeasonalPrice = (id, item) => request(`/api/seasonal-prices/${id}`, { method: "PUT", body: JSON.stringify(item) });
 export const deleteSeasonalPrice = (id) => request(`/api/seasonal-prices/${id}`, { method: "DELETE" });

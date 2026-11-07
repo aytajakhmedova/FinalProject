@@ -23,11 +23,14 @@ import {
   FaFileAlt,
   FaGlobe,
   FaCity,
-  FaChartLine
+  FaChartLine,
+  FaTags
 } from 'react-icons/fa';
 import logoImage from '../../assets/images/AE_HOTEL_transparent_logo.png';
 import './AdminLayout.css';
 import { useLanguage } from '../../context/LanguageContext';
+import { useSiteContent } from '../../context/SiteContentContext';
+import { resolveImage } from '../../api/client';
 import { clearAuthSession, getAuthUser, hasRole, isAdminSession } from '../../api/auth';
 
 const ALL_MENU = [
@@ -38,6 +41,8 @@ const ALL_MENU = [
   { path: '/admin/rezervasiyalar', icon: <FaCalendarCheck />, labelKey: 'admin.bookings', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
   { path: '/admin/teqvim', icon: <FaCalendarAlt />, labelKey: 'admin.occupancy', roles: ['SuperAdmin', 'Admin', 'HotelManager', 'Receptionist'] },
   { path: '/admin/ucuslar', icon: <FaPlane />, label: 'Uçuşlar', roles: ['SuperAdmin', 'Admin'] },
+  { path: '/admin/aviasirketler', icon: <FaPlane />, label: 'Aviaşirkətlər', roles: ['SuperAdmin', 'Admin'] },
+  { path: '/admin/tur-kateqoriyalari', icon: <FaTags />, label: 'Tur kateqoriyaları', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/turlar', icon: <FaMapMarkedAlt />, label: 'Turlar', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/paketler', icon: <FaPercentage />, label: 'Paketlər və Endirimlər', roles: ['SuperAdmin', 'Admin'] },
   { path: '/admin/reyler', icon: <FaStar />, label: 'Rəylər', roles: ['SuperAdmin', 'Admin', 'HotelManager'] },
@@ -62,6 +67,9 @@ const ROLE_LABELS = {
 
 const AdminLayout = () => {
   const { t } = useLanguage();
+  // The logo is managed in the site settings; the bundled file is only a fallback.
+  const { content: siteContent } = useSiteContent();
+  const logoSrc = resolveImage(siteContent?.settings?.logoUrl) || logoImage;
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -121,7 +129,7 @@ const AdminLayout = () => {
       <aside className={`admin-sidebar ${sidebarOpen ? 'open' : 'collapsed'} ${mobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <div className="sidebar-logo">
-            <img className="logo-img" src={logoImage} alt="AEHotel" />
+            <img className="logo-img" src={logoSrc} alt="AEHotel" />
             {sidebarOpen && (
               <span className="logo-text">
                 {hasRole('Receptionist') && !hasRole('SuperAdmin', 'Admin', 'HotelManager')

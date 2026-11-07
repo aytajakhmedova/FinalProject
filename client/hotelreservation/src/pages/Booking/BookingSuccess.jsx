@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation, Navigate } from 'react-router-dom';
 import { FaCheckCircle, FaHotel, FaCalendarAlt, FaUsers, FaPlane, FaMapMarkedAlt } from 'react-icons/fa';
 import { formatDate } from '../../data/roomsData';
+import { CABIN_LABELS } from '../../api/client';
 import { printBookingReceipt } from '../../utils/printReceipt';
 import './BookingSuccess.css';
 
@@ -53,7 +54,7 @@ const BookingSuccess = () => {
             <div key={extra.id}>
               {extra.bookingType === 'flight' ? <FaPlane /> : <FaMapMarkedAlt />}
               <span>
-                {extra.bookingType === 'flight' ? extra.flightNumber || extra.itemName : extra.tourName || extra.itemName}
+                {extra.bookingType === 'flight' ? [extra.flightNumber || extra.itemName, CABIN_LABELS[extra.cabinClass]].filter(Boolean).join(' · ') : extra.tourName || extra.itemName}
                 {' · '}
                 {extra.confirmationNumber || extra.code}
                 {' · ₼'}

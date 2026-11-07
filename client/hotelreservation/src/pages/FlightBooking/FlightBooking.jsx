@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaPlane, FaInfoCircle, FaUserPlus, FaMinus, FaPlus } from 'react-icons/fa';
 import { applyCouponCode, createBooking } from '../../api/client';
+import CabinPicker from '../../components/common/CabinPicker/CabinPicker';
 import { getAuthToken } from '../../api/auth';
 import './FlightBooking.css';
 
@@ -58,7 +59,14 @@ const FlightBooking = () => {
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const baseFare = (Number(flight.price) || 0) * passengers.length;
+  // The class is chosen by the guest: price and free seats are those of that class.
+  const [cabinClass, setCabinClass] = useState(flight.cabinClass || '');
+  const cabinList = flight.cabins || [];
+  const cabin = cabinList.find((item) => item.cabinClass === cabinClass) || null;
+  const farePrice = cabin ? cabin.price : Number(flight.price) || 0;
+  const seatsInClass = cabin ? cabin.seatsAvailable : flight.seatsAvailable;
+
+  const baseFare = farePrice * passengers.length;
   const totalFare = Math.max(0, Math.round((baseFare - discount) * 100) / 100);
 
   const addPassenger = () => {
@@ -205,8 +213,8 @@ const FlightBooking = () => {
     }
 
     // Check available seats
-    if (flight.seatsAvailable && passengers.length > flight.seatsAvailable) {
-      setFormError(`Yalnız ${flight.seatsAvailable} boş yer var.`);
+    if (seatsInClass && passengers.length > seatsInClass) {
+      setFormError(`Seçilən sinifdə yalnız ${seatsInClass} boş yer var.`);
       return;
     }
 
@@ -215,6 +223,7 @@ const FlightBooking = () => {
       const booking = await createBooking({
         bookingType: 'flight',
         flightId: flight.id,
+        cabinClass: cabinClass || undefined,
         guests: passengers.length,
         guestName,
         guestEmail: contactInfo.email,
@@ -268,8 +277,11 @@ const FlightBooking = () => {
               </div>
 
               <div className="flight-class-badge">
-                Səyahət Sinfi: {flight.class}
+                Səyahət Sinfi: {cabin ? cabin.label : flight.class}
               </div>
+              {cabinList.length > 1 && (
+                <CabinPicker cabins={cabinList} value={cabinClass} party={passengers.length} onChange={setCabinClass} />
+              )}
 
               {/* Flight Details */}
               <div className="flight-legs">

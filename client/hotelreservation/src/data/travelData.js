@@ -12,14 +12,5 @@ export const countryImages = (hotels = []) => {
   return images;
 };
 
-export const RATES = {
-  AZN: { label: 'AZN', symbol: '₼', rate: 1 },
-  USD: { label: 'USD', symbol: '$', rate: 1 / 1.7 },
-  EUR: { label: 'EUR', symbol: '€', rate: 1 / 1.85 },
-};
-
-export const formatPrice = (aznAmount, currency = 'AZN') => {
-  const cfg = RATES[currency] || RATES.AZN;
-  const value = Math.round(aznAmount * cfg.rate);
-  return `${cfg.symbol}${value}`;
-};
+// Hotel prices are stored and shown in AZN.
+export const formatPrice = (aznAmount) => `₼${Math.round(aznAmount)}`;

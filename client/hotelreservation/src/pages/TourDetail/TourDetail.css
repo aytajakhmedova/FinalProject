@@ -485,3 +485,42 @@
     height: 60px;
   }
 }
+
+.tour-date-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.tour-date-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.75rem 1rem;
+  min-width: 150px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+}
+
+.tour-date-chip span {
+  font-size: 0.85rem;
+  color: #22c55e;
+}
+
+.tour-date-chip.active {
+  border-color: #8B5A3C;
+}
+
+.tour-date-chip.full {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tour-date-chip.full span {
+  color: #ef4444;
+}

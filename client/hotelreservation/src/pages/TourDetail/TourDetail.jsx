@@ -30,6 +30,16 @@ const TourDetail = () => {
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
 
+  // Past dates cannot be booked, so they are not offered.
+  const todayIso = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const remainingOn = (date) => {
+    const found = (tour?.availability || []).find((item) => String(item.date).slice(0, 10) === String(date).slice(0, 10));
+    return found ? found.remainingPlaces : null;
+  };
+  const selectedRemaining = selectedDate ? remainingOn(selectedDate) : null;
+  const upcomingAvailability = (tour?.availability || []).filter((item) => String(item.date).slice(0, 10) >= todayIso);
+  const maxSelectable = selectedRemaining == null ? (tour?.maxGuests || 1) : Math.min(tour?.maxGuests || 1, selectedRemaining);
+
   useEffect(() => {
     let active = true;
     getTour(id)
@@ -97,9 +107,11 @@ const TourDetail = () => {
       return;
     }
     
-    // Check available capacity (if backend provides this info)
-    if (tour.capacity && guestCount > tour.capacity) {
-      setBookingError(`Bu tur üçün yalnız ${tour.capacity} yer qalıb.`);
+    // Places left on the chosen date (every guest's bookings counted)
+    if (selectedRemaining != null && guestCount > selectedRemaining) {
+      setBookingError(selectedRemaining === 0
+        ? 'Bu tarix üçün yer qalmayıb.'
+        : `Bu tarix üçün yalnız ${selectedRemaining} yer qalıb.`);
       return;
     }
 
@@ -142,6 +154,8 @@ const TourDetail = () => {
       })
       .catch((error) => {
         setBookingError(error.message || 'Rezervasiya alınmadı.');
+        // Someone else may have taken the places meanwhile: show the current numbers.
+        getTour(id).then(setTour).catch(() => {});
       })
       .finally(() => setBooking(false));
   };
@@ -201,10 +215,41 @@ const TourDetail = () => {
                 <FaUsers className="info-icon" />
                 <div>
                   <span className="info-label">Qrup ölçüsü</span>
-                  <span className="info-value">{tour.minGuests}-{tour.maxGuests} nəfər</span>
+                  <span className="info-value">
+                    {tour.minGuests}-{tour.maxGuests} nəfər
+                    {selectedRemaining != null && ` · qalan yer: ${selectedRemaining}`}
+                  </span>
                 </div>
               </div>
             </div>
+
+            {/* Dates and the places still free on each, counted over every guest's bookings */}
+            {upcomingAvailability.length > 0 && (
+              <section className="tour-section">
+                <h2 className="section-title">Tarixlər və boş yerlər</h2>
+                <div className="tour-date-chips">
+                  {upcomingAvailability.map((item) => {
+                    const [year, month, day] = String(item.date).slice(0, 10).split('-');
+                    const full = item.remainingPlaces === 0;
+                    return (
+                      <button
+                        type="button"
+                        key={item.date}
+                        className={`tour-date-chip ${full ? 'full' : ''} ${selectedDate === item.date ? 'active' : ''}`}
+                        disabled={full}
+                        onClick={() => {
+                          setSelectedDate(item.date);
+                          setGuestCount((current) => Math.min(Math.max(current, tour.minGuests), Math.max(item.remainingPlaces, tour.minGuests)));
+                        }}
+                      >
+                        <strong>{`${day}.${month}.${year}`}</strong>
+                        <span>{full ? 'Yer qalmayıb' : `${item.remainingPlaces} / ${tour.maxGuests} yer qalıb`}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             {/* Description */}
             <section className="tour-section">
@@ -298,17 +343,23 @@ const TourDetail = () => {
                   </label>
                   <Select
                     value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
+                    onChange={(e) => {
+                      const date = e.target.value;
+                      setSelectedDate(date);
+                      const left = date ? remainingOn(date) : null;
+                      if (left != null && left > 0) setGuestCount((current) => Math.min(current, left));
+                    }}
                     className="form-select"
                     required
                   >
                     <option value="">Tarix seçin</option>
-                    {tour.availableDates.map(date => {
+                    {tour.availableDates.filter((date) => String(date).slice(0, 10) >= todayIso).map(date => {
                       const [year, month, day] = String(date).slice(0, 10).split('-');
                       const label = year && month && day ? `${day}.${month}.${year}` : date;
+                      const left = remainingOn(date);
                       return (
-                        <option key={date} value={date}>
-                          {label}
+                        <option key={date} value={date} disabled={left === 0}>
+                          {label}{left == null ? '' : left === 0 ? ' — yer qalmayıb' : ` — ${left} yer qalıb`}
                         </option>
                       );
                     })}
@@ -327,12 +378,19 @@ const TourDetail = () => {
                     className="form-select"
                   >
                     {Array.from(
-                      { length: tour.maxGuests - tour.minGuests + 1 },
+                      { length: Math.max(0, maxSelectable - tour.minGuests + 1) },
                       (_, i) => tour.minGuests + i
                     ).map(num => (
                       <option key={num} value={num}>{num} nəfər</option>
                     ))}
                   </Select>
+                  {selectedRemaining != null && (
+                    <small className="form-hint">
+                      {selectedRemaining === 0
+                        ? 'Bu tarix üçün yer qalmayıb.'
+                        : `Bu tarixdə qalan yer: ${selectedRemaining} / ${tour.maxGuests}`}
+                    </small>
+                  )}
                 </div>
 
                 {/* Price Summary */}

@@ -156,7 +156,7 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
                 <p className="hotel-description">{hotel.description}</p>
                 <div className="info-meta">
                   <span><FaStar /> {hotel.rating}</span>
-                  <strong>{formatPrice(hotel.pricePerNight, currency)} {t('feat.perNight')}</strong>
+                  <strong>{formatPrice(hotel.pricePerNight)} {t('feat.perNight')}</strong>
                 </div>
                 <button
                   className="discover-btn"

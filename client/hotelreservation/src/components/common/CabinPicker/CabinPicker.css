@@ -1,0 +1,41 @@
+.cabin-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.cabin-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  min-width: 110px;
+  padding: 0.5rem 0.8rem;
+  background: var(--bg-card, transparent);
+  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.15));
+  border-radius: 10px;
+  color: var(--text-primary, inherit);
+  cursor: pointer;
+  text-align: left;
+}
+
+.cabin-chip span {
+  color: #8B5A3C;
+  font-weight: 700;
+}
+
+.cabin-chip small {
+  font-size: 0.75rem;
+  color: var(--text-muted, #9ca3af);
+}
+
+.cabin-chip.active {
+  border-color: #8B5A3C;
+  box-shadow: 0 0 0 1px #8B5A3C;
+}
+
+.cabin-chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaCheck, FaCompass, FaCreditCard, FaGlobeEurope, FaHotel, FaInfoCircle, FaLock, FaPlane, FaRulerCombined, FaShieldAlt, FaUserFriends } from 'react-icons/fa';
 import { formatDate } from '../../data/roomsData';
-import { applyCouponCode, createBooking, getActiveDiscounts, getTripCountries, getTripSuggestionsByCountry } from '../../api/client';
+import CabinPicker from '../../components/common/CabinPicker/CabinPicker';
+import { applyCouponCode, createBooking, getActiveDiscounts, getTours, getTripCountries, getTripSuggestionsByCountry } from '../../api/client';
 import roomPhoto from '../../assets/images/otaq2.jpg';
 import { useLanguage } from '../../context/LanguageContext';
 import './Booking.css';
@@ -86,6 +87,8 @@ const Booking = () => {
   const [offersError, setOffersError] = useState('');
   const [discounts, setDiscounts] = useState([]);
   const [selectedFlightId, setSelectedFlightId] = useState(null);
+  // The travel class picked on each suggested flight (flight id -> class)
+  const [flightCabin, setFlightCabin] = useState({});
   const [selectedTourId, setSelectedTourId] = useState(null);
   const [couponInput, setCouponInput] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
@@ -140,14 +143,11 @@ const Booking = () => {
     getTripSuggestionsByCountry({ country: travelCountry, guests })
       .then((result) => {
         if (!active) return;
-        setSuggestions({
-          flights: uniqueBy(result.flights, (item) => item.id),
-          tours: uniqueBy(result.tours, (item) => item.id),
-        });
+        setSuggestions((prev) => ({ ...prev, flights: uniqueBy(result.flights, (item) => item.id) }));
       })
       .catch((error) => {
         if (!active) return;
-        setSuggestions({ flights: [], tours: [] });
+        setSuggestions((prev) => ({ ...prev, flights: [] }));
         setOffersError(error.message || 'Uçuş və tur məlumatları yüklənmədi.');
       })
       .finally(() => {
@@ -157,6 +157,22 @@ const Booking = () => {
       active = false;
     };
   }, [travelCountry, guests]);
+
+  // Tours are tied to the hotel being booked: the guest sees only that hotel's tours and may add one.
+  useEffect(() => {
+    if (!hotel?.id) return undefined;
+    let active = true;
+    getTours({ hotelId: hotel.id, guests })
+      .then((items) => {
+        if (active) setSuggestions((prev) => ({ ...prev, tours: uniqueBy(items, (item) => item.id) }));
+      })
+      .catch(() => {
+        if (active) setSuggestions((prev) => ({ ...prev, tours: [] }));
+      });
+    return () => {
+      active = false;
+    };
+  }, [hotel?.id, guests]);
 
 useEffect(() => {
     let active = true;
@@ -190,13 +206,19 @@ useEffect(() => {
   }
 
   const selectedFlight = suggestions.flights.find((item) => item.id === selectedFlightId) || null;
+  // Price and class of a flight as the guest chose it; the server's choice (cheapest) is the default.
+  const cabinFor = (flight) => {
+    const wanted = flightCabin[flight.id] || flight.cabinClass;
+    return (flight.cabins || []).find((item) => item.cabinClass === wanted)
+      || { cabinClass: flight.cabinClass, price: Number(flight.price), seatsAvailable: flight.seatsAvailable };
+  };
   const selectedTour = suggestions.tours.find((item) => item.id === selectedTourId) || null;
   const combo = comboKey(selectedFlight, selectedTour);
   const activeRule = discounts.find((item) => item.combo === combo && item.isActive) || null;
   const discountPercent = Number(activeRule?.percent) || 0;
   const discountAmount = Number(activeRule?.amount) || 0;
   const hotelList = Number(priceBreakdown?.total) || 0;
-  const flightList = selectedFlight ? Number(selectedFlight.price) * Number(guests) : 0;
+  const flightList = selectedFlight ? Number(cabinFor(selectedFlight).price) * Number(guests) : 0;
   const tourList = selectedTour ? Number(selectedTour.price) * Number(guests) : 0;
   const listTotal = hotelList + flightList + tourList;
   const percentOff = discountPercent > 0 ? listTotal - applyPercent(listTotal, discountPercent) : 0;
@@ -230,9 +252,8 @@ useEffect(() => {
     setTravelCountry(value);
     setOffersLoading(Boolean(value));
     setOffersError('');
-    setSuggestions({ flights: [], tours: [] });
+    setSuggestions((prev) => ({ flights: [], tours: prev.tours }));
     setSelectedFlightId(null);
-    setSelectedTourId(null);
   };
 
   const handleApplyCoupon = async (rawValue) => {
@@ -352,6 +373,7 @@ useEffect(() => {
           extras.push(await createBooking({
             bookingType: 'flight',
             flightId: selectedFlight.id,
+            cabinClass: cabinFor(selectedFlight).cabinClass,
             travelCountry,
             bundleCombo: combo,
             couponCode: couponForBooking?.code || undefined,
@@ -603,8 +625,9 @@ useEffect(() => {
               </div>
             )}
             {offersError && <p className="pay-error">{offersError}</p>}
-            {travelCountry && (
+            {(travelCountry || suggestions.tours.length > 0) && (
             <div className="enrich-grid">
+              {travelCountry && (
               <section className="enrich-panel" aria-label="Uçuş bileti">
                 <header className="enrich-panel-head">
                   <span className="enrich-panel-icon"><FaPlane /></span>
@@ -655,9 +678,16 @@ useEffect(() => {
                           <em>{formatDate(String(flight.departureAt).slice(0, 10))}</em>
                         </div>
 
+                        <CabinPicker
+                          cabins={flight.cabins}
+                          value={cabinFor(flight).cabinClass}
+                          party={Number(guests) || 1}
+                          onChange={(next) => setFlightCabin((prev) => ({ ...prev, [flight.id]: next }))}
+                        />
+
                         <div className="offer-foot">
                           <div className="offer-price">
-                            <strong>{fmt(Number(flight.price) * Number(guests))}</strong>
+                            <strong>{fmt(Number(cabinFor(flight).price) * Number(guests))}</strong>
                             <small>{guests} nəfər</small>
                           </div>
                           <button
@@ -674,22 +704,21 @@ useEffect(() => {
                   })}
                 </div>
               </section>
+              )}
 
+              {suggestions.tours.length > 0 && (
               <section className="enrich-panel" aria-label="Turlar">
                 <header className="enrich-panel-head">
                   <span className="enrich-panel-icon"><FaCompass /></span>
                   <div>
                     <h3>Turlar</h3>
-                    <p>{travelCountry} üzrə mövcud turlar</p>
+                    <p>{hotel.title || hotel.name} üçün turlar</p>
                   </div>
                 </header>
 
                 <div className="enrich-list">
                   {offersLoading && <p className="enrich-empty">Yüklənir...</p>}
-                  {!offersLoading && suggestions.tours.length === 0 && (
-                    <p className="enrich-empty">Bu ölkə üçün uyğun tur tapılmadı.</p>
-                  )}
-                  {!offersLoading && suggestions.tours.map((tour) => {
+                  {suggestions.tours.map((tour) => {
                     const active = selectedTourId === tour.id;
                     return (
                       <article key={tour.id} className={`offer-card tour-card ${active ? 'active' : ''}`}>
@@ -723,6 +752,7 @@ useEffect(() => {
                   })}
                 </div>
               </section>
+              )}
             </div>
             )}
           </div>

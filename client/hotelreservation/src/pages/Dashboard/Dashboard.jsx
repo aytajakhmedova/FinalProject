@@ -3,7 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { FaCalendarAlt, FaCheckCircle, FaClipboardList } from 'react-icons/fa';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAuthToken } from '../../api/auth';
-import { deleteBooking, getHotels, getMyBookings, getMyReviews } from '../../api/client';
+import { CABIN_LABELS, deleteBooking, getHotels, getMyBookings, getMyCoupons, getMyReviews } from '../../api/client';
 import { printBookingReceipt } from '../../utils/printReceipt';
 import './Dashboard.css';
 
@@ -18,7 +18,7 @@ const bookingTitle = (reservation) => {
 
 const bookingSubtitle = (reservation) => {
   const type = bookingTypeOf(reservation);
-  if (type === 'flight') return reservation.flightNumber || reservation.itemName;
+  if (type === 'flight') return [reservation.flightNumber || reservation.itemName, CABIN_LABELS[reservation.cabinClass]].filter(Boolean).join(' · ');
   if (type === 'tour') return reservation.tourName || reservation.itemName;
   return reservation.roomType || reservation.roomName || reservation.itemName;
 };
@@ -71,6 +71,8 @@ const Dashboard = () => {
   const { t } = useLanguage();
   const token = getAuthToken();
   const [activeTab, setActiveTab] = useState('all');
+  // Personal coupons (such as the welcome coupon sent by email) that can still be used
+  const [coupons, setCoupons] = useState([]);
   const [user, setUser] = useState(null);
   const [reservations, setReservations] = useState([]);
   const [reviewedIds, setReviewedIds] = useState(() => new Set());
@@ -116,6 +118,10 @@ const Dashboard = () => {
       setLoading(false);
     }
   }, [t]);
+
+  useEffect(() => {
+    getMyCoupons().then(setCoupons).catch(() => setCoupons([]));
+  }, []);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -202,6 +208,22 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Cards */}
+        {coupons.map((coupon) => (
+          <div key={coupon.id} className={`dashboard-coupon ${coupon.usedAt || (coupon.endsAt && new Date(coupon.endsAt) < new Date()) ? 'used' : ''}`}>
+            <div>
+              <strong>{coupon.name}</strong>
+              <span>
+                {coupon.usedAt
+                  ? 'Bu kupon istifadə olunub və yenidən işləməyəcək.'
+                  : coupon.endsAt && new Date(coupon.endsAt) < new Date()
+                    ? 'Bu kuponun müddəti bitib.'
+                    : `${coupon.endsAt ? new Date(coupon.endsAt).toLocaleString('az-AZ', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' tarixinədək etibarlıdır. ' : ''}Rezervasiya zamanı ödəniş səhifəsində kupon xanasına yazın. Yalnız bir dəfə istifadə olunur.`}
+              </span>
+            </div>
+            <code>{coupon.code}</code>
+          </div>
+        ))}
+
         <div className="dashboard-stats">
           <div className="stat-card stat-upcoming">
             <div className="stat-icon">

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FaFilter, FaTimesCircle } from 'react-icons/fa';
-import { getFlights, getFlightAirports } from '../../api/client';
+import CabinPicker from '../../components/common/CabinPicker/CabinPicker';
+import { getAirlines, getFlights, getFlightAirports, CABIN_LABELS } from '../../api/client';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { DEFAULT_FLIGHT_GUIDELINES } from '../../constants/flightGuidelines';
 import './FlightResults.css';
@@ -26,6 +27,8 @@ const FlightResults = () => {
   const [selectedAirports, setSelectedAirports] = useState([]);
 
   const [flights, setFlights] = useState([]);
+  // The class picked on each flight card (flight id -> class); the server's choice is the default.
+  const [cabinChoice, setCabinChoice] = useState({});
   const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
@@ -49,7 +52,16 @@ const FlightResults = () => {
     };
   }, [searchParams.from, searchParams.to, searchParams.departure, searchParams.class]);
 
-  const airlines = [...new Set(flights.map((flight) => flight.airline))];
+  // The airline filter lists the airlines admins created, not just the ones in the current results.
+  const [airlineList, setAirlineList] = useState([]);
+  useEffect(() => {
+    getAirlines().then(setAirlineList).catch(() => setAirlineList([]));
+  }, []);
+  const airlines = airlineList.map((airline) => airline.name);
+  // Stop options are the ones the found flights actually have, fewest stops first.
+  const stopOptions = [...new Map(flights.map((flight) => [flight.stopCount, flight.stops])).entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([, label]) => label);
 
   // Airports and their flight counts are calculated by the server for the same search.
   const [airports, setAirports] = useState([]);
@@ -139,7 +151,7 @@ const FlightResults = () => {
               {/* Stops Filter */}
               <div className="filter-section">
                 <h4 className="filter-title">Dayanacaqlar</h4>
-                {['Birbaşa', '1 dayanacaq', '2+ dayanacaq'].map(stop => (
+                {stopOptions.map(stop => (
                   <label key={stop} className="filter-checkbox">
                     <input
                       type="checkbox"
@@ -189,7 +201,7 @@ const FlightResults = () => {
               <div className="results-header">
                 <h2>{filteredFlights.length} Uçuş Mövcuddur</h2>
                 <p className="results-date">
-                  {searchParams.departure} • 1 dayanacaq
+                  {searchParams.departure}
                 </p>
               </div>
 
@@ -212,7 +224,12 @@ const FlightResults = () => {
 
               {/* Flight Cards */}
               <div className="flights-grid">
-                {filteredFlights.map(flight => (
+                {filteredFlights.map(flight => {
+                  const chosenClass = cabinChoice[flight.id] || flight.cabinClass;
+                  const chosen = (flight.cabins || []).find((item) => item.cabinClass === chosenClass)
+                    || { cabinClass: flight.cabinClass, price: flight.price, seatsAvailable: flight.seatsLeft };
+                  const party = Number(searchParams.travelers) || 1;
+                  return (
                   <div key={flight.id} className="flight-card">
                     <div className="flight-card-header">
                       <div className="airline-info">
@@ -222,7 +239,7 @@ const FlightResults = () => {
                           <div className="flight-number">{flight.flightNumber}</div>
                         </div>
                       </div>
-                      <div className="travel-class">{flight.class}</div>
+                      <div className="travel-class">{CABIN_LABELS[chosen.cabinClass] || flight.class}</div>
                     </div>
 
                     <div className="flight-card-body">
@@ -252,8 +269,14 @@ const FlightResults = () => {
 
                     <div className="flight-card-footer">
                       <div className="flight-meta">
-                        <span className={`seats-left ${flight.seatsLeft < 10 ? 'low' : ''}`}>
-                          {flight.seatsLeft < 10 ? `Yalnız ${flight.seatsLeft} yer qalıb` : `${flight.seatsLeft} yer mövcuddur`}
+                        <CabinPicker
+                          cabins={flight.cabins}
+                          value={chosen.cabinClass}
+                          party={party}
+                          onChange={(next) => setCabinChoice((prev) => ({ ...prev, [flight.id]: next }))}
+                        />
+                        <span className={`seats-left ${chosen.seatsAvailable < 10 ? 'low' : ''}`}>
+                          {chosen.seatsAvailable < 10 ? `Yalnız ${chosen.seatsAvailable} yer qalıb` : `${chosen.seatsAvailable} yer mövcuddur`}
                         </span>
                         <span className={`refund-status ${flight.refundable ? 'refundable' : 'non-refundable'}`}>
                           {flight.refundable ? 'Geri qaytarıla bilər' : 'Geri qaytarılmır'}
@@ -262,11 +285,21 @@ const FlightResults = () => {
                       
                       <div className="flight-price-action">
                         <div className="flight-price">
-                          <span className="price-amount">₼{flight.price}</span>
+                          <span className="price-amount">₼{chosen.price}</span>
                         </div>
                         <button 
                           className="btn-book-flight"
-                          onClick={() => navigate('/flight-booking', { state: { flight } })}
+                          onClick={() => navigate('/flight-booking', {
+                            state: {
+                              flight: {
+                                ...flight,
+                                cabinClass: chosen.cabinClass,
+                                class: CABIN_LABELS[chosen.cabinClass] || flight.class,
+                                price: chosen.price,
+                                seatsAvailable: chosen.seatsAvailable,
+                              },
+                            },
+                          })}
                         >
                           Rezerv Et
                         </button>
@@ -274,7 +307,8 @@ const FlightResults = () => {
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               {filteredFlights.length === 0 && (

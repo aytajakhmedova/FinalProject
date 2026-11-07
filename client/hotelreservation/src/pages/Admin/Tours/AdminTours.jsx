@@ -2,8 +2,11 @@ import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { createTour, deleteTour, listTours, updateTour, uploadMedia } from '../../../api/client';
+import { createTour, deleteTour, getHotels, getTourCategoryList, listTours, updateTour, uploadMedia } from '../../../api/client';
 import '../Hotels/AdminHotels.css';
+
+// The fixed difficulty levels; the server accepts only these.
+const DIFFICULTIES = ['Asan', 'Orta', 'Çətin'];
 
 const splitList = (value) => (Array.isArray(value)
   ? value
@@ -43,6 +46,7 @@ const formatItinerary = (value) => {
 const emptyTour = () => ({
   name: '',
   destination: '',
+  hotelId: '',
   rating: 0,
   reviewCount: 0,
   duration: '',
@@ -63,6 +67,7 @@ const emptyTour = () => ({
 const toTourRequest = (tour) => ({
   name: (tour.name || '').trim(),
   destination: (tour.destination || '').trim(),
+  hotelId: Number(tour.hotelId) || null,
   rating: Number(tour.rating) || 0,
   reviewCount: Number(tour.reviewCount) || 0,
   duration: (tour.duration || '').trim(),
@@ -103,6 +108,8 @@ const AdminTours = () => {
   const [saveError, setSaveError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [dateInput, setDateInput] = useState('');
+  const [hotels, setHotels] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
 
   const loadTours = (silent = false) => {
     if (!silent) setLoading(true);
@@ -122,6 +129,8 @@ const AdminTours = () => {
 
   useEffect(() => {
     loadTours();
+    getHotels().then(setHotels).catch(() => setHotels([]));
+    getTourCategoryList().then(setCategoryList).catch(() => setCategoryList([]));
   }, []);
 
   const handleAddDate = () => {
@@ -144,12 +153,10 @@ const AdminTours = () => {
   };
 
   const categories = useMemo(() => (
-    [...new Set(tours.map((tour) => tour.category).filter(Boolean))].sort()
-  ), [tours]);
+    categoryList.map((category) => category.name)
+  ), [categoryList]);
 
-  const difficulties = useMemo(() => (
-    [...new Set(tours.map((tour) => tour.difficulty).filter(Boolean))].sort()
-  ), [tours]);
+  const difficulties = DIFFICULTIES;
 
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -160,6 +167,7 @@ const AdminTours = () => {
       const haystack = [
         tour.name,
         tour.destination,
+        tour.hotelName,
         tour.category,
         tour.difficulty,
         tour.duration,
@@ -226,12 +234,17 @@ const AdminTours = () => {
               />
             </label>
             <label>
-              İstiqamət
-              <input
-                value={editing.destination}
-                onChange={(e) => setEditing({ ...editing, destination: e.target.value })}
-                maxLength={200}
-              />
+              Otel
+              <Select
+                value={editing.hotelId ? String(editing.hotelId) : ''}
+                onChange={(e) => setEditing({ ...editing, hotelId: e.target.value })}
+                required
+              >
+                <option value="">Otel seçin</option>
+                {hotels.map((hotel) => (
+                  <option key={hotel.id} value={hotel.id}>{hotel.title || hotel.name} — {hotel.city}</option>
+                ))}
+              </Select>
             </label>
             <label>
               Qiymət
@@ -255,19 +268,29 @@ const AdminTours = () => {
             </label>
             <label>
               Kateqoriya
-              <input
-                value={editing.category}
+              <Select
+                value={editing.category || ''}
                 onChange={(e) => setEditing({ ...editing, category: e.target.value })}
-                maxLength={100}
-              />
+                required
+              >
+                <option value="">{categoryList.length ? 'Kateqoriya seçin' : 'Əvvəlcə Tur kateqoriyaları bölməsində əlavə edin'}</option>
+                {categoryList.map((category) => (
+                  <option key={category.id} value={category.name}>{category.name}</option>
+                ))}
+              </Select>
             </label>
             <label>
               Çətinlik
-              <input
-                value={editing.difficulty}
+              <Select
+                value={editing.difficulty || ''}
                 onChange={(e) => setEditing({ ...editing, difficulty: e.target.value })}
-                maxLength={50}
-              />
+                required
+              >
+                <option value="">Çətinlik seçin</option>
+                {DIFFICULTIES.map((level) => (
+                  <option key={level} value={level}>{level}</option>
+                ))}
+              </Select>
             </label>
             <label>
               Min qonaq
@@ -502,6 +525,7 @@ const AdminTours = () => {
               <thead>
                 <tr>
                   <th>Tur adı</th>
+                  <th>Otel</th>
                   <th>İstiqamət</th>
                   <th>Qiymət</th>
                   <th>Tarix</th>
@@ -512,7 +536,7 @@ const AdminTours = () => {
               <tbody>
                 {editing && !editing.id && (
                   <tr className="edit-row">
-                    <td colSpan="6">{editForm}</td>
+                    <td colSpan="7">{editForm}</td>
                   </tr>
                 )}
                 {visible.map((tour) => (
@@ -522,6 +546,7 @@ const AdminTours = () => {
                       <strong>{tour.name}</strong>
                       <div className="muted">{tour.category || 'Kateqoriya yoxdur'}</div>
                     </td>
+                    <td>{tour.hotelName || '—'}</td>
                     <td>{tour.destination || '—'}</td>
                     <td>₼{Number(tour.price || 0).toLocaleString('az-AZ', { maximumFractionDigits: 0 })}</td>
                     <td>
@@ -546,14 +571,14 @@ const AdminTours = () => {
                   </tr>
                   {editing?.id === tour.id && (
                     <tr className="edit-row">
-                      <td colSpan="6">{editForm}</td>
+                      <td colSpan="7">{editForm}</td>
                     </tr>
                   )}
                   </Fragment>
                 ))}
                 {visible.length === 0 && (
                   <tr>
-                    <td colSpan="6">{tours.length === 0 ? 'Tur yoxdur' : 'Uyğun tur tapılmadı'}</td>
+                    <td colSpan="7">{tours.length === 0 ? 'Tur yoxdur' : 'Uyğun tur tapılmadı'}</td>
                   </tr>
                 )}
               </tbody>
