@@ -186,6 +186,10 @@ export const createFlight = (flight) => request("/api/flights", { method: "POST"
 export const updateFlight = (id, flight) => request(`/api/flights/${id}`, { method: "PUT", body: JSON.stringify(flight) });
 export const deleteFlight = (id) => request(`/api/flights/${id}`, { method: "DELETE" });
 export const getTours = (params) => request(withQuery("/api/tours", params)).then((items) => items.map(mapTour));
+export const getFeaturedReviews = (limit = 6) => request(`/api/reviews/featured?limit=${limit}`);
+export const getReviewSummary = () => request("/api/reviews/summary");
+export const getFlightAirports = (params) => request(withQuery("/api/flights/airports", params));
+export const getTourCategories =() => request("/api/tours/categories");
 export const getTour = (id) => request(`/api/tours/${id}`).then(mapTour);
 export const listTours = () => request("/api/tours");
 export const createTour = (tour) => request("/api/tours", { method: "POST", body: JSON.stringify(tour) });

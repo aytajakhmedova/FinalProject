@@ -94,7 +94,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (serviceType === 'hotel' && (!checkIn || !checkOut)) {
+    if (serviceType === 'hotel' && Boolean(checkIn) !== Boolean(checkOut)) {
       setError(t('search.needDates'));
       return;
     }
@@ -191,7 +191,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
                 min={todayISO()}
                 onChange={handleCheckInChange}
                 placeholder={t('search.checkIn')}
-                required
+                required={serviceType === 'flight'}
               />
             )}
           </div>
@@ -211,7 +211,7 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
               onChange={(e) => setCheckOut(e.target.value)}
               placeholder={t('search.checkOut')}
               disabled={!checkIn}
-              required
+              required={serviceType === 'flight'}
             />
           </div>
         </div>}

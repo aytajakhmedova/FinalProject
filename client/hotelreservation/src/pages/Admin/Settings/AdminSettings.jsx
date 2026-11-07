@@ -20,6 +20,7 @@ import {
   uploadMedia,
 } from '../../../api/client';
 import { useSiteContent } from '../../../context/SiteContentContext';
+import { DEFAULT_FLIGHT_GUIDELINES } from '../../../constants/flightGuidelines';
 import '../Hotels/AdminHotels.css';
 
 const emptyMenu = () => ({ label: '', url: '/', placement: 'footer', iconKey: '', isRoute: true, sortOrder: 0, isActive: true });
@@ -43,7 +44,7 @@ const AdminSettings = () => {
     setLoading(true);
     Promise.all([getSiteContent(), getSiteMenuItems(), getSiteSlides(), getSiteAdvantages()])
       .then(([content, menuItems, slideItems, advantageItems]) => {
-        setSettings(content.settings);
+        setSettings({ ...content.settings, flightGuidelinesText: content.settings?.flightGuidelinesText || DEFAULT_FLIGHT_GUIDELINES });
         setMenus(menuItems);
         setSlides(slideItems);
         setAdvantages(advantageItems);
@@ -219,6 +220,9 @@ const AdminSettings = () => {
           {field('advantagesDescription', 'Üstünlüklər mətni', { full: true, area: true })}
           {field('advantagesImageUrl', 'Üstünlüklər şəkli', { full: true, file: true })}
           {field('advantagesRating', 'Reytinq')}
+          {field('flightGuidelinesTitle', 'Uçuş qaydaları başlığı')}
+          {field('flightGuidelinesSummary', 'Uçuş qaydaları qısa mətn', { full: true })}
+          {field('flightGuidelinesText', 'Uçuş qaydaları (tam mətn)', { full: true, area: true })}
           {field('galleryTitle', 'Qalereya başlığı')}
           {field('featuredEyebrow', 'Seçilmiş eyebrow')}
           {field('featuredTitle', 'Seçilmiş başlıq')}

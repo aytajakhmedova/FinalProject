@@ -34,7 +34,14 @@ const Hotels = () => {
     getHotels({ city: searchParams.get('country') ? undefined : searchParams.get('location'),
       country: searchParams.get('country'), checkIn, checkOut, guests: searchParams.get('guests'),
       adults: searchParams.get('adults'), children: searchParams.get('children'), rooms: searchParams.get('rooms'),
-      minPrice: searchParams.get('minPrice'), maxPrice: searchParams.get('maxPrice'), currency: searchParams.get('currency') })
+      // Price, stars, type and amenities are filtered by the server. A range picked on the home page
+      // (kept in its own currency) applies until the sliders are touched.
+      ...(filters.priceRange[1] === 100000 && searchParams.get('maxPrice')
+        ? { minPrice: searchParams.get('minPrice'), maxPrice: searchParams.get('maxPrice'), currency: searchParams.get('currency') }
+        : { minPrice: filters.priceRange[0] || undefined, maxPrice: filters.priceRange[1] }),
+      stars: filters.stars.join(',') || undefined,
+      hotelTypes: filters.hotelType.join(',') || undefined,
+      amenities: filters.amenities.join(',') || undefined })
       .then((data) => {
         if (!active) return;
         setLoadError('');
@@ -48,7 +55,7 @@ const Hotels = () => {
     return () => {
       active = false;
     };
-  }, [checkIn, checkOut, guests, searchParams]);
+  }, [checkIn, checkOut, guests, searchParams, filters]);
 
   const guestCount = parseInt(guests, 10) || 1;
 
@@ -78,16 +85,7 @@ const Hotels = () => {
     { value: 'Şəhər', key: 'hotels.typeCity' },
   ];
 
-  const filteredHotels = hotels.filter(hotel => {
-    const matchesPrice = hotel.pricePerNight >= filters.priceRange[0] && 
-                        hotel.pricePerNight <= filters.priceRange[1];
-    const matchesStars = filters.stars.length === 0 || filters.stars.includes(hotel.stars);
-    const matchesAmenities = filters.amenities.length === 0 || 
-                            filters.amenities.every(a => hotel.amenities.includes(a));
-    const matchesType = filters.hotelType.length === 0 || filters.hotelType.includes(hotel.hotelType);
-    
-    return matchesPrice && matchesStars && matchesAmenities && matchesType;
-  });
+  const filteredHotels = hotels;
 
   const sortedHotels = [...filteredHotels].sort((a, b) => {
     switch(sortBy) {

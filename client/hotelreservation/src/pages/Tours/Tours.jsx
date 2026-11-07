@@ -2,7 +2,7 @@ import Select from '../../components/common/Select/Select';
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FaStar, FaClock, FaMapMarkerAlt, FaUsers, FaSearch, FaFilter } from 'react-icons/fa';
-import { getTours, resolveImage } from '../../api/client';
+import { getTours, getTourCategories, resolveImage } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import './Tours.css';
@@ -18,13 +18,27 @@ const Tours = () => {
   const [tours, setTours] = useState([]);
   const [loadError, setLoadError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [query, setQuery] = useState(searchTerm.trim());
+
+  // Wait for a pause in typing before asking the server.
+  useEffect(() => {
+    const timer = setTimeout(() => setQuery(searchTerm.trim()), 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    getTourCategories().then(setCategories).catch(() => setCategories([]));
+  }, []);
 
   useEffect(() => {
     let active = true;
     getTours({
-      destination: searchParams.get('destination') || undefined,
+      destination: query || undefined,
       date: searchParams.get('date') || undefined,
       guests: searchParams.get('guests') || undefined,
+      category: selectedCategory || undefined,
+      sort: sortBy,
     })
       .then((items) => {
         if (!active) return;
@@ -42,32 +56,10 @@ const Tours = () => {
     return () => {
       active = false;
     };
-  }, [searchParams]);
+  }, [searchParams, query, selectedCategory, sortBy]);
 
-  const categories = [...new Set(tours.map((tour) => tour.category).filter(Boolean))];
-
-  const filteredTours = tours.filter(tour => {
-    const matchesSearch = tour.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tour.destination.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !selectedCategory || tour.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  // Sort tours
-  const sortedTours = [...filteredTours].sort((a, b) => {
-    switch (sortBy) {
-      case 'price-low':
-        return a.price - b.price;
-      case 'price-high':
-        return b.price - a.price;
-      case 'rating':
-        return b.rating - a.rating;
-      case 'duration':
-        return a.duration.localeCompare(b.duration);
-      default: // popular
-        return b.reviews - a.reviews;
-    }
-  });
+  // Search, category and sorting are all done by the server.
+  const sortedTours = tours;
 
   return (
     <div className="tours-page">

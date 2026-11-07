@@ -1,43 +1,41 @@
 import { useState, useEffect } from 'react';
 import { FaQuoteLeft, FaStar, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { getFeaturedReviews } from '../../api/client';
 import './Testimonials.css';
 
 const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const testimonials = [
-    {
-      id: 1,
-      name: 'Leyla Məmmədova',
-      role: 'Səyahət blogeri',
-      letter: 'L',
-      rating: 5,
-      text: 'Qəbələ dağ oteli və spa paketi gözləntilərimi aşdı. Bron prosesi 2 dəqiqə çəkdi.',
-    },
-    {
-      id: 2,
-      name: 'Rəşad Əliyev',
-      role: 'Biznes səyahətçisi',
-      letter: 'R',
-      rating: 5,
-      text: 'Bakı mərkəzindəki suit, gecə uçuşu və taksi hamısı bir rezervasiyada. Peşəkar xidmət.',
-    },
-    {
-      id: 3,
-      name: 'Nigar Həsənova',
-      role: 'Ailəvi tətil',
-      letter: 'N',
-      rating: 4,
-      text: 'Antalya all-inclusive və uşaq klubu sayəsində ailə tətilimiz problemsiz keçdi.',
-    },
-  ];
+  const [testimonials, setTestimonials] = useState([]);
+
+  // Guest reviews come from the server: the best approved ones across all hotels.
+  useEffect(() => {
+    let active = true;
+    getFeaturedReviews(6)
+      .then((items) => {
+        if (!active) return;
+        setTestimonials(items.map((review) => ({
+          id: review.id,
+          name: review.guestName,
+          role: review.hotelName,
+          letter: (review.guestName || '?').trim().charAt(0).toUpperCase(),
+          rating: review.rating,
+          text: review.comment,
+        })));
+      })
+      .catch(() => active && setTestimonials([]));
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
+    if (testimonials.length < 2) return undefined;
     const interval = setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(interval);
   }, [testimonials.length]);
+
+  if (testimonials.length === 0) return null;
 
   return (
     <section className="testimonials-section" id="reviews">

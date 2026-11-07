@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FaFilter, FaTimesCircle } from 'react-icons/fa';
-import { getFlights } from '../../api/client';
+import { getFlights, getFlightAirports } from '../../api/client';
+import { useSiteContent } from '../../context/SiteContentContext';
+import { DEFAULT_FLIGHT_GUIDELINES } from '../../constants/flightGuidelines';
 import './FlightResults.css';
 
 const FlightResults = () => {
   const navigate = useNavigate();
   const [query] = useSearchParams();
+  const { content: siteContent } = useSiteContent();
+  const siteSettings = siteContent?.settings || {};
+  const [showGuidelines, setShowGuidelines] = useState(false);
   const searchParams = {
     from: query.get('origin') || query.get('from') || '',
     to: query.get('destination') || query.get('to') || '',
@@ -45,11 +50,24 @@ const FlightResults = () => {
   }, [searchParams.from, searchParams.to, searchParams.departure, searchParams.class]);
 
   const airlines = [...new Set(flights.map((flight) => flight.airline))];
-  const airports = [
-    { code: 'GYD', name: 'Bakı', count: 4 },
-    { code: 'IST', name: 'İstanbul', count: 2 },
-    { code: 'SAW', name: 'Sabiha Gökçən', count: 2 },
-  ];
+
+  // Airports and their flight counts are calculated by the server for the same search.
+  const [airports, setAirports] = useState([]);
+  useEffect(() => {
+    let active = true;
+    getFlightAirports({
+      origin: searchParams.from,
+      destination: searchParams.to,
+      date: searchParams.departure,
+      passengers: searchParams.travelers,
+      cabin: searchParams.class,
+    })
+      .then((data) => active && setAirports(data))
+      .catch(() => active && setAirports([]));
+    return () => {
+      active = false;
+    };
+  }, [searchParams.from, searchParams.to, searchParams.departure, searchParams.class]);
 
   const handleStopsFilter = (stop) => {
     setSelectedStops(prev => 
@@ -80,7 +98,9 @@ const FlightResults = () => {
     const priceMatch = flight.price >= priceRange[0] && flight.price <= priceRange[1];
     const stopsMatch = selectedStops.length === 0 || selectedStops.includes(flight.stops);
     const airlineMatch = selectedAirlines.length === 0 || selectedAirlines.includes(flight.airline);
-    return priceMatch && stopsMatch && airlineMatch;
+    const airportMatch = selectedAirports.length === 0
+      || selectedAirports.includes(flight.originCode) || selectedAirports.includes(flight.destinationCode);
+    return priceMatch && stopsMatch && airlineMatch && airportMatch;
   });
 
   return (
@@ -178,11 +198,16 @@ const FlightResults = () => {
                 <div className="guidelines-content">
                   <div className="guidelines-icon">✈️</div>
                   <div className="guidelines-text">
-                    <h3>Beynəlxalq Qaydalar</h3>
-                    <p>COVID təhlükəsizlik tədbirləri, VİZA məhdudiyyətləri və karantin qaydaları</p>
+                    <h3>{siteSettings.flightGuidelinesTitle || 'Beynəlxalq Qaydalar'}</h3>
+                    <p>{siteSettings.flightGuidelinesSummary || 'COVID təhlükəsizlik tədbirləri, VİZA məhdudiyyətləri və karantin qaydaları'}</p>
                   </div>
-                  <button className="btn-view-guidelines">Qaydaları Oxu</button>
+                  <button type="button" className="btn-view-guidelines" onClick={() => setShowGuidelines((v) => !v)}>{showGuidelines ? 'Bağla' : 'Qaydaları Oxu'}</button>
                 </div>
+                {showGuidelines && (
+                  <div className="guidelines-full" style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(255,255,255,0.1)', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
+                    {siteSettings.flightGuidelinesText || DEFAULT_FLIGHT_GUIDELINES}
+                  </div>
+                )}
               </div>
 
               {/* Flight Cards */}
