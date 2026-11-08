@@ -80,7 +80,10 @@ const Booking = () => {
   const [cardBrand, setCardBrand] = useState('mastercard');
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [suggestions, setSuggestions] = useState({ flights: [], tours: [] });
+  const [suggestions, setSuggestions] = useState({ flights: [], returnFlights: [], tours: [] });
+  // One way, or round trip: a round trip also needs a return flight
+  const [tripType, setTripType] = useState('one-way');
+  const [selectedReturnId, setSelectedReturnId] = useState(null);
   const [countries, setCountries] = useState([]);
   const [travelCountry, setTravelCountry] = useState('');
   const [offersLoading, setOffersLoading] = useState(false);
@@ -143,11 +146,15 @@ const Booking = () => {
     getTripSuggestionsByCountry({ country: travelCountry, guests })
       .then((result) => {
         if (!active) return;
-        setSuggestions((prev) => ({ ...prev, flights: uniqueBy(result.flights, (item) => item.id) }));
+        setSuggestions((prev) => ({
+          ...prev,
+          flights: uniqueBy(result.flights, (item) => item.id),
+          returnFlights: uniqueBy(result.returnFlights || [], (item) => item.id),
+        }));
       })
       .catch((error) => {
         if (!active) return;
-        setSuggestions((prev) => ({ ...prev, flights: [] }));
+        setSuggestions((prev) => ({ ...prev, flights: [], returnFlights: [] }));
         setOffersError(error.message || 'Uçuş və tur məlumatları yüklənmədi.');
       })
       .finally(() => {
@@ -205,7 +212,27 @@ useEffect(() => {
     );
   }
 
-  const selectedFlight = suggestions.flights.find((item) => item.id === selectedFlightId) || null;
+  // Flights follow the hotel dates: the outbound flight leaves on or before the check-in day (the closest one
+  // first), the return flight leaves on or after the check-out day.
+  const dayOf = (flight) => String(flight.departureAt).slice(0, 10);
+  const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  const gap = (flight, day) => (day
+    ? Math.abs(new Date(dayOf(flight)) - new Date(String(day).slice(0, 10)))
+    : new Date(flight.departureAt).getTime());
+  const outboundOptions = suggestions.flights
+    .filter((item) => dayOf(item) >= today)
+    .sort((a, b) => gap(a, checkIn) - gap(b, checkIn));
+  const selectedFlight = outboundOptions.find((item) => item.id === selectedFlightId) || null;
+  const returnOptions = selectedFlight
+    ? (suggestions.returnFlights || [])
+      .filter((item) =>
+        String(item.destinationCity).toLowerCase() === String(selectedFlight.originCity).toLowerCase()
+        && new Date(item.departureAt) > new Date(selectedFlight.arrivalAt))
+      .sort((a, b) => gap(a, checkOut) - gap(b, checkOut))
+    : [];
+  const selectedReturn = tripType === 'round-trip'
+    ? returnOptions.find((item) => item.id === selectedReturnId) || null
+    : null;
   // Price and class of a flight as the guest chose it; the server's choice (cheapest) is the default.
   const cabinFor = (flight) => {
     const wanted = flightCabin[flight.id] || flight.cabinClass;
@@ -218,7 +245,10 @@ useEffect(() => {
   const discountPercent = Number(activeRule?.percent) || 0;
   const discountAmount = Number(activeRule?.amount) || 0;
   const hotelList = Number(priceBreakdown?.total) || 0;
-  const flightList = selectedFlight ? Number(cabinFor(selectedFlight).price) * Number(guests) : 0;
+  // A round trip cannot be paid until the return flight is chosen too
+  const returnMissing = tripType === 'round-trip' && !selectedReturn;
+  const flightList = (selectedFlight ? Number(cabinFor(selectedFlight).price) * Number(guests) : 0)
+    + (selectedReturn ? Number(cabinFor(selectedReturn).price) * Number(guests) : 0);
   const tourList = selectedTour ? Number(selectedTour.price) * Number(guests) : 0;
   const listTotal = hotelList + flightList + tourList;
   const percentOff = discountPercent > 0 ? listTotal - applyPercent(listTotal, discountPercent) : 0;
@@ -227,7 +257,9 @@ useEffect(() => {
   const afterCombo = roundMoney(listTotal - comboOff);
   const couponPercent = Number(appliedCoupon?.percent) || 0;
   const couponFixed = Number(appliedCoupon?.amount) || 0;
-  const couponOff = couponPercent > 0
+  // The coupon counts only while the bundle (hotel + flight and/or tour) is complete
+  const couponBlocked = Boolean(appliedCoupon) && !combo;
+  const couponOff = couponBlocked ? 0 : couponPercent > 0
     ? roundMoney(afterCombo - applyPercent(afterCombo, couponPercent))
     : Math.min(couponFixed, afterCombo);
   const discountValue = roundMoney(comboOff + couponOff);
@@ -252,13 +284,20 @@ useEffect(() => {
     setTravelCountry(value);
     setOffersLoading(Boolean(value));
     setOffersError('');
-    setSuggestions((prev) => ({ flights: [], tours: prev.tours }));
+    setSuggestions((prev) => ({ flights: [], returnFlights: [], tours: prev.tours }));
+    setSelectedReturnId(null);
     setSelectedFlightId(null);
   };
 
   const handleApplyCoupon = async (rawValue) => {
     const code = String(rawValue ?? couponInput).trim();
     if (!code || couponBusy) return null;
+    // An offer or a coupon needs the whole bundle: the hotel plus a flight and/or a tour
+    if (!combo) {
+      setAppliedCoupon(null);
+      setCouponError('Kupon yalnız otel ilə birlikdə uçuş və ya tur seçəndə işləyir. Tək otel rezervasiyasına kupon tətbiq olunmur.');
+      return null;
+    }
     setCouponBusy(true);
     setCouponError('');
     try {
@@ -286,6 +325,16 @@ useEffect(() => {
     setFormError('');
 
     // Check dates validity
+    if (couponBlocked) {
+      setFormError('Kupon yalnız otel ilə birlikdə uçuş və ya tur seçəndə işləyir. Tək otel rezervasiyasına kupon tətbiq olunmur. Uçuş/tur seçin və ya kuponu silin.');
+      return;
+    }
+
+    if (returnMissing) {
+      setFormError('Gediş-gəliş seçmisiniz: qayıdış uçuşunu da seçin və ya tək istiqamət seçin');
+      return;
+    }
+
     if (!checkIn || !checkOut) {
       setFormError('Giriş və çıxış tarixləri tələb olunur');
       return;
@@ -355,49 +404,31 @@ useEffect(() => {
         cardHolder: (normalizedPaymentMethod === 'card' || normalizedPaymentMethod === 'hotel') ? cardName : undefined,
         depositPercent: normalizedPaymentMethod === 'hotel' ? depositPercent : 100,
       };
+      // The hotel, the flights and the tour go to the server together: it checks the package and works out the discount.
+      const extraItems = [];
+      if (selectedFlight) {
+        extraItems.push({ bookingType: 'flight', flightId: selectedFlight.id, cabinClass: cabinFor(selectedFlight).cabinClass, travelCountry, guests });
+      }
+      if (selectedReturn) {
+        extraItems.push({ bookingType: 'flight', flightId: selectedReturn.id, cabinClass: cabinFor(selectedReturn).cabinClass, travelCountry, guests });
+      }
+      if (selectedTour) {
+        extraItems.push({ bookingType: 'tour', tourId: selectedTour.id, travelCountry, travelDate: pickTourDate(selectedTour, checkIn, checkOut), guests });
+      }
+
       const booking = await createBooking({
         bookingType: 'hotel',
         hotelId: hotel.id,
         expectedStayTotal: priceBreakdown.total,
         ...stay,
         specialRequests,
-        bundleCombo: combo || undefined,
         couponCode: couponForBooking?.code || undefined,
+        extras: extraItems,
         ...guest,
       });
 
-      const extras = [];
+      const extras = booking.extras || [];
       const extraErrors = [];
-      if (selectedFlight) {
-        try {
-          extras.push(await createBooking({
-            bookingType: 'flight',
-            flightId: selectedFlight.id,
-            cabinClass: cabinFor(selectedFlight).cabinClass,
-            travelCountry,
-            bundleCombo: combo,
-            couponCode: couponForBooking?.code || undefined,
-            ...guest,
-          }));
-        } catch (error) {
-          extraErrors.push(error.message || 'Uçuş əlavə olunmadı.');
-        }
-      }
-      if (selectedTour) {
-        try {
-          extras.push(await createBooking({
-            bookingType: 'tour',
-            tourId: selectedTour.id,
-            travelCountry,
-            travelDate: pickTourDate(selectedTour, checkIn, checkOut),
-            bundleCombo: combo,
-            couponCode: couponForBooking?.code || undefined,
-            ...guest,
-          }));
-        } catch (error) {
-          extraErrors.push(error.message || 'Tur əlavə olunmadı.');
-        }
-      }
 
       navigate('/booking-success', {
         state: {
@@ -411,6 +442,68 @@ useEffect(() => {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // One suggested flight: the same card is used for the outbound and the return list.
+  const renderFlight = (flight, selectedId, onSelect) => {
+                    const active = selectedId === flight.id;
+                    return (
+                      <article key={flight.id} className={`offer-card flight-card ${active ? 'active' : ''}`}>
+                        <div className="flight-top">
+                          <span className="airline-logo" style={{ background: airlineColor(flight.airline) }}>
+                            {airlineInitials(flight.airline)}
+                          </span>
+                          <div className="flight-name">
+                            <strong>{flight.airline}</strong>
+                            <em>{flight.flightNumber}</em>
+                          </div>
+                          <span className={`pick-dot ${active ? 'on' : ''}`} aria-hidden="true">
+                            {active && <FaCheck />}
+                          </span>
+                        </div>
+
+                        <div className="flight-route">
+                          <div className="route-point">
+                            <b>{flight.originCode}</b>
+                            <span>{flight.originCity}</span>
+                          </div>
+                          <span className="route-line" aria-hidden="true"><FaPlane /></span>
+                          <div className="route-point end">
+                            <b>{flight.destinationCode}</b>
+                            <span>{flight.destinationCity}</span>
+                          </div>
+                        </div>
+
+                        <div className="flight-times">
+                          <b>{flight.departTime}</b>
+                          <span>{flight.duration}</span>
+                          <b>{flight.arriveTime}</b>
+                          <em>{formatDate(String(flight.departureAt).slice(0, 10))}</em>
+                        </div>
+
+                        <CabinPicker
+                          cabins={flight.cabins}
+                          value={cabinFor(flight).cabinClass}
+                          party={Number(guests) || 1}
+                          onChange={(next) => setFlightCabin((prev) => ({ ...prev, [flight.id]: next }))}
+                        />
+
+                        <div className="offer-foot">
+                          <div className="offer-price">
+                            <strong>{fmt(Number(cabinFor(flight).price) * Number(guests))}</strong>
+                            <small>{guests} nəfər</small>
+                          </div>
+                          <button
+                            type="button"
+                            className="offer-pick"
+                            aria-pressed={active}
+                            onClick={() => onSelect(active ? null : flight.id)}
+                          >
+                            {active ? 'Seçildi' : 'Bilet seç'}
+                          </button>
+                        </div>
+                      </article>
+                    );
   };
 
   return (
@@ -633,76 +726,55 @@ useEffect(() => {
                   <span className="enrich-panel-icon"><FaPlane /></span>
                   <div>
                     <h3>Uçuş bileti</h3>
-                    <p>{travelCountry} istiqamətli uçuşlar</p>
+                    <p>{travelCountry} istiqamətli uçuşlar{checkIn ? ` · girişə (${formatDate(checkIn)}) ən yaxın tarixlər əvvəldə` : ''}</p>
                   </div>
                 </header>
 
+                <div className="trip-type-switch" role="radiogroup" aria-label="Səfər növü">
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={tripType === 'one-way'}
+                    className={tripType === 'one-way' ? 'active' : ''}
+                    onClick={() => { setTripType('one-way'); setSelectedReturnId(null); }}
+                  >
+                    Tək istiqamət
+                  </button>
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={tripType === 'round-trip'}
+                    className={tripType === 'round-trip' ? 'active' : ''}
+                    onClick={() => setTripType('round-trip')}
+                  >
+                    Gediş-gəliş
+                  </button>
+                </div>
+
                 <div className="enrich-list">
                   {offersLoading && <p className="enrich-empty">Yüklənir...</p>}
-                  {!offersLoading && suggestions.flights.length === 0 && (
-                    <p className="enrich-empty">Bu ölkə üçün uyğun uçuş tapılmadı.</p>
+                  {!offersLoading && outboundOptions.length === 0 && (
+                    <p className="enrich-empty">
+                      Bu ölkə üçün gələcək tarixli uyğun uçuş tapılmadı.
+                    </p>
                   )}
-                  {!offersLoading && suggestions.flights.map((flight) => {
-                    const active = selectedFlightId === flight.id;
-                    return (
-                      <article key={flight.id} className={`offer-card flight-card ${active ? 'active' : ''}`}>
-                        <div className="flight-top">
-                          <span className="airline-logo" style={{ background: airlineColor(flight.airline) }}>
-                            {airlineInitials(flight.airline)}
-                          </span>
-                          <div className="flight-name">
-                            <strong>{flight.airline}</strong>
-                            <em>{flight.flightNumber}</em>
-                          </div>
-                          <span className={`pick-dot ${active ? 'on' : ''}`} aria-hidden="true">
-                            {active && <FaCheck />}
-                          </span>
-                        </div>
-
-                        <div className="flight-route">
-                          <div className="route-point">
-                            <b>{flight.originCode}</b>
-                            <span>{flight.originCity}</span>
-                          </div>
-                          <span className="route-line" aria-hidden="true"><FaPlane /></span>
-                          <div className="route-point end">
-                            <b>{flight.destinationCode}</b>
-                            <span>{flight.destinationCity}</span>
-                          </div>
-                        </div>
-
-                        <div className="flight-times">
-                          <b>{flight.departTime}</b>
-                          <span>{flight.duration}</span>
-                          <b>{flight.arriveTime}</b>
-                          <em>{formatDate(String(flight.departureAt).slice(0, 10))}</em>
-                        </div>
-
-                        <CabinPicker
-                          cabins={flight.cabins}
-                          value={cabinFor(flight).cabinClass}
-                          party={Number(guests) || 1}
-                          onChange={(next) => setFlightCabin((prev) => ({ ...prev, [flight.id]: next }))}
-                        />
-
-                        <div className="offer-foot">
-                          <div className="offer-price">
-                            <strong>{fmt(Number(cabinFor(flight).price) * Number(guests))}</strong>
-                            <small>{guests} nəfər</small>
-                          </div>
-                          <button
-                            type="button"
-                            className="offer-pick"
-                            aria-pressed={active}
-                            onClick={() => setSelectedFlightId(active ? null : flight.id)}
-                          >
-                            {active ? 'Seçildi' : 'Bilet seç'}
-                          </button>
-                        </div>
-                      </article>
-                    );
-                  })}
+                  {!offersLoading && outboundOptions.map((flight) => renderFlight(flight, selectedFlightId, setSelectedFlightId))}
                 </div>
+
+                {tripType === 'round-trip' && (
+                  <>
+                    <h4 className="enrich-subtitle">Qayıdış uçuşu</h4>
+                    <div className="enrich-list">
+                      {!selectedFlight && <p className="enrich-empty">Əvvəlcə gediş uçuşunu seçin.</p>}
+                      {selectedFlight && returnOptions.length === 0 && (
+                        <p className="enrich-empty">
+                          {`Gedişdən sonra ${selectedFlight.originCity} şəhərinə qayıdış uçuşu tapılmadı.`}
+                        </p>
+                      )}
+                      {returnOptions.map((flight) => renderFlight(flight, selectedReturnId, setSelectedReturnId))}
+                    </div>
+                  </>
+                )}
               </section>
               )}
 
@@ -830,7 +902,7 @@ useEffect(() => {
             </div>
             {selectedFlight && (
               <div>
-                <span>Uçuş bileti</span>
+                <span>{selectedReturn ? 'Uçuş biletləri (gediş-gəliş)' : 'Uçuş bileti'}</span>
                 <strong>{fmt(flightList)}</strong>
               </div>
             )}
@@ -871,8 +943,11 @@ useEffect(() => {
           </div>
 
           {formError && <p className="pay-error">{formError}</p>}
+          {returnMissing && (
+            <p className="pay-error">Gediş-gəliş seçmisiniz: ödənişdən əvvəl qayıdış uçuşunu da seçin və ya “Tək istiqamət”ə keçin.</p>
+          )}
 
-          <button type="submit" className="pay-submit" disabled={submitting}>
+          <button type="submit" className="pay-submit" disabled={submitting || returnMissing}>
             <FaLock />
             <span>
               {paymentMethod === 'hotel'

@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import DestinationsPage from './pages/Destinations/DestinationsPage';
 import About from './pages/About/About';
 import ReviewsPage from './pages/Reviews/ReviewsPage';
+import Offers from './pages/Offers/Offers';
 import Gallery from './pages/Gallery/Gallery';
 import Hotels from './pages/Hotels/Hotels';
 import HotelDetail from './pages/HotelDetail/HotelDetail';
@@ -160,6 +161,14 @@ function App() {
             <>
               <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <main className="section-page"><About /></main>
+              <Footer />
+            </>
+          } />
+
+          <Route path="/offers" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <main className="section-page"><Offers /></main>
               <Footer />
             </>
           } />

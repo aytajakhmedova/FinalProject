@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FaSearch, FaFilter, FaSort } from 'react-icons/fa';
 import HotelCard from '../../components/common/HotelCard/HotelCard';
-import { getHotels, resolveImage } from '../../api/client';
+import { getHotels, getHotelFilterOptions, resolveImage } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import './Hotels.css';
@@ -28,6 +28,14 @@ const Hotels = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [hotels, setHotels] = useState([]);
   const [loadError, setLoadError] = useState('');
+  // The type and amenity lists come from the hotels in the database
+  const [filterOptions, setFilterOptions] = useState({ hotelTypes: [], amenities: [] });
+
+  useEffect(() => {
+    getHotelFilterOptions()
+      .then((data) => setFilterOptions({ hotelTypes: data.hotelTypes || [], amenities: data.amenities || [] }))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -68,22 +76,12 @@ const Hotels = () => {
     setSearchParams(params);
   };
 
-  const allAmenities = [
-    { value: 'Spa', key: 'hotels.amSpa' },
-    { value: 'Hovuz', key: 'hotels.amPool' },
-    { value: 'Wi-Fi', key: 'hotels.amWifi' },
-    { value: 'Restoran', key: 'hotels.amRest' },
-    { value: 'Fitness', key: 'hotels.amFit' },
-    { value: 'Plaj', key: 'hotels.amBeach' },
-    { value: 'Parking', key: 'hotels.amPark' },
-    { value: 'Bar', key: 'hotels.amBar' },
-  ];
-  const hotelTypes = [
-    { value: 'Lüks', key: 'hotels.typeLuxury' },
-    { value: 'Wellness', key: 'hotels.typeWellness' },
-    { value: 'Ailə', key: 'hotels.typeFamily' },
-    { value: 'Şəhər', key: 'hotels.typeCity' },
-  ];
+  // Known values keep their translation; a value an admin typed is shown as written
+  const TYPE_KEYS = { 'Lüks': 'hotels.typeLuxury', Wellness: 'hotels.typeWellness', 'Ailə': 'hotels.typeFamily', 'Şəhər': 'hotels.typeCity' };
+  const AMENITY_KEYS = { Spa: 'hotels.amSpa', Hovuz: 'hotels.amPool', 'Wi-Fi': 'hotels.amWifi', Restoran: 'hotels.amRest', Fitness: 'hotels.amFit', Plaj: 'hotels.amBeach', Parking: 'hotels.amPark', Bar: 'hotels.amBar' };
+  const labelOf = (keys, value) => (keys[value] ? t(keys[value]) : value);
+  const hotelTypes = filterOptions.hotelTypes.map((value) => ({ value, label: labelOf(TYPE_KEYS, value) }));
+  const allAmenities = filterOptions.amenities.map((value) => ({ value, label: labelOf(AMENITY_KEYS, value) }));
 
   const filteredHotels = hotels;
 
@@ -269,7 +267,7 @@ const Hotels = () => {
                       checked={filters.hotelType.includes(type.value)}
                       onChange={() => toggleFilter('hotelType', type.value)}
                     />
-                    <span>{t(type.key)}</span>
+                    <span>{type.label}</span>
                   </label>
                 ))}
               </div>
@@ -286,7 +284,7 @@ const Hotels = () => {
                       checked={filters.amenities.includes(amenity.value)}
                       onChange={() => toggleFilter('amenities', amenity.value)}
                     />
-                    <span>{t(amenity.key)}</span>
+                    <span>{amenity.label}</span>
                   </label>
                 ))}
               </div>

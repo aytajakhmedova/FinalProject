@@ -6,6 +6,7 @@ const PATH_KEYS = {
   '/about': 'nav.about',
   '/gallery': 'nav.gallery',
   '/reviews': 'nav.reviews',
+  '/offers': 'nav.offers',
   '/destinations': 'nav.destinations',
   '/contact': 'footer.contact',
 };

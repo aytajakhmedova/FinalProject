@@ -146,6 +146,7 @@ export function mapFlight(flight) {
 export function mapBooking(booking) {
   return {
     ...booking,
+    extras: Array.isArray(booking.extras) ? booking.extras.map(mapBooking) : [],
     confirmationNumber: booking.code,
     hotelName: booking.hotelName || booking.itemName,
     roomType: booking.roomName || booking.itemName,
@@ -182,6 +183,7 @@ export const getHotels = (params) => request(withQuery("/api/hotels", params)).t
 export const quoteHotelStay = (id, stay) => request(`/api/hotels/${id}/quote`, {
   method: "POST", body: JSON.stringify(stay),
 });
+export const getHotelFilterOptions = () => request("/api/hotels/filter-options");
 export const getHotel = (id, params) => request(withQuery(`/api/hotels/${id}`, params)).then(mapHotel);
 export const createHotel = (hotel) => request("/api/hotels", { method: "POST", body: JSON.stringify(hotel) }).then(mapHotel);
 export const updateHotel = (id, hotel) => request(`/api/hotels/${id}`, { method: "PUT", body: JSON.stringify(hotel) }).then(mapHotel);
@@ -315,12 +317,14 @@ export const getTripSuggestionsByCountry = ({ country, guests = 1 }) =>
     .catch(() =>
       Promise.all([listFlights(), listTours()]).then(([flights, tours]) => ({
         flights: flights.filter((item) => sameCountry(item.destinationCountry, country) && item.seatsAvailable >= guests),
+        returnFlights: flights.filter((item) => sameCountry(item.originCountry, country) && item.seatsAvailable >= guests),
         tours: tours.filter((item) =>
           sameCountry(tourCountry(item), country) && guests >= (item.minGuests || 1) && guests <= (item.maxGuests || 99)),
       }))
     )
     .then((result) => ({
       flights: (result.flights || []).map(mapFlight),
+      returnFlights: (result.returnFlights || []).map(mapFlight),
       tours: (result.tours || []).map(mapTour),
     }));
 

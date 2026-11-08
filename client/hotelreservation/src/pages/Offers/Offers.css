@@ -1,0 +1,12 @@
+.offers-page { max-width: 1100px; margin: 0 auto; padding: 7rem 16px 4rem; color: inherit; }
+.offers-head h1 { margin: 0 0 .4rem; }
+.offers-head p, .offers-hint, .offers-note { opacity: .8; }
+.offers-page h2 { margin: 2rem 0 .3rem; }
+.offers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; margin-top: 1rem; }
+.offer-card { display: flex; flex-direction: column; gap: .5rem; padding: 1.2rem; border-radius: 18px; border: 1px solid rgba(139, 90, 60, .35); background: rgba(139, 90, 60, .08); }
+.offer-card h3 { margin: 0; font-size: 1rem; font-weight: 600; }
+.offer-card small { opacity: .7; }
+.offer-tag { align-self: flex-start; padding: .2rem .7rem; border-radius: 999px; font-size: .78rem; background: #8B5A3C; color: #fff; }
+.offer-value { font-size: 2rem; color: #c9936a; }
+.offer-code { align-self: flex-start; padding: .45rem 1rem; border: 1px dashed #c9936a; border-radius: 10px; background: transparent; color: inherit; font-weight: 700; letter-spacing: .08em; cursor: pointer; }
+.offer-cta { display: inline-block; margin-top: 1.2rem; padding: .7rem 1.4rem; border-radius: 12px; background: #8B5A3C; color: #fff; text-decoration: none; font-weight: 600; }

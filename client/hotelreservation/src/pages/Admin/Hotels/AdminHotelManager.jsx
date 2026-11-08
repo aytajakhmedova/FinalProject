@@ -2,7 +2,7 @@ import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useState } from 'react';
-import { createHotel, deleteHotel, getHotels, getLocationCities, getLocationCountries, updateHotel, uploadMedia } from '../../../api/client';
+import { createHotel, deleteHotel, getHotels, getLocationCities, getLocationCountries, getLocationTouristPlaces, updateHotel, uploadMedia } from '../../../api/client';
 import { hasRole } from '../../../api/auth';
 import './AdminHotels.css';
 
@@ -80,6 +80,13 @@ const AdminHotelManager = () => {
       .catch(() => setCountries([]));
   }, []);
 
+  const [places, setPlaces] = useState([]);
+  const loadPlaces = (cityId) => {
+    setPlaces([]);
+    if (!cityId) return;
+    getLocationTouristPlaces(cityId).then(setPlaces).catch(() => setPlaces([]));
+  };
+
   const loadCities = (countryId) => {
     setCities([]);
     if (!countryId) return Promise.resolve();
@@ -92,12 +99,14 @@ const AdminHotelManager = () => {
 
   // Changing the country clears the city.
   const handleCountryChange = (countryId) => {
-    setEditing({ ...editing, countryId, cityId: '' });
+    setEditing({ ...editing, countryId, cityId: '', touristPlaceId: '' });
+    setPlaces([]);
     loadCities(countryId);
   };
 
   const handleCityChange = (cityId) => {
-    setEditing({ ...editing, cityId });
+    setEditing({ ...editing, cityId, touristPlaceId: '' });
+    loadPlaces(cityId);
   };
 
   const handleEditHotel = (hotel) => {
@@ -111,6 +120,7 @@ const AdminHotelManager = () => {
       amenities: hotel.amenities || [],
     });
     loadCities(hotel.countryId);
+    loadPlaces(hotel.cityId);
   };
 
   const handleNewHotel = () => {
@@ -118,6 +128,7 @@ const AdminHotelManager = () => {
     setSuccessMessage('');
     setEditing(emptyHotel());
     setCities([]);
+    setPlaces([]);
   };
 
   const handleSave = (event) => {
@@ -215,6 +226,19 @@ const AdminHotelManager = () => {
                   <option key={city.id} value={city.id}>
                     {city.name}
                   </option>
+                ))}
+              </Select>
+            </label>
+            <label>
+              Turist məkanı
+              <Select
+                value={editing.touristPlaceId}
+                onChange={(e) => setEditing({ ...editing, touristPlaceId: e.target.value })}
+                disabled={!editing.cityId}
+              >
+                <option value="">Seçilməyib</option>
+                {places.map((place) => (
+                  <option key={place.id} value={place.id}>{place.name}</option>
                 ))}
               </Select>
             </label>

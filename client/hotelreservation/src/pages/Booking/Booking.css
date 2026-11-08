@@ -1554,3 +1554,32 @@
   }
 }
 
+
+.trip-type-switch {
+  display: inline-flex;
+  gap: 0.25rem;
+  margin: 0.75rem 0;
+  padding: 0.25rem;
+  background: rgba(139, 90, 60, 0.12);
+  border-radius: 999px;
+}
+
+.trip-type-switch button {
+  padding: 0.45rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.trip-type-switch button.active {
+  background: #8B5A3C;
+  color: #fff;
+}
+
+.enrich-subtitle {
+  margin: 1rem 0 0.5rem;
+  font-size: 1rem;
+}
