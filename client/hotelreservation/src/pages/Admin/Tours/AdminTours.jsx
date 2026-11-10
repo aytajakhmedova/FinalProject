@@ -116,7 +116,12 @@ const AdminTours = () => {
     if (!silent) setLoading(true);
     return listTours()
       .then((items) => {
-        setTours(newestFirst(items));
+        // Filter out Maldives tours
+        const filteredItems = items.filter(tour => {
+          const destination = tour.destination?.toLowerCase() || '';
+          return !destination.includes('maldiv') && !destination.includes('maldives');
+        });
+        setTours(newestFirst(filteredItems));
         setLoadError('');
       })
       .catch((error) => {

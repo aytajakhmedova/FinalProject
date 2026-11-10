@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import './ImageGallery.css';
 
-const ImageGallery = ({ images, title }) => {
+const ImageGallery = ({ images, title, variant }) => {
   const slides = images || [];
   const count = slides.length;
 
@@ -51,7 +51,7 @@ const ImageGallery = ({ images, title }) => {
   return (
     <>
       <div
-        className="image-gallery-component"
+        className={`image-gallery-component${variant === 'hotel' ? ` hotel-gallery-layout${count < 2 ? ' hotel-gallery-single' : ''}` : ''}`}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
@@ -86,6 +86,17 @@ const ImageGallery = ({ images, title }) => {
               onClick={() => setShowModal(true)}
               aria-label="Şəkli böyüt"
             />
+
+            {variant === 'hotel' && (
+              <button
+                type="button"
+                className="gallery-fullscreen"
+                onClick={() => setShowModal(true)}
+                aria-label="Şəkli tam ekranda aç"
+              >
+                ⛶
+              </button>
+            )}
 
             {count > 1 && (
               <>
@@ -123,6 +134,7 @@ const ImageGallery = ({ images, title }) => {
         {count > 1 && (
           <div className="gallery-thumbs">
             {slides.map((img, idx) => (
+              variant === 'hotel' && idx === currentSlide ? null : (
               <button
                 type="button"
                 key={`${img}-${idx}`}
@@ -132,13 +144,14 @@ const ImageGallery = ({ images, title }) => {
               >
                 <img src={img} alt="" />
               </button>
+              )
             ))}
           </div>
         )}
       </div>
 
       {showModal && (
-        <div className="gallery-modal" onClick={() => setShowModal(false)}>
+        <div className={`gallery-modal${variant === 'hotel' ? ' hotel-gallery-modal-layout' : ''}`} onClick={() => setShowModal(false)}>
           <div className="gallery-modal-content" onClick={(e) => e.stopPropagation()}>
             <button type="button" className="gallery-close" onClick={() => setShowModal(false)}>
               ✕

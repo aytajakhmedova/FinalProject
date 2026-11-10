@@ -62,7 +62,12 @@ const AdminHotelManager = () => {
     if (!silent) setLoading(true);
     return getHotels()
       .then((items) => {
-        setHotels(newestFirst(items));
+        // Filter out Maldives hotels
+        const filteredItems = items.filter(hotel => {
+          const country = hotel.country?.toLowerCase() || '';
+          return !country.includes('maldiv') && !country.includes('maldives');
+        });
+        setHotels(newestFirst(filteredItems));
         setLoadError('');
       })
       .catch((error) => {

@@ -356,9 +356,15 @@ const Profile = () => {
                         type="tel"
                         name="phone"
                         value={editForm.phone}
-                        onChange={handleEditChange}
+                        onChange={(e) => {
+                          // Only allow numbers, spaces, +, -, (, )
+                          const value = e.target.value.replace(/[^0-9\s\+\-\(\)]/g, '');
+                          handleEditChange({ target: { name: 'phone', value } });
+                        }}
                         className="form-input"
                         placeholder="Telefon"
+                        pattern="[\d\s\+\-\(\)]+"
+                        title="Yalnız rəqəm, +, -, (, ), və boşluq qəbul edilir"
                       />
                     </div>
                     {errors.phone && <span className="error-message">{errors.phone}</span>}

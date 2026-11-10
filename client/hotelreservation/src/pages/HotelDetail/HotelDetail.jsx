@@ -9,6 +9,31 @@ import InquiryForm from '../../components/common/InquiryForm/InquiryForm';
 import { getAuthToken } from '../../api/auth';
 import { getHotel, quoteHotelStay } from '../../api/client';
 import './HotelDetail.css';
+import fallbackHotel1 from '../../assets/images/hotelyeni.jpg';
+import fallbackHotel2 from '../../assets/images/HOTEL1.jpg';
+import fallbackRoom1 from '../../assets/images/otaqyeni.jpg';
+import fallbackHotel3 from '../../assets/images/HOTEL2.jpg';
+import fallbackRoom2 from '../../assets/images/yeniotaq1.jpg';
+import fallbackHotel4 from '../../assets/images/HOTEL3.jpg';
+import fallbackRoom3 from '../../assets/images/ROOM1.jpg';
+import fallbackHotel5 from '../../assets/images/bakuhotel.jpg';
+
+const GALLERY_SIZE = 5;
+const FALLBACK_IMAGES = [
+  fallbackHotel1, fallbackHotel2, fallbackRoom1, fallbackHotel3,
+  fallbackRoom2, fallbackHotel4, fallbackRoom3, fallbackHotel5,
+];
+
+// Otelin öz şəkilləri birinci gəlir; 5-ə çatmırsa ümumi assets şəkilləri ilə tamamlanır.
+const buildGallery = (images) => {
+  const own = (Array.isArray(images) ? images : []).filter(Boolean);
+  const merged = [...own];
+  for (const fallback of FALLBACK_IMAGES) {
+    if (merged.length >= GALLERY_SIZE) break;
+    if (!merged.includes(fallback)) merged.push(fallback);
+  }
+  return merged.slice(0, GALLERY_SIZE);
+};
 
 const HotelDetail = () => {
   const { id } = useParams();
@@ -126,7 +151,7 @@ const HotelDetail = () => {
       {/* Image Gallery */}
       <section className="hotel-gallery-section">
         <div className="hotel-detail-container">
-          <ImageGallery images={hotel.images} title={hotel.title} />
+          <ImageGallery images={buildGallery(hotel.images)}title={hotel.title} variant="hotel" />
         </div>
       </section>
 

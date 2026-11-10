@@ -20,7 +20,12 @@ const FeaturedHotels = ({ currency, favorites, onToggleFavorite, onDiscover, onP
     getHotels()
       .then((items) => {
         if (!active) return;
-        setFeatured(items.filter((item) => item.imageFile).slice(0, 5));
+        // Filter out Maldives hotels
+        const filteredItems = items.filter(hotel => {
+          const country = hotel.country?.toLowerCase() || '';
+          return !country.includes('maldiv') && !country.includes('maldives');
+        });
+        setFeatured(filteredItems.filter((item) => item.imageFile).slice(0, 5));
         setLoadError('');
       })
       .catch((error) => {

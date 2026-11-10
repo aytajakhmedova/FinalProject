@@ -60,7 +60,12 @@ const Hotels = () => {
       .then((data) => {
         if (!active) return;
         setLoadError('');
-        setHotels(data);
+        // Filter out Maldives hotels
+        const filteredData = data.filter(hotel => {
+          const country = hotel.country?.toLowerCase() || '';
+          return !country.includes('maldiv') && !country.includes('maldives');
+        });
+        setHotels(filteredData);
         setPage(1);
       })
       .catch((error) => {

@@ -45,11 +45,16 @@ const AdminHotels = () => {
     setLoading(true);
     return getHotels()
       .then((items) => {
-        setHotels(newestFirst(items));
+        // Filter out Maldives hotels
+        const filteredItems = items.filter(hotel => {
+          const country = hotel.country?.toLowerCase() || '';
+          return !country.includes('maldiv') && !country.includes('maldives');
+        });
+        setHotels(newestFirst(filteredItems));
         setLoadError('');
         setSelectedHotelId((current) => {
-          if (items.some((item) => String(item.id) === String(current))) return current;
-          return items[0]?.id || '';
+          if (filteredItems.some((item) => String(item.id) === String(current))) return current;
+          return filteredItems[0]?.id || '';
         });
       })
       .catch((error) => {

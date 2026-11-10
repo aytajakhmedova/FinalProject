@@ -516,8 +516,14 @@ const FlightBooking = () => {
                         type="tel"
                         placeholder="+994 XX XXX XX XX"
                         value={contactInfo.mobile}
-                        onChange={(e) => setContactInfo({ ...contactInfo, mobile: e.target.value })}
+                        onChange={(e) => {
+                          // Only allow numbers, spaces, +, -, (, )
+                          const value = e.target.value.replace(/[^0-9\s\+\-\(\)]/g, '');
+                          setContactInfo({ ...contactInfo, mobile: value });
+                        }}
                         required
+                        pattern="[\d\s\+\-\(\)]+"
+                        title="Yalnız rəqəm, +, -, (, ), və boşluq qəbul edilir"
                       />
                     </div>
 

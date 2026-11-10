@@ -46,7 +46,12 @@ const Tours = () => {
     })
       .then((items) => {
         if (!active) return;
-        setTours(items);
+        // Filter out Maldives tours
+        const filteredItems = items.filter(tour => {
+          const destination = tour.destination?.toLowerCase() || '';
+          return !destination.includes('maldiv') && !destination.includes('maldives');
+        });
+        setTours(filteredItems);
         setLoadError('');
         setPage(1);
       })

@@ -170,9 +170,15 @@ const Register = () => {
                   name="phone"
                   autoComplete="tel"
                   value={formData.phone}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    // Only allow numbers, spaces, +, -, (, )
+                    const value = e.target.value.replace(/[^0-9\s\+\-\(\)]/g, '');
+                    handleChange({ target: { name: 'phone', value, type: 'text' } });
+                  }}
                   placeholder="+994 50 123 45 67"
                   className="form-input"
+                  pattern="[\d\s\+\-\(\)]+"
+                  title="Yalnız rəqəm, +, -, (, ), və boşluq qəbul edilir"
                 />
               </div>
               {errors.phone && <span className="error-message">{errors.phone}</span>}

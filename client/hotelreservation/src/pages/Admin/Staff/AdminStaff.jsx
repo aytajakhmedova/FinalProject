@@ -161,7 +161,15 @@ const AdminStaff = () => {
             </label>
             <label>
               Telefon
-              <input value={editing?.phone || ''} onChange={(e) => change('phone', e.target.value)} />
+              <input
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={15}
+                placeholder="Məsələn: 501234567"
+                value={editing?.phone || ''}
+                onChange={(e) => change('phone', e.target.value.replace(/\D/g, '').slice(0, 15))}
+              />
             </label>
             <label>
               Vəzifə

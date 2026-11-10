@@ -63,8 +63,9 @@ const ALL_MENU = [
 const ROLE_LABELS = {
   SuperAdmin: 'Super Admin',
   Admin: 'Admin',
-  HotelManager: 'Hotel Manager',
-  Receptionist: 'Receptionist',
+  HotelManager: 'Otel Meneceri',
+  Receptionist: 'Resepsiyonist',
+  Customer: 'Müştəri',
 };
 
 const AdminLayout = () => {
@@ -79,7 +80,17 @@ const AdminLayout = () => {
   const isAdmin = isAdminSession();
   const user = getAuthUser();
   const needsHotel = hasRole('HotelManager', 'Receptionist') && !hasRole('SuperAdmin', 'Admin');
-  const roleName = Array.isArray(user?.roles) ? (ROLE_LABELS[user.roles[0]] || user.roles[0]) : 'Admin';
+  
+  // Get the highest priority admin role for display (ignore Customer role in admin panel)
+  const roleName = useMemo(() => {
+    if (!Array.isArray(user?.roles) || user.roles.length === 0) return 'Admin';
+    
+    // Priority order for admin roles (ignore Customer)
+    const adminRoles = ['SuperAdmin', 'Admin', 'HotelManager', 'Receptionist'];
+    const userAdminRole = user.roles.find(role => adminRoles.includes(role));
+    
+    return ROLE_LABELS[userAdminRole] || userAdminRole || 'Admin';
+  }, [user?.roles]);
 
   const menuItems = useMemo(
     () => ALL_MENU.filter((item) => hasRole(...item.roles)),

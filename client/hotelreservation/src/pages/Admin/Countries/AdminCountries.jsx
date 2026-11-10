@@ -28,7 +28,12 @@ const AdminCountries = () => {
     try {
       setLoading(true);
       const data = await getAllCountries();
-      setCountries(newestFirst(data));
+      // Filter out Maldives
+      const filteredData = data.filter(country => {
+        const name = country.name?.toLowerCase() || '';
+        return !name.includes('maldiv') && !name.includes('maldives');
+      });
+      setCountries(newestFirst(filteredData));
       setError('');
     } catch (err) {
       setError(err.message || 'Ölkələr yüklənmədi');

@@ -63,10 +63,10 @@ const matchesBoard = (booking, board, today) => {
   if (status === 'cancelled') return board === 'all';
   const inDate = dateOnly(booking.checkIn);
   const outDate = dateOnly(booking.checkOut);
-  if (board === 'arrive') return inDate === today && status === 'confirmed';
+  if (board === 'arrive') return inDate === today && (status === 'confirmed' || status === 'pending' || status === 'checked-in');
   if (board === 'depart') return outDate === today && (status === 'checked-in' || status === 'confirmed');
   if (board === 'stay') return status === 'checked-in';
-  if (board === 'wait') return status === 'confirmed';
+  if (board === 'wait') return status === 'confirmed' || status === 'pending';
   return true;
 };
 
@@ -210,7 +210,7 @@ const ReceptionDesk = () => {
         </div>
         <div className="desk-hero-date" aria-hidden="true">
           <strong>{new Date().getDate()}</strong>
-          <span>{new Date().toLocaleDateString('az-AZ', { month: 'short' })}</span>
+          <span>{MONTHS_AZ[new Date().getMonth()]}</span>
         </div>
       </header>
 
@@ -283,7 +283,7 @@ const ReceptionDesk = () => {
                   </span>
                 </div>
                 <div className="folio-pay">
-                  <b>₼{money(booking.totalPrice)}</b>
+                  <b>{money(booking.totalPrice)} AZN</b>
                   <span>
                     {booking.paymentMethod === 'hotel' ? 'Oteldə' : booking.paymentMethod === 'card' ? 'Kart' : booking.paymentMethod || '—'}
                     {deposit ? ` · ${booking.depositPercent}% avans` : ''}
@@ -301,11 +301,11 @@ const ReceptionDesk = () => {
                     <div><dt>Telefon</dt><dd><FaPhone /> {booking.guestPhone || '—'}</dd></div>
                     <div><dt>Qonaq</dt><dd><FaUser /> {booking.guests || 1} nəfər</dd></div>
                     <div><dt>Növ</dt><dd>{TYPE_LABELS[bookingTypeOf(booking)]}</dd></div>
-                    <div><dt>Yekun</dt><dd>₼{money(booking.totalPrice)}</dd></div>
+                    <div><dt>Yekun</dt><dd>{money(booking.totalPrice)} AZN</dd></div>
                     {deposit && (
                       <>
-                        <div><dt>Kartla avans</dt><dd>{booking.depositPercent}% · ₼{money(booking.depositAmount)}</dd></div>
-                        <div><dt>Oteldə qalıq</dt><dd>₼{money(booking.remainingAmount)}</dd></div>
+                        <div><dt>Kartla avans</dt><dd>{booking.depositPercent}% · {money(booking.depositAmount)} AZN</dd></div>
+                        <div><dt>Oteldə qalıq</dt><dd>{money(booking.remainingAmount)} AZN</dd></div>
                       </>
                     )}
                     <div><dt>Ödəniş</dt><dd>{booking.paymentMethod || '—'} · {booking.paymentStatus || '—'}</dd></div>

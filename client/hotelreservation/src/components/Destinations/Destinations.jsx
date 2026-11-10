@@ -20,7 +20,13 @@ const Destinations = () => {
     let active = true;
     getSeasonalPrices()
       .then((items) => {
-        if (active) setPrices(items);
+        if (!active) return;
+        // Filter out Maldives from prices
+        const filteredItems = items.filter(price => {
+          const country = price.country?.toLowerCase() || '';
+          return !country.includes('maldiv') && !country.includes('maldives');
+        });
+        setPrices(filteredItems);
       })
       .catch(() => {
         if (active) setPrices([]);
@@ -34,7 +40,13 @@ const Destinations = () => {
     let active = true;
     getHotels()
       .then((items) => {
-        if (active) setHotels(items);
+        if (!active) return;
+        // Filter out Maldives hotels
+        const filteredItems = items.filter(hotel => {
+          const country = hotel.country?.toLowerCase() || '';
+          return !country.includes('maldiv') && !country.includes('maldives');
+        });
+        setHotels(filteredItems);
       })
       .catch(() => {});
     return () => {
@@ -48,6 +60,10 @@ const Destinations = () => {
   const countries = useMemo(() => {
     const grouped = new Map();
     prices.forEach((price) => {
+      // Filter out Maldives - check all possible variations
+      const country = price.country?.toLowerCase() || '';
+      if (country.includes('maldiv') || country.includes('maldives')) return;
+      
       if (!grouped.has(price.country)) grouped.set(price.country, []);
       grouped.get(price.country).push(price);
     });

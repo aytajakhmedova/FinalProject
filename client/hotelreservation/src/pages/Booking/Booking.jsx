@@ -545,9 +545,15 @@ useEffect(() => {
               <input
                 type="tel"
                 value={guestPhone}
-                onChange={(e) => setGuestPhone(e.target.value)}
+                onChange={(e) => {
+                  // Only allow numbers, spaces, +, -, (, )
+                  const value = e.target.value.replace(/[^0-9\s\+\-\(\)]/g, '');
+                  setGuestPhone(value);
+                }}
                 required
                 placeholder="+994 XX XXX XX XX"
+                pattern="[\d\s\+\-\(\)]+"
+                title="Yalnız rəqəm, +, -, (, ), və boşluq qəbul edilir"
               />
             </label>
 

@@ -14,7 +14,13 @@ const DestinationsPage = () => {
     let active = true;
     getHotels()
       .then((items) => {
-        if (active) setHotels(items);
+        if (!active) return;
+        // Filter out Maldives hotels
+        const filteredItems = items.filter(hotel => {
+          const country = hotel.country?.toLowerCase() || '';
+          return !country.includes('maldiv') && !country.includes('maldives');
+        });
+        setHotels(filteredItems);
       })
       .catch(() => {
         if (active) setHotels([]);

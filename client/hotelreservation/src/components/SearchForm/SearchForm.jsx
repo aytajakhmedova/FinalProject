@@ -48,11 +48,42 @@ const SearchForm = ({ onSearch, serviceType = 'hotel', onServiceChange }) => {
   ];
 
   useEffect(() => {
-    getSiteCountries().then(setCountries).catch(() => setCountries([]));
+    // Only show these 4 countries in the search form
+    const ALLOWED_COUNTRIES = ['Fransa', 'İtaliya', 'Türkiyə', 'Azərbaycan'];
+    
+    getSiteCountries()
+      .then((allCountries) => {
+        // Filter to only allowed countries
+        const filteredCountries = allCountries.filter(country => 
+          ALLOWED_COUNTRIES.includes(country)
+        );
+        console.log('Filtered countries:', filteredCountries);
+        setCountries(filteredCountries);
+      })
+      .catch(() => setCountries([]));
+      
     getSiteCities()
-      .then(setCities)
+      .then((allCities) => {
+        // Filter cities to only those in allowed countries
+        const filteredCities = allCities.filter(city => 
+          ALLOWED_COUNTRIES.includes(city.country)
+        );
+        console.log('Filtered cities:', filteredCities);
+        setCities(filteredCities);
+      })
       .catch(() => setCities([]));
-    listTours().then(setTours).catch(() => setTours([]));
+      
+    listTours()
+      .then((allTours) => {
+        // Filter tours - no Maldives
+        const filteredTours = allTours.filter(tour => {
+          const destination = tour.destination?.toLowerCase() || '';
+          return !destination.includes('maldiv') && !destination.includes('maldives');
+        });
+        console.log('Filtered tours:', filteredTours);
+        setTours(filteredTours);
+      })
+      .catch(() => setTours([]));
   }, []);
 
   // A tour only runs on fixed dates: offer just the upcoming ones of the tours matching the place.

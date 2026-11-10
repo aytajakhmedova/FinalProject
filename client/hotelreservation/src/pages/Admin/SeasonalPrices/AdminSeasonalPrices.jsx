@@ -3,7 +3,7 @@ import { FiPlus, FiEdit2, FiTrash2, FiX, FiAlertCircle, FiCheckCircle, FiTrendin
 import {
   getSeasonalPrices, createSeasonalPrice, updateSeasonalPrice, deleteSeasonalPrice, getAllCountries,
 } from '../../../api/client';
-import { MONTH_NAMES, formatPriceRange } from '../../../data/seasonalPrices';
+import { MONTH_NAMES, formatPriceRange, toAzn } from '../../../data/seasonalPrices';
 import { newestFirst } from '../../../utils/newestFirst';
 import '../Countries/AdminCountries.css';
 
@@ -23,7 +23,13 @@ const AdminSeasonalPrices = () => {
   const load = async () => {
     try {
       setLoading(true);
-      setPrices(newestFirst(await getSeasonalPrices()));
+      const data = await getSeasonalPrices();
+      // Filter out Maldives from seasonal prices
+      const filteredData = data.filter(price => {
+        const country = price.country?.toLowerCase() || '';
+        return !country.includes('maldiv') && !country.includes('maldives');
+      });
+      setPrices(newestFirst(filteredData));
       setError('');
     } catch (err) {
       setError(err.message || 'Qiymətlər yüklənmədi');
@@ -46,7 +52,13 @@ const AdminSeasonalPrices = () => {
   const openModal = (price = null) => {
     setEditing(price);
     setFormData(price
-      ? { country: price.country, month: price.month, minPrice: price.minPrice, maxPrice: price.maxPrice, currency: price.currency }
+      ? {
+        country: price.country,
+        month: price.month,
+        minPrice: Math.round(toAzn(price.minPrice, price.currency)),
+        maxPrice: Math.round(toAzn(price.maxPrice, price.currency)),
+        currency: 'AZN',
+      }
       : emptyForm);
     setError('');
     setShowModal(true);
@@ -66,7 +78,7 @@ const AdminSeasonalPrices = () => {
       month: Number(formData.month),
       minPrice: Number(formData.minPrice),
       maxPrice: Number(formData.maxPrice),
-      currency: formData.currency,
+      currency: 'AZN',
     };
     if (!payload.country) {
       setError('Ölkə daxil edilməlidir');
@@ -154,7 +166,7 @@ const AdminSeasonalPrices = () => {
                 <tr key={price.id}>
                   <td><strong>{price.country}</strong></td>
                   <td>{MONTH_NAMES[price.month - 1]}</td>
-                  <td><span className="um-property">{formatPriceRange(price, { original: true })}</span></td>
+                  <td><span className="um-property">{formatPriceRange(price)}</span></td>
                   <td>
                     <div className="um-actions">
                       <button className="um-icon-btn" onClick={() => openModal(price)} title="Redaktə et">
@@ -208,21 +220,7 @@ const AdminSeasonalPrices = () => {
             </div>
 
             <div className="um-form-group">
-              <label>Valyuta *</label>
-              <select
-                value={formData.currency}
-                onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                disabled={saving}
-              >
-                <option value="AZN">₼ AZN</option>
-                <option value="TRY">₺ TRY</option>
-                <option value="EUR">€ EUR</option>
-                <option value="USD">$ USD</option>
-              </select>
-            </div>
-
-            <div className="um-form-group">
-              <label>Minimum qiymət *</label>
+              <label>Minimum qiymət (₼ AZN) *</label>
               <input
                 type="number" min="0" step="1" required disabled={saving}
                 value={formData.minPrice}
@@ -231,7 +229,7 @@ const AdminSeasonalPrices = () => {
             </div>
 
             <div className="um-form-group">
-              <label>Maksimum qiymət *</label>
+              <label>Maksimum qiymət (₼ AZN) *</label>
               <input
                 type="number" min="0" step="1" required disabled={saving}
                 value={formData.maxPrice}
