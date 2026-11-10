@@ -7,7 +7,7 @@ import { MONTH_NAMES, formatPriceRange } from '../../data/seasonalPrices';
 import { useLanguage } from '../../context/LanguageContext';
 import './Destinations.css';
 
-const countryBadges = { 'Azərbaycan': 'az', 'Fransa': 'fr', 'İtaliya': 'it', 'Maldiv adaları': 'mv', 'Türkiyə': 'tr' };
+const countryBadges = { 'Azərbaycan': 'az', 'Fransa': 'fr', 'İtaliya': 'it', 'Türkiyə': 'tr' };
 
 const Destinations = () => {
   const { t } = useLanguage();
@@ -99,7 +99,7 @@ const Destinations = () => {
               aria-pressed={selected.country === item.country}
               onClick={() => setActiveTab(item.country)}
             >
-              <span className={`country-badge country-badge-${countryBadges[item.country] || 'other'}`} aria-hidden="true">{countryBadges[item.country] === 'mv' ? '🌴' : ['az', 'tr'].includes(countryBadges[item.country]) ? <span>☾<small>★</small></span> : !countryBadges[item.country] ? <FaGlobeAmericas /> : null}</span>
+              <span className={`country-badge country-badge-${countryBadges[item.country] || 'other'}`} aria-hidden="true">{['az', 'tr'].includes(countryBadges[item.country]) ? <span>☾<small>★</small></span> : !countryBadges[item.country] ? <FaGlobeAmericas /> : null}</span>
               {item.country}
             </button>
           ))}

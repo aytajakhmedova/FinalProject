@@ -91,6 +91,8 @@
   background: color-mix(in srgb, var(--um-tone) 12%, #231c18);
 }
 .um-icon-btn { padding: 0; width: 34px; height: 34px; }
+.um-table td.um-action { display: flex; gap: 6px; }
+.um-action .um-icon-btn:last-child:not(:first-child):hover { color: #ff8a80; }
 .um-page :is(.um-picker, .um-btn, .um-icon-btn) { transition: background .16s, border-color .16s, filter .16s; }
 .um-page :is(.um-picker, .um-btn, .um-icon-btn):hover:enabled { border-color: var(--um-accent); filter: brightness(1.12); }
 .um-options {

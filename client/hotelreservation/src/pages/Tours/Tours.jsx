@@ -1,11 +1,13 @@
 import Select from '../../components/common/Select/Select';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { FaStar, FaClock, FaMapMarkerAlt, FaUsers, FaSearch, FaFilter } from 'react-icons/fa';
+import { FaStar, FaClock, FaMapMarkerAlt, FaUsers, FaSearch, FaFilter, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { getTours, getTourCategories, resolveImage } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import './Tours.css';
+
+const PAGE_SIZE = 6;
 
 const Tours = () => {
   const { t } = useLanguage();
@@ -20,6 +22,8 @@ const Tours = () => {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [query, setQuery] = useState(searchTerm.trim());
+  const [page, setPage] = useState(1);
+  const resultsRef = useRef(null);
 
   // Wait for a pause in typing before asking the server.
   useEffect(() => {
@@ -44,11 +48,13 @@ const Tours = () => {
         if (!active) return;
         setTours(items);
         setLoadError('');
+        setPage(1);
       })
       .catch((error) => {
         if (!active) return;
         setTours([]);
         setLoadError(error.message || 'Turlar yüklənmədi.');
+        setPage(1);
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -60,6 +66,18 @@ const Tours = () => {
 
   // Search, category and sorting are all done by the server.
   const sortedTours = tours;
+
+  const totalPages = Math.max(1, Math.ceil(sortedTours.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const pageStart = (currentPage - 1) * PAGE_SIZE;
+  const visibleTours = sortedTours.slice(pageStart, pageStart + PAGE_SIZE);
+  const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1)
+    .filter(number => totalPages <= 7 || number === 1 || number === totalPages || Math.abs(number - currentPage) <= 1);
+  const scrollToResults = () => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const changePage = (nextPage) => {
+    setPage(Math.max(1, Math.min(nextPage, totalPages)));
+    scrollToResults();
+  };
 
   return (
     <div className="tours-page">
@@ -137,10 +155,10 @@ const Tours = () => {
       </section>
 
       {/* Tours Grid */}
-      <section className="tours-grid-section">
+      <section className="tours-grid-section" ref={resultsRef}>
         <div className="tours-container">
           <div className="tours-grid">
-            {sortedTours.map(tour => (
+            {visibleTours.map(tour => (
               <div key={tour.id} className="tour-card">
                 <Link to={`/tours/${tour.id}`} className="tour-card-link">
                   <div className="tour-card-image">
@@ -197,6 +215,20 @@ const Tours = () => {
               <div className="no-results-icon">🔍</div>
               <h3>{t('tours.empty')}</h3>
               <p>{t('tours.emptyHint')}</p>
+            </div>
+          )}
+
+          {!loading && !loadError && sortedTours.length > 0 && (
+            <div className="tours-pagination-bar">
+              <p>{pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, sortedTours.length)} / {sortedTours.length} tur</p>
+              {totalPages > 1 && <nav className="tours-pagination" aria-label="Turların səhifələri">
+                <button type="button" aria-label={t('feat.prev')} disabled={currentPage === 1} onClick={() => changePage(currentPage - 1)}><FaChevronLeft /></button>
+                {pageNumbers.map((number, index) => <React.Fragment key={number}>
+                  {index > 0 && number - pageNumbers[index - 1] > 1 && <span className="pagination-gap" aria-hidden="true">…</span>}
+                  <button type="button" aria-label={`Səhifə ${number}`} aria-current={currentPage === number ? 'page' : undefined} onClick={() => changePage(number)}>{number}</button>
+                </React.Fragment>)}
+                <button type="button" aria-label={t('feat.next')} disabled={currentPage === totalPages} onClick={() => changePage(currentPage + 1)}><FaChevronRight /></button>
+              </nav>}
             </div>
           )}
         </div>

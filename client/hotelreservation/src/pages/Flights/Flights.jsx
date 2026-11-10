@@ -7,6 +7,8 @@ import istanbulImage from '../../assets/images/istanbul.jpg';
 import dubaiImage from '../../assets/images/dubai.jpg';
 import parisImage from '../../assets/images/paris.jpg';
 import londonImage from '../../assets/images/london.jpg';
+import bakuImage from '../../assets/images/bakucity.jfif';
+import antalyaImage from '../../assets/images/antalya-beach.jfif';
 import { getSiteCities, getPopularDestinations, listFlights, resolveImage } from '../../api/client';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
@@ -108,7 +110,7 @@ const Flights = () => {
   }, []);
   const destinationCount = new Set(dbFlights.map((f) => f.destinationCity)).size;
   // City photos are local assets; a city without one is shown without a picture.
-  const cityImages = { 'İstanbul': istanbulImage, 'Dubai': dubaiImage, 'Paris': parisImage, 'London': londonImage };
+  const cityImages = { 'İstanbul': istanbulImage, 'Dubai': dubaiImage, 'Paris': parisImage, 'London': londonImage, 'Bakı': bakuImage, 'Antalya': antalyaImage };
 
   const handleDestinationClick = (destination) => {
     // Navigate to flight results with pre-filled destination

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { FiAlertCircle, FiBriefcase, FiCheckCircle, FiChevronLeft, FiChevronRight, FiEye, FiFilter, FiHome, FiLoader, FiLock, FiSearch, FiShield, FiUsers, FiX } from 'react-icons/fi';
-import { getHotels, getUsers, updateUserRole } from '../../../api/client';
+import { FiAlertCircle, FiBriefcase, FiCheckCircle, FiChevronLeft, FiChevronRight, FiEye, FiFilter, FiHome, FiLoader, FiLock, FiSearch, FiShield, FiTrash2, FiUsers, FiX } from 'react-icons/fi';
+import { deleteCustomer, deleteStaff, getHotels, getUsers, updateUserRole } from '../../../api/client';
 import { canManageUser, getAuthUser, hasRole } from '../../../api/auth';
 import UserPicker from './UserPicker';
 import { allRoles, isAdmin, matchText, needsHotel, roleOf, roles } from './userRoles';
@@ -121,6 +121,31 @@ export default function AdminUsers() {
     }
   }
 
+  // Staff accounts go through the staff endpoint, guests through the customer one; the server checks the permissions again.
+  async function remove(user) {
+    if (pending.current) return;
+    if (!canManageUser(user) || user.id === actorId) {
+      setToast({ type: 'error', message: 'Bu əməliyyat üçün icazəniz yoxdur.' });
+      return;
+    }
+    const isStaff = user.roles?.some((item) => ['SuperAdmin', 'Admin', 'HotelManager', 'Receptionist'].includes(item));
+    const note = isStaff ? '' : ' Rezervasiyaları otelin qeydlərində qalacaq.';
+    if (!window.confirm(`${user.name || user.email} (${user.email}) hesabı həmişəlik silinsin?${note}`)) return;
+    pending.current = true;
+    setSaving(true);
+    setToast({ type: 'loading', message: 'Hesab silinir…' });
+    try {
+      await (isStaff ? deleteStaff(user.id) : deleteCustomer(user.id));
+      setUsers((items) => items.filter((item) => item.id !== user.id));
+      setToast({ type: 'success', message: `${user.email} silindi.` });
+    } catch (error) {
+      setToast({ type: 'error', message: error.message || 'Silinmədi.' });
+    } finally {
+      pending.current = false;
+      setSaving(false);
+    }
+  }
+
   function resetFilters() { setFilter(''); setSearch(''); setPage(1); }
 
   return <section className="um-page">
@@ -151,7 +176,7 @@ export default function AdminUsers() {
             <td data-label="Rol">{editable && user.id !== actorId ? <UserPicker label={`${user.name} üçün rol`} tone={role.tone} icon={role.icon} value={role.value} options={options} disabled={saving}
               onChange={(value) => setModal({ user, role: roles.find((item) => item.value === value), hotelId: hasHotelRole && hotelNames.has(user.assignedHotelId) ? user.assignedHotelId : null })} /> : <Badge role={role} />}</td>
             <td data-label="Otel">{hasHotelRole && editable ? <UserPicker icon={FiHome} label={`${user.name} üçün otel`} value={user.assignedHotelId} options={hotelOptions} searchable placeholder={hotels.length ? 'Otel seçin' : 'Otel yoxdur'} disabled={saving || !hotels.length} onChange={(value) => save(user, role.value, value)} /> : <span className="um-property">{hasHotelRole ? hotelNames.get(user.assignedHotelId) || 'Təyin edilməyib' : '—'}</span>}</td>
-            <td className="um-action"><button className="um-icon-btn" aria-label={`${user.name} — hesab məlumatları`} title="Hesab məlumatları" onClick={() => setModal({ user })}><FiEye /></button></td>
+            <td className="um-action"><button className="um-icon-btn" aria-label={`${user.name} — hesab məlumatları`} title="Hesab məlumatları" onClick={() => setModal({ user })}><FiEye /></button>{editable && user.id !== actorId && <button className="um-icon-btn" aria-label={`${user.name} — hesabı sil`} title="Hesabı sil" disabled={saving} onClick={() => remove(user)}><FiTrash2 /></button>}</td>
           </tr>;
         })}</tbody></table> : <div className="um-empty"><FiSearch /><h3>{users.length ? 'Uyğun istifadəçi tapılmadı' : 'İstifadəçi yoxdur'}</h3>{(filter || search) && <button className="um-btn" onClick={resetFilters}>Filtrləri təmizlə</button>}</div>}
       {!loading && !loadError && <footer className="um-pagination"><span>{visible.length ? `${start + 1}–${start + displayed.length} / ${visible.length} istifadəçi` : '0 istifadəçi'}</span>

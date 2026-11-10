@@ -431,6 +431,66 @@
   color: var(--text-secondary);
 }
 
+/* Pagination - Same Style as Hotels Page */
+.tours-pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 30px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border-color);
+}
+
+.tours-pagination-bar > p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.tours-pagination {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tours-pagination button {
+  min-width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tours-pagination button[aria-current="page"] {
+  background: linear-gradient(180deg, #bd824a, #95512b);
+  border-color: #d69e5b;
+  color: white;
+  box-shadow: 0 3px 12px rgba(170, 99, 35, 0.23);
+}
+
+.tours-pagination button:hover:enabled {
+  border-color: #d69e5b;
+  transform: translateY(-1px);
+}
+
+.tours-pagination button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.pagination-gap {
+  padding: 0 3px;
+  color: var(--text-muted);
+}
+
 /* Responsive */
 @media (max-width: 1200px) {
   .tours-grid {
@@ -487,6 +547,20 @@
 
   .btn-tour-view {
     width: 100%;
+  }
+
+  .tours-pagination-bar {
+    flex-direction: column;
+    padding-top: 18px;
+  }
+
+  .tours-pagination {
+    gap: 6px;
+  }
+
+  .tours-pagination button {
+    min-width: 36px;
+    height: 38px;
   }
 }
 

@@ -1,6 +1,7 @@
 import Select from '../../../components/common/Select/Select';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
-import { getCustomerBookings, getCustomers } from '../../../api/client';
+import { deleteCustomer, getCustomerBookings, getCustomers } from '../../../api/client';
+import { FaRegTrashAlt } from 'react-icons/fa';
 import { STATUS_LABELS } from '../../../utils/bookingStatus';
 import '../Hotels/AdminHotels.css';
 import '../Analytics/AdminAnalytics.css';
@@ -20,6 +21,27 @@ const AdminCustomers = () => {
   const [loadError, setLoadError] = useState('');
   const [openId, setOpenId] = useState('');
   const [history, setHistory] = useState({});
+  const [message, setMessage] = useState('');
+  const [busyId, setBusyId] = useState('');
+
+  const remove = (customer) => {
+    if (busyId) return;
+    const note = customer.bookingCount > 0
+      ? `
+
+Bu müştərinin ${customer.bookingCount} rezervasiyası var. Rezervasiyalar otelin qeydlərində qalacaq, amma hesaba bağlı olmayacaq.`
+      : '';
+    if (!window.confirm(`${customer.name} (${customer.email}) hesabı həmişəlik silinsin?${note}`)) return;
+    setBusyId(customer.id);
+    setMessage('');
+    deleteCustomer(customer.id)
+      .then(() => {
+        setCustomers((prev) => prev.filter((item) => item.id !== customer.id));
+        setMessage(`${customer.email} silindi.`);
+      })
+      .catch((error) => setMessage(error.message || 'Silinmədi.'))
+      .finally(() => setBusyId(''));
+  };
 
   const load = () => {
     setLoading(true);
@@ -84,6 +106,7 @@ const AdminCustomers = () => {
         <p className="page-subtitle">Qeydiyyatlı müştərilər, rezervasiya sayı və ümumi xərcləri</p>
       </div>
 
+      {message && <p className="manage-message">{message}</p>}
       {loading && <p className="page-subtitle">Yüklənir...</p>}
       {loadError && (
         <div className="coming-soon-card">
@@ -141,6 +164,7 @@ const AdminCustomers = () => {
                   <th>Ümumi xərc</th>
                   <th>Son rezervasiya</th>
                   <th>Status</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -160,10 +184,22 @@ const AdminCustomers = () => {
                             {customer.isRestricted ? 'Məhdud' : 'Aktiv'}
                           </span>
                         </td>
+                        <td className="table-actions">
+                          <button
+                            type="button"
+                            className="danger"
+                            aria-label="Sil"
+                            title="Sil"
+                            disabled={busyId === customer.id}
+                            onClick={(event) => { event.stopPropagation(); remove(customer); }}
+                          >
+                            <FaRegTrashAlt />
+                          </button>
+                        </td>
                       </tr>
                       {openId === customer.id && (
                         <tr className="edit-row">
-                          <td colSpan="7">
+                          <td colSpan="8">
                             <div className="admin-edit-card">
                               <h3>Rezervasiya tarixçəsi</h3>
                               {(!entry || entry.loading) && <p className="manage-message">Yüklənir...</p>}
@@ -210,7 +246,7 @@ const AdminCustomers = () => {
                 })}
                 {visible.length === 0 && (
                   <tr>
-                    <td colSpan="7">{customers.length === 0 ? 'Müştəri yoxdur' : 'Uyğun müştəri tapılmadı'}</td>
+                    <td colSpan="8">{customers.length === 0 ? 'Müştəri yoxdur' : 'Uyğun müştəri tapılmadı'}</td>
                   </tr>
                 )}
               </tbody>
