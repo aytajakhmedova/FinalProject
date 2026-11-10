@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiGlobe, FiX, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
 import { getAllCountries, createCountry, updateCountry, deleteCountry } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import './AdminCountries.css';
 
 const AdminCountries = () => {
@@ -27,7 +28,7 @@ const AdminCountries = () => {
     try {
       setLoading(true);
       const data = await getAllCountries();
-      setCountries(data);
+      setCountries(newestFirst(data));
       setError('');
     } catch (err) {
       setError(err.message || 'Ölkələr yüklənmədi');

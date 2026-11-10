@@ -2,6 +2,7 @@ import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import React, { useEffect, useMemo, useState } from 'react';
 import { approveReview, deleteReview, getAdminReviews } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import '../Hotels/AdminHotels.css';
 
 const AdminReviews = () => {
@@ -16,7 +17,7 @@ const AdminReviews = () => {
     if (!silent) setLoading(true);
     return getAdminReviews()
       .then((rows) => {
-        setItems(Array.isArray(rows) ? rows : []);
+        setItems(newestFirst(rows));
         setLoadError('');
       })
       .catch((error) => {

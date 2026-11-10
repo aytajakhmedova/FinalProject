@@ -183,6 +183,10 @@ export const getHotels = (params) => request(withQuery("/api/hotels", params)).t
 export const quoteHotelStay = (id, stay) => request(`/api/hotels/${id}/quote`, {
   method: "POST", body: JSON.stringify(stay),
 });
+// Favourite hotels belong to the signed-in user and live in the database
+export const getFavoriteIds = () => request("/api/favorites");
+export const addFavorite = (hotelId) => request(`/api/favorites/${hotelId}`, { method: "PUT" });
+export const removeFavorite = (hotelId) => request(`/api/favorites/${hotelId}`, { method: "DELETE" });
 export const getHotelFilterOptions = () => request("/api/hotels/filter-options");
 export const getHotel = (id, params) => request(withQuery(`/api/hotels/${id}`, params)).then(mapHotel);
 export const createHotel = (hotel) => request("/api/hotels", { method: "POST", body: JSON.stringify(hotel) }).then(mapHotel);
@@ -374,3 +378,11 @@ export const deleteCity = (id) => {
       throw error;
     });
 };
+
+// Guest questions: a hotel's questions go to its manager, general ones to the admins
+export const createInquiry = (item) => request("/api/inquiries", { method: "POST", body: JSON.stringify(item) });
+export const getMyInquiries = () => request("/api/inquiries/mine");
+export const getInquiries = () => request("/api/inquiries");
+export const replyInquiry = (id, reply) => request(`/api/inquiries/${id}/reply`, { method: "PUT", body: JSON.stringify({ reply }) });
+export const setInquiryStatus = (id, status) => request(`/api/inquiries/${id}/status`, { method: "PUT", body: JSON.stringify({ status }) });
+export const deleteInquiry = (id) => request(`/api/inquiries/${id}`, { method: "DELETE" });

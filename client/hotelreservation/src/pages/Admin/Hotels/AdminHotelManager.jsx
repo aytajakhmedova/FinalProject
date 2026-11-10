@@ -3,6 +3,7 @@ import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useState } from 'react';
 import { createHotel, deleteHotel, getHotels, getLocationCities, getLocationCountries, getLocationTouristPlaces, updateHotel, uploadMedia } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import { hasRole } from '../../../api/auth';
 import './AdminHotels.css';
 
@@ -61,7 +62,7 @@ const AdminHotelManager = () => {
     if (!silent) setLoading(true);
     return getHotels()
       .then((items) => {
-        setHotels(items);
+        setHotels(newestFirst(items));
         setLoadError('');
       })
       .catch((error) => {

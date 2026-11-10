@@ -7,6 +7,9 @@ import DestinationsPage from './pages/Destinations/DestinationsPage';
 import About from './pages/About/About';
 import ReviewsPage from './pages/Reviews/ReviewsPage';
 import Offers from './pages/Offers/Offers';
+import Favorites from './pages/Favorites/Favorites';
+import { getAuthToken } from './api/auth';
+import { addFavorite, getFavoriteIds, removeFavorite } from './api/client';
 import Gallery from './pages/Gallery/Gallery';
 import Hotels from './pages/Hotels/Hotels';
 import HotelDetail from './pages/HotelDetail/HotelDetail';
@@ -43,6 +46,8 @@ import AdminTours from './pages/Admin/Tours/AdminTours';
 import AdminDiscounts from './pages/Admin/Discounts/AdminDiscounts';
 import ReceptionDesk from './pages/Reception/ReceptionDesk';
 import AdminReviews from './pages/Admin/Reviews/AdminReviews';
+import AdminInquiries from './pages/Admin/Inquiries/AdminInquiries';
+import Contact from './pages/Contact/Contact';
 import AdminCountries from './pages/Admin/Countries/AdminCountries';
 import AdminCities from './pages/Admin/Cities/AdminCities';
 import AdminTourCategories from './pages/Admin/TourCategories/AdminTourCategories';
@@ -66,11 +71,15 @@ function App() {
   const [toast, setToast] = useState('');
 
   // Load user-specific favorites when user changes (login/logout)
+  // Favourites live in the database and belong to the signed-in user; a guest has none.
   const loadFavorites = () => {
-    const user = JSON.parse(localStorage.getItem('user') || 'null');
-    const favKey = user ? `favorites_${user.email}` : 'favorites_guest';
-    const savedFavs = localStorage.getItem(favKey);
-    setFavorites(savedFavs ? JSON.parse(savedFavs) : []);
+    if (!getAuthToken()) {
+      setFavorites([]);
+      return;
+    }
+    getFavoriteIds()
+      .then((ids) => setFavorites(Array.isArray(ids) ? ids : []))
+      .catch(() => setFavorites([]));
   };
 
   useEffect(() => {
@@ -109,13 +118,16 @@ function App() {
   };
 
   const toggleFavorite = (id) => {
-    setFavorites((prev) => {
-      const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
-      // Save favorites per user
-      const user = JSON.parse(localStorage.getItem('user') || 'null');
-      const favKey = user ? `favorites_${user.email}` : 'favorites_guest';
-      localStorage.setItem(favKey, JSON.stringify(next));
-      return next;
+    if (!getAuthToken()) {
+      setToast('Sevimlilərə əlavə etmək üçün hesabınıza daxil olun.');
+      return;
+    }
+    const wasFavorite = favorites.includes(id);
+    // shown at once, then saved; a failed save puts it back
+    setFavorites((prev) => (wasFavorite ? prev.filter((x) => x !== id) : [id, ...prev]));
+    (wasFavorite ? removeFavorite(id) : addFavorite(id)).catch(() => {
+      setFavorites((prev) => (wasFavorite ? [id, ...prev] : prev.filter((x) => x !== id)));
+      setToast('Sevimlilər yadda saxlanmadı. Yenidən cəhd edin.');
     });
   };
 
@@ -161,6 +173,14 @@ function App() {
             <>
               <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
               <main className="section-page"><About /></main>
+              <Footer />
+            </>
+          } />
+
+          <Route path="/contact" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <main className="section-page"><Contact /></main>
               <Footer />
             </>
           } />
@@ -261,6 +281,14 @@ function App() {
             </>
           } />
           
+          <Route path="/favorites" element={
+            <>
+              <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
+              <Favorites favorites={favorites} onToggleFavorite={toggleFavorite} />
+              <Footer />
+            </>
+          } />
+
           <Route path="/dashboard" element={
             <>
               <Header darkMode={darkMode} toggleDarkMode={toggleDarkMode} onServiceChange={(type) => setServiceType(type)} favoriteCount={favorites.length} />
@@ -314,6 +342,7 @@ function App() {
             <Route path="tours" element={<AdminTours />} />
             <Route path="paketler" element={<AdminDiscounts />} />
             <Route path="reyler" element={<AdminReviews />} />
+            <Route path="suallar" element={<AdminInquiries />} />
             <Route path="olkeler" element={<AdminCountries />} />
             <Route path="seherler" element={<AdminCities />} />
             <Route path="aviasirketler" element={<AdminAirlines />} />

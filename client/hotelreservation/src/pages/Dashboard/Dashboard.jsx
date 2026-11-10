@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import { FaCalendarAlt, FaCheckCircle, FaClipboardList } from 'react-icons/fa';
 import { useLanguage } from '../../context/LanguageContext';
 import { getAuthToken } from '../../api/auth';
+import MyInquiries from '../../components/common/MyInquiries/MyInquiries';
 import { CABIN_LABELS, deleteBooking, getHotels, getMyBookings, getMyCoupons, getMyReviews } from '../../api/client';
 import { printBookingReceipt } from '../../utils/printReceipt';
 import './Dashboard.css';
@@ -369,6 +370,8 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+
+        <MyInquiries />
       </div>
 
       {/* Cancel Confirmation Modal */}

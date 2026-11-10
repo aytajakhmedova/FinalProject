@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FiLogIn, FiMail as FaEnvelope, FiLock as FaLock } from 'react-icons/fi';
+import AuthBrand, { AuthSocialOptions } from './AuthBrand';
 import { useLanguage } from '../../context/LanguageContext';
 import { getPostLoginPath, getSafeAdminPath, loginRequest, saveAuthSession } from '../../api/auth';
 import './Auth.css';
+import './LuxuryAuth.css';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -83,7 +86,8 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page auth-luxury">
+      <AuthBrand />
       <div className="auth-container">
         <div className="auth-card">
           <div className="auth-header">
@@ -103,13 +107,16 @@ const Login = () => {
                   type="email"
                   id="email"
                   name="email"
+                  autoComplete="email"
+                  aria-invalid={Boolean(errors.email)}
+                  aria-describedby={errors.email ? 'login-email-error' : undefined}
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="emailiniz@example.com"
                   className="form-input"
                 />
               </div>
-              {errors.email && <span className="error-message">{errors.email}</span>}
+              {errors.email && <span id="login-email-error" className="error-message">{errors.email}</span>}
             </div>
 
             {/* Password */}
@@ -123,6 +130,9 @@ const Login = () => {
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
+                  autoComplete="current-password"
+                  aria-invalid={Boolean(errors.password)}
+                  aria-describedby={errors.password ? 'login-password-error' : undefined}
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
@@ -131,12 +141,14 @@ const Login = () => {
                 <button
                   type="button"
                   className="password-toggle"
+                  aria-label={showPassword ? 'Şifrəni gizlət' : 'Şifrəni göstər'}
+                  aria-pressed={showPassword}
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
               </div>
-              {errors.password && <span className="error-message">{errors.password}</span>}
+              {errors.password && <span id="login-password-error" className="error-message">{errors.password}</span>}
             </div>
 
             {/* Remember Me & Forgot Password */}
@@ -156,7 +168,7 @@ const Login = () => {
               </Link>
             </div>
 
-            {errors.form && <span className="error-message">{errors.form}</span>}
+            {errors.form && <span className="error-message" role="alert">{errors.form}</span>}
 
             {/* Submit Button */}
             <button 
@@ -170,10 +182,11 @@ const Login = () => {
                   {t('auth.loggingIn')}
                 </span>
               ) : (
-                t('auth.login')
+                <><FiLogIn aria-hidden="true" />{t('auth.login')}</>
               )}
             </button>
           </form>
+          <AuthSocialOptions />
 
           {/* Register Link */}
           <div className="auth-footer">

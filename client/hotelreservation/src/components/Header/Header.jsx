@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHotel, FaPlane, FaCar, FaBars, FaTimes, FaUser, FaSignOutAlt, FaClipboardList } from 'react-icons/fa';
-import { IoNotifications } from 'react-icons/io5';
+import { FaHotel, FaPlane, FaCar, FaBars, FaTimes, FaUser, FaSignOutAlt, FaClipboardList, FaHeart } from 'react-icons/fa';
 import { MdKeyboardArrowDown, MdDarkMode, MdLightMode } from 'react-icons/md';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
@@ -31,7 +30,6 @@ const Header = ({
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [notesOpen, setNotesOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   // Check if user is authenticated
@@ -66,9 +64,6 @@ const Header = ({
       if (userMenuOpen && !event.target.closest('.user-profile')) {
         setUserMenuOpen(false);
       }
-      if (notesOpen && !event.target.closest('.note-wrap')) {
-        setNotesOpen(false);
-      }
       if (openMenu && !event.target.closest('.nav-item')) {
         setOpenMenu(null);
       }
@@ -76,7 +71,7 @@ const Header = ({
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [userMenuOpen, notesOpen, openMenu]);
+  }, [userMenuOpen, openMenu]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -216,20 +211,6 @@ const Header = ({
               {darkMode ? <MdLightMode /> : <MdDarkMode />}
             </button>
 
-            <div className="note-wrap">
-              <button className="notification-btn" onClick={() => setNotesOpen((v) => !v)}>
-                <IoNotifications />
-                {favoriteCount > 0 && <span className="badge">{favoriteCount}</span>}
-              </button>
-              {notesOpen && (
-                <div className="notes-panel">
-                  <p>{t('note.summer')}</p>
-                  <p>{t('note.favorites', { count: favoriteCount })}</p>
-                  <p>{t('note.support')}</p>
-                </div>
-              )}
-            </div>
-
             {isAuthenticated ? (
               <div 
                 className="user-profile" 
@@ -262,6 +243,10 @@ const Header = ({
                     <Link to="/dashboard" className="user-menu-item" onClick={() => setUserMenuOpen(false)}>
                       <FaClipboardList />
                       <span>Rezervasiyalarım</span>
+                    </Link>
+                    <Link to="/favorites" className="user-menu-item" onClick={() => setUserMenuOpen(false)}>
+                      <FaHeart />
+                      <span>Sevimlilər{favoriteCount > 0 ? ` (${favoriteCount})` : ''}</span>
                     </Link>
                     <Link to="/profile" className="user-menu-item" onClick={() => setUserMenuOpen(false)}>
                       <FaUser />

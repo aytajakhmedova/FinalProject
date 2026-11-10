@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { FaRegStar, FaUsers, FaRegThumbsUp, FaHeadset } from 'react-icons/fa';
 import Testimonials from '../../components/Testimonials/Testimonials';
 import { getFeaturedReviews, getReviewSummary } from '../../api/client';
 import '../contentPages.css';
@@ -23,15 +24,15 @@ const ReviewsPage = () => {
     <>
       <Testimonials />
       <section className="fill-wrap">
-        <div className="stat-row">
+        <div className="reviews-stats">
           {summary && summary.count > 0 && (
             <>
-              <article className="stat-card"><strong>{summary.averageRating.toFixed(1)}</strong><span>orta qiymət</span></article>
-              <article className="stat-card"><strong>{summary.count}</strong><span>qonaq rəyi</span></article>
-              <article className="stat-card"><strong>{summary.positivePercent}%</strong><span>müsbət rəy</span></article>
+              <article><FaRegStar /><div><strong>{summary.averageRating.toFixed(1)}</strong><span>orta qiymət</span></div></article>
+              <article><FaUsers /><div><strong>{summary.count}</strong><span>qonaq rəyi</span></div></article>
+              <article><FaRegThumbsUp /><div><strong>{summary.positivePercent}%</strong><span>müsbət rəy</span></div></article>
             </>
           )}
-          <article className="stat-card"><strong>7/24</strong><span>dəstəyə yazmaq</span></article>
+          <article><FaHeadset /><div><strong>7/24</strong><span>dəstəyə yazmaq</span></div></article>
         </div>
         {moreReviews.length > 0 && (
           <>

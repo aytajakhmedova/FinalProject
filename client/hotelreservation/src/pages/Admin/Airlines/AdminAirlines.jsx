@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiX, FiAlertCircle, FiCheckCircle, FiSend } from 'react-icons/fi';
 import { getAirlines, createAirline, updateAirline, deleteAirline } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import '../Countries/AdminCountries.css';
 
 const emptyForm = { name: '', code: '' };
@@ -18,7 +19,7 @@ const AdminAirlines = () => {
   const load = async () => {
     try {
       setLoading(true);
-      setAirlines(await getAirlines());
+      setAirlines(newestFirst(await getAirlines()));
       setError('');
     } catch (err) {
       setError(err.message || 'Aviaşirkətlər yüklənmədi');

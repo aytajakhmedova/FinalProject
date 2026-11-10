@@ -3,6 +3,7 @@ import { FiPlus, FiEdit2, FiTrash2, FiX, FiAlertCircle, FiCheckCircle, FiTag } f
 import {
   getTourCategoryList, createTourCategory, updateTourCategory, deleteTourCategory,
 } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import '../Countries/AdminCountries.css';
 
 const AdminTourCategories = () => {
@@ -18,7 +19,7 @@ const AdminTourCategories = () => {
   const load = async () => {
     try {
       setLoading(true);
-      setCategories(await getTourCategoryList());
+      setCategories(newestFirst(await getTourCategoryList()));
       setError('');
     } catch (err) {
       setError(err.message || 'Kateqoriyalar yüklənmədi');

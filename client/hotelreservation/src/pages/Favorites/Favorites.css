@@ -1,0 +1,8 @@
+.favorites-page { max-width: 1200px; margin: 0 auto; padding: 7rem 16px 4rem; }
+.favorites-page h1 { margin: 0 0 1.5rem; }
+.favorites-note { opacity: .8; }
+.favorites-note a { color: #c9936a; }
+.favorites-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.4rem; }
+.favorite-item { display: flex; flex-direction: column; gap: .6rem; }
+.favorite-remove { padding: .55rem; border: 1px solid rgba(201, 147, 106, .5); border-radius: 12px; background: transparent; color: inherit; cursor: pointer; }
+.favorite-remove:hover { background: rgba(201, 147, 106, .15); }

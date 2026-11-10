@@ -2,6 +2,7 @@ import Select from '../../../components/common/Select/Select';
 import React, { Fragment, useEffect, useMemo, useState } from 'react';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { createStaff, deleteStaff, getHotels, getStaff, updateStaff } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import { canManageUser, getAuthUser, hasRole } from '../../../api/auth';
 import '../Hotels/AdminHotels.css';
 import '../Manage/AdminManage.css';
@@ -50,7 +51,7 @@ const AdminStaff = () => {
     setLoading(true);
     return Promise.all([getStaff(), getHotels()])
       .then(([items, hotelItems]) => {
-        setStaff(Array.isArray(items) ? items : []);
+        setStaff(newestFirst(items));
         setHotels(Array.isArray(hotelItems) ? hotelItems : []);
         setLoadError('');
       })

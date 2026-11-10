@@ -1,0 +1,55 @@
+.hotel-gallery { position: relative; margin: -.5rem 0 -1rem; padding-bottom: 22px; color: #f4e5cc; background: radial-gradient(ellipse at 50% 60%, #50301930, transparent 70%), #1b120c; }
+.hotel-gallery-container { width: min(1600px, 79%); margin-inline: auto; }
+.hotel-gallery-hero { position: relative; isolation: isolate; min-height: 325px; background-image: linear-gradient(0deg, #1b120c 0%, transparent 23%), linear-gradient(90deg, #1b120c 4%, #1b120ced 19%, #1b120ca6 34%, #1b120c16 63%), url('../../assets/images/hero-luxury-resort.png'); background-size: cover; background-position: center, center, center 56%; }
+.hotel-gallery-waves { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.hotel-gallery-intro { padding: 36px 32px 42px; }
+.hotel-gallery-kicker { margin: 0 0 9px; color: #d4b27e; font-size: 14px; letter-spacing: .35em; font-weight: 600; }
+.hotel-gallery h1 { margin: 0; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(40px, 3.4vw, 60px); font-weight: 400; line-height: 1.15; color: #f6e2bc; }
+.hotel-gallery-ornament { display: flex; align-items: center; gap: 14px; width: 350px; max-width: 100%; margin: 12px 0 15px; color: #e5ad55; font-size: 23px; }
+.hotel-gallery-ornament span { position: relative; flex: 1; height: 2px; background: linear-gradient(90deg, transparent, #dfa14a); }
+.hotel-gallery-ornament span::after { content: ''; position: absolute; right: -1px; top: -3px; border-block: 4px solid transparent; border-left: 7px solid #dfa14a; }
+.hotel-gallery-ornament span:last-child { transform: rotate(180deg); }
+.hotel-gallery-lead { margin: 0 0 16px; color: #dfccb0; font-size: 16px; line-height: 1.45; }
+.hotel-gallery-explore { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 47px; padding: 11px 24px; border: 1px solid #e4ac53; border-radius: 28px; font: inherit; font-weight: 600; color: #fff3de; background: linear-gradient(180deg, #bb8236, #8e591f 65%, #bd8435); box-shadow: inset 0 1px 7px #ffe0a8a1, 0 0 13px #df9a3b60; cursor: pointer; }
+.hotel-gallery-explore svg { font-size: 13px; }
+.hotel-gallery-grid { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 18px; scroll-margin-top: 90px; }
+.hotel-gallery-card { position: relative; grid-column: span 3; min-width: 0; height: clamp(180px, 10.7vw, 220px); overflow: hidden; padding: 0; text-align: left; border: 1px solid #ba8b4f96; border-radius: 22px; background: #2a1b10; color: #fff5e6; box-shadow: 0 0 9px #da9b483d, 0 7px 18px #0005; cursor: pointer; }
+.hotel-gallery-card:nth-child(-n + 3) { grid-column: span 4; height: clamp(200px, 11.4vw, 236px); }
+.hotel-gallery-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 48%, #100b069c 83%, #100b06ed); pointer-events: none; }
+.hotel-gallery-card > img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+.hotel-gallery-card:hover > img { transform: scale(1.04); }
+.hotel-gallery-caption { position: absolute; z-index: 1; bottom: 15px; left: 20px; right: 56px; display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600; line-height: 1.3; text-shadow: 0 1px 4px #000; }
+.hotel-gallery-caption svg { flex: none; font-size: 18px; }
+.hotel-gallery-expand { position: absolute; z-index: 1; bottom: 12px; right: 13px; display: grid; place-items: center; width: 35px; height: 35px; border: 1px solid #d3ab72b3; border-radius: 50%; background: #2c1b0ba3; box-shadow: inset 0 1px 3px #ffe1a03d; font-size: 16px; }
+.hotel-gallery button:focus-visible { outline: 2px solid #ffe2aa; outline-offset: 4px; }
+.hotel-gallery-explore:hover { filter: brightness(1.12); }
+.hotel-gallery-lightbox { position: fixed; inset: 0; width: min(1100px, 92vw); max-width: 92vw; max-height: 90vh; margin: auto; padding: 12px; border: 1px solid #c6934c; border-radius: 18px; background: #1b120c; color: #f4e5cc; box-shadow: 0 20px 80px #000a; }
+.hotel-gallery-lightbox::backdrop { background: #0c0805e8; backdrop-filter: blur(6px); }
+.hotel-gallery-lightbox figure { margin: 0; }
+.hotel-gallery-lightbox img { display: block; width: 100%; max-height: 76vh; object-fit: contain; border-radius: 9px; }
+.hotel-gallery-lightbox figcaption { padding: 14px 8px 4px; text-align: center; }
+.hotel-gallery-close { position: absolute; right: 20px; top: 20px; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid #d6ab6b; border-radius: 50%; color: #fff; background: #24170ee6; cursor: pointer; }
+@media (max-width: 1100px) {
+  .hotel-gallery-container { width: 90%; }
+  .hotel-gallery-intro { padding-inline: 10px; }
+  .hotel-gallery-grid { gap: 14px; }
+  .hotel-gallery-caption { left: 14px; font-size: 14px; gap: 7px; }
+}
+@media (max-width: 760px) {
+  .hotel-gallery-hero { background-position: center, center, 65% center; }
+  .hotel-gallery-intro { padding-block: 36px; }
+  .hotel-gallery-kicker { font-size: 11px; }
+  .hotel-gallery-lead { font-size: 14px; }
+  .hotel-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hotel-gallery-card, .hotel-gallery-card:nth-child(-n + 3) { grid-column: span 1; height: 200px; border-radius: 17px; }
+  .hotel-gallery-card:first-child { grid-column: 1 / -1; height: 240px; }
+}
+@media (max-width: 480px) {
+  .hotel-gallery-container { width: calc(100% - 32px); }
+  .hotel-gallery-intro { padding-inline: 0; }
+  .hotel-gallery-hero { background-image: linear-gradient(0deg, #1b120c, transparent 45%), linear-gradient(90deg, #1b120ce8, #1b120c70), url('../../assets/images/hero-luxury-resort.png'); }
+  .hotel-gallery-grid { grid-template-columns: minmax(0, 1fr); }
+  .hotel-gallery-card, .hotel-gallery-card:nth-child(-n + 3) { height: 215px; }
+  .hotel-gallery-caption { font-size: 16px; }
+}
+@media (prefers-reduced-motion: reduce) { .hotel-gallery-card > img { transition: none; } }

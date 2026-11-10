@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaPhone, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FiUserPlus, FiUser as FaUser, FiMail as FaEnvelope, FiPhone as FaPhone, FiLock as FaLock } from 'react-icons/fi';
+import AuthBrand from './AuthBrand';
 import { useLanguage } from '../../context/LanguageContext';
 import { registerRequest, saveAuthSession } from '../../api/auth';
 import './Auth.css';
+import './LuxuryAuth.css';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -102,7 +105,8 @@ const Register = () => {
   };
 
   return (
-    <div className="auth-page">
+    <div className="auth-page auth-luxury">
+      <AuthBrand />
       <div className="auth-container">
         <div className="auth-card register-card">
           <div className="auth-header">
@@ -122,6 +126,7 @@ const Register = () => {
                   type="text"
                   id="fullName"
                   name="fullName"
+                  autoComplete="name"
                   value={formData.fullName}
                   onChange={handleChange}
                   placeholder={t('auth.fullNamePh')}
@@ -142,6 +147,7 @@ const Register = () => {
                   type="email"
                   id="email"
                   name="email"
+                  autoComplete="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="emailiniz@example.com"
@@ -162,6 +168,7 @@ const Register = () => {
                   type="tel"
                   id="phone"
                   name="phone"
+                  autoComplete="tel"
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="+994 50 123 45 67"
@@ -182,6 +189,7 @@ const Register = () => {
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
+                  autoComplete="new-password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
@@ -191,6 +199,8 @@ const Register = () => {
                   type="button"
                   className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Şifrəni gizlət' : 'Şifrəni göstər'}
+                  aria-pressed={showPassword}
                 >
                   {showPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
@@ -209,6 +219,7 @@ const Register = () => {
                   type={showConfirmPassword ? 'text' : 'password'}
                   id="confirmPassword"
                   name="confirmPassword"
+                  autoComplete="new-password"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="••••••••"
@@ -218,6 +229,8 @@ const Register = () => {
                   type="button"
                   className="password-toggle"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  aria-label={showConfirmPassword ? 'Təkrar şifrəni gizlət' : 'Təkrar şifrəni göstər'}
+                  aria-pressed={showConfirmPassword}
                 >
                   {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
                 </button>
@@ -244,7 +257,7 @@ const Register = () => {
               {errors.agreeToTerms && <span className="error-message">{errors.agreeToTerms}</span>}
             </div>
 
-            {errors.form && <span className="error-message">{errors.form}</span>}
+            {errors.form && <span className="error-message" role="alert">{errors.form}</span>}
 
             {/* Submit Button */}
             <button 
@@ -258,7 +271,7 @@ const Register = () => {
                   {t('auth.registering')}
                 </span>
               ) : (
-                t('auth.registerBtn')
+                <><FiUserPlus aria-hidden="true" />{t('auth.registerBtn')}</>
               )}
             </button>
           </form>

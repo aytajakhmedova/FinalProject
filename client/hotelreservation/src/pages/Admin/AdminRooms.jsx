@@ -3,6 +3,7 @@ import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useState } from 'react';
 import { createRoom, deleteRoom, getHotels, getRooms, updateRoom } from '../../api/client';
+import { newestFirst } from '../../utils/newestFirst';
 import './Hotels/AdminHotels.css';
 
 const emptyRoom = (hotelId) => ({
@@ -46,8 +47,8 @@ const AdminRooms = () => {
     setLoading(true);
     return Promise.all([getHotels(), getRooms()])
       .then(([hotelItems, roomItems]) => {
-        setHotels(hotelItems);
-        setRooms(roomItems);
+        setHotels(newestFirst(hotelItems));
+        setRooms(newestFirst(roomItems));
         setLoadError('');
       })
       .catch((error) => {

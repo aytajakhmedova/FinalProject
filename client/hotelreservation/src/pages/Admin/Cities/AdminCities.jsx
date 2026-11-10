@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiPlus, FiEdit2, FiTrash2, FiMapPin, FiFilter, FiX, FiAlertCircle, FiCheckCircle, FiChevronDown } from 'react-icons/fi';
 import { getAllCities, getAllCountries, createCity, updateCity, deleteCity } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import './AdminCities.css';
 
 const AdminCities = () => {
@@ -36,7 +37,7 @@ const AdminCities = () => {
       ]);
       console.log('Cities loaded:', citiesData.length); // Debug
       console.log('Countries loaded:', countriesData.length); // Debug
-      setCities(citiesData);
+      setCities(newestFirst(citiesData));
       setCountries(countriesData);
       setError('');
     } catch (err) {

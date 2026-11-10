@@ -3,6 +3,7 @@ import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createTour, deleteTour, getHotels, getTourCategoryList, listTours, updateTour, uploadMedia } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import '../Hotels/AdminHotels.css';
 
 // The fixed difficulty levels; the server accepts only these.
@@ -115,7 +116,7 @@ const AdminTours = () => {
     if (!silent) setLoading(true);
     return listTours()
       .then((items) => {
-        setTours(Array.isArray(items) ? items : []);
+        setTours(newestFirst(items));
         setLoadError('');
       })
       .catch((error) => {

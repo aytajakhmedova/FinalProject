@@ -2,7 +2,8 @@ import Select from '../../../components/common/Select/Select';
 import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { createRoom, deleteRoom, getHotels, updateRoom } from '../../../api/client';
+import { createRoom, deleteRoom, getHotels, resolveImage, updateRoom, uploadMedia } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import './AdminHotels.css';
 
 const emptyRoom = (hotelId) => ({
@@ -44,7 +45,7 @@ const AdminHotels = () => {
     setLoading(true);
     return getHotels()
       .then((items) => {
-        setHotels(items);
+        setHotels(newestFirst(items));
         setLoadError('');
         setSelectedHotelId((current) => {
           if (items.some((item) => String(item.id) === String(current))) return current;
@@ -169,14 +170,29 @@ const AdminHotels = () => {
               />
             </label>
             <label className="full">
-              Şəkil URL
+              Şəkil
+              {(editing.images?.[0] || editing.imageFile) && (
+                <img
+                  src={resolveImage(editing.images?.[0] || editing.imageFile)}
+                  alt="Otaq şəkli"
+                  style={{ maxWidth: 220, maxHeight: 140, objectFit: 'cover', borderRadius: 10, margin: '0.4rem 0' }}
+                />
+              )}
               <input
-                value={editing.images?.[0] || editing.imageFile || ''}
-                onChange={(e) => setEditing({
-                  ...editing,
-                  imageFile: e.target.value,
-                  images: e.target.value ? [e.target.value, ...(editing.images || []).slice(1)] : [],
-                })}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setSaveError('');
+                  uploadMedia(file)
+                    .then((data) => setEditing((prev) => ({
+                      ...prev,
+                      imageFile: data.url,
+                      images: [data.url, ...(prev.images || []).slice(1)],
+                    })))
+                    .catch((err) => setSaveError(err.message || 'Şəkil yüklənmədi.'));
+                }}
               />
             </label>
             <label className="checkbox-row">

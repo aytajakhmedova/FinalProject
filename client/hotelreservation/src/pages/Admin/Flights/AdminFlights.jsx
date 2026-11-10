@@ -3,6 +3,7 @@ import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createFlight, deleteFlight, getAirlines, getSiteCities, getSiteCountries, listFlights, updateFlight } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import '../Hotels/AdminHotels.css';
 
 const CABIN_LABELS = {
@@ -112,7 +113,7 @@ const AdminFlights = () => {
     if (!silent) setLoading(true);
     return listFlights()
       .then((items) => {
-        setFlights(Array.isArray(items) ? items : []);
+        setFlights(newestFirst(items));
         setLoadError('');
       })
       .catch((error) => {

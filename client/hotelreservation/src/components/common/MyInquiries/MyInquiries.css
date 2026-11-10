@@ -1,0 +1,56 @@
+.my-inquiries {
+  display: grid;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.my-inquiry {
+  display: grid;
+  gap: 10px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(201, 172, 137, 0.35);
+  background: var(--bg-card, #2a1f1a);
+  color: var(--text-primary, #e8c9a0);
+}
+
+.my-inquiry header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.my-inquiry-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted, #c4a484);
+}
+
+.my-inquiry-message,
+.my-inquiry-reply p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.my-inquiry-reply {
+  padding: 12px 14px;
+  border-left: 3px solid #d9b27c;
+  border-radius: 8px;
+  background: rgba(217, 178, 124, 0.1);
+}
+
+.my-inquiry-status {
+  flex-shrink: 0;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: rgba(201, 172, 137, 0.2);
+}
+
+.my-inquiry-status.status-answered {
+  background: rgba(74, 222, 128, 0.2);
+}
+
+.my-inquiries-error {
+  color: #ff8a80;
+}

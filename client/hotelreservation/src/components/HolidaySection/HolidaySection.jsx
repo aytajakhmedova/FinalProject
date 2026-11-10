@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUtensils, FaBolt, FaShieldAlt, FaClock, FaStar } from 'react-icons/fa';
+import { FaUtensils, FaBolt, FaShieldAlt, FaClock, FaStar, FaHeadset, FaPlay } from 'react-icons/fa';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSiteContent } from '../../context/SiteContentContext';
 import { resolveImage } from '../../api/client';
@@ -26,7 +26,7 @@ const DEFAULT_FEATURES = [
   { id: 'support', iconKey: 'clock', color: '#A0522D' },
 ];
 
-const HolidaySection = () => {
+const HolidaySection = ({ aboutPage = false, reviewCount = 0, onPlayVideo }) => {
   const { t } = useLanguage();
   const { content, loading, error } = useSiteContent();
   const settings = content?.settings;
@@ -71,24 +71,26 @@ const HolidaySection = () => {
                 ))}
               </div>
               <div className="rating-info">
-                <div className="rating-label">{t('holiday.guests')}</div>
-                <div className="rating-text">{t('holiday.rating')}</div>
+                <div className="rating-label">{aboutPage ? 'Qonaq rəyləri' : t('holiday.guests')}</div>
+                <div className="rating-text">{aboutPage && reviewCount > 0 ? `${reviewCount.toLocaleString('az-AZ')} rəy` : t('holiday.rating')}</div>
                 <div className="rating-stars">{settings?.advantagesRating || '4.9'} ⭐</div>
               </div>
             </div>
+            {aboutPage && onPlayVideo && <button type="button" className="about-play-video" onClick={onPlayVideo} aria-label="AE Hotel videosunu izlə"><FaPlay aria-hidden="true" /></button>}
           </div>
         </div>
 
         <div className="holiday-right">
-          <h2 className="holiday-title">{t('holiday.title')}</h2>
+          {aboutPage && <p className="about-eyebrow">AE Hotel</p>}
+          <h2 className="holiday-title">{aboutPage ? <>Ən yaxşı tətil<br />buradan <em>başlayır</em></> : t('holiday.title')}</h2>
           <p className="holiday-description">{t('holiday.desc')}</p>
 
           <div className="features-grid">
             {features.map((feature) => {
-              const Icon = ICONS[feature.iconKey] || FaStar;
+              const Icon = aboutPage && feature.iconKey === 'clock' ? FaHeadset : ICONS[feature.iconKey] || FaStar;
               const copy = FEATURE_COPY[feature.iconKey];
               return (
-                <div key={feature.id} className="feature-card">
+                <div key={feature.id} className="feature-card" data-feature={feature.iconKey}>
                   <div
                     className="feature-icon"
                     style={{ backgroundColor: `${feature.color}20`, color: feature.color }}

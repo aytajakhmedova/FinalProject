@@ -5,6 +5,7 @@ import RatingStars from '../../components/common/RatingStars/RatingStars';
 import RoomCard from '../../components/common/RoomCard/RoomCard';
 import ImageGallery from '../../components/common/ImageGallery/ImageGallery';
 import ReviewsSection from '../../components/common/ReviewsSection/ReviewsSection';
+import InquiryForm from '../../components/common/InquiryForm/InquiryForm';
 import { getAuthToken } from '../../api/auth';
 import { getHotel, quoteHotelStay } from '../../api/client';
 import './HotelDetail.css';
@@ -239,6 +240,11 @@ const HotelDetail = () => {
                   )}
                 </>
               )}
+            </section>
+
+            {/* Ask the hotel manager */}
+            <section className="hotel-section" id="ask">
+              <InquiryForm hotelId={hotel.id} hotelName={hotel.title || hotel.name} />
             </section>
 
             {/* Reviews */}

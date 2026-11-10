@@ -4,6 +4,7 @@ import {
   getSeasonalPrices, createSeasonalPrice, updateSeasonalPrice, deleteSeasonalPrice, getAllCountries,
 } from '../../../api/client';
 import { MONTH_NAMES, formatPriceRange } from '../../../data/seasonalPrices';
+import { newestFirst } from '../../../utils/newestFirst';
 import '../Countries/AdminCountries.css';
 
 const emptyForm = { country: '', month: 2, minPrice: '', maxPrice: '', currency: 'AZN' };
@@ -22,7 +23,7 @@ const AdminSeasonalPrices = () => {
   const load = async () => {
     try {
       setLoading(true);
-      setPrices(await getSeasonalPrices());
+      setPrices(newestFirst(await getSeasonalPrices()));
       setError('');
     } catch (err) {
       setError(err.message || 'Qiymətlər yüklənmədi');
@@ -153,7 +154,7 @@ const AdminSeasonalPrices = () => {
                 <tr key={price.id}>
                   <td><strong>{price.country}</strong></td>
                   <td>{MONTH_NAMES[price.month - 1]}</td>
-                  <td><span className="um-property">{formatPriceRange(price)}</span></td>
+                  <td><span className="um-property">{formatPriceRange(price, { original: true })}</span></td>
                   <td>
                     <div className="um-actions">
                       <button className="um-icon-btn" onClick={() => openModal(price)} title="Redaktə et">

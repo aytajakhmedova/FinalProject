@@ -50,6 +50,7 @@ const Footer = () => {
                   )}
                 </li>
               ))}
+              <li><Link to="/contact">Bizimlə əlaqə</Link></li>
             </ul>
           </div>
 

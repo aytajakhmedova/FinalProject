@@ -3,6 +3,7 @@ import { FaRegTrashAlt } from 'react-icons/fa';
 import { Fragment } from 'react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createDiscount, deleteDiscount, getDiscounts, updateDiscount } from '../../../api/client';
+import { newestFirst } from '../../../utils/newestFirst';
 import '../Hotels/AdminHotels.css';
 
 const COMBO_OPTIONS = [
@@ -71,7 +72,7 @@ const AdminDiscounts = () => {
     if (!silent) setLoading(true);
     return getDiscounts()
       .then((rows) => {
-        setItems(Array.isArray(rows) ? rows : []);
+        setItems(newestFirst(rows));
         setLoadError('');
       })
       .catch((error) => {
